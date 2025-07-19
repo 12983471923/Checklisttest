@@ -19,6 +19,7 @@ function App() {
   const [showInitialsModal, setShowInitialsModal] = useState(false);
   const [showDowntimeInfo, setShowDowntimeInfo] = useState(false);
   const [showHandoverModal, setShowHandoverModal] = useState(false);
+  const [showHandoverFullscreen, setShowHandoverFullscreen] = useState(false);
   const [handoverDate, setHandoverDate] = useState(new Date().toISOString().split('T')[0]);
   const [handoverNotes, setHandoverNotes] = useState("");
   const [savedHandovers, setSavedHandovers] = useState(() => {
@@ -30,12 +31,18 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [showWakeUpModal, setShowWakeUpModal] = useState(false);
+  const [showWakeUpFullscreen, setShowWakeUpFullscreen] = useState(false);
   const [newWakeUpCall, setNewWakeUpCall] = useState({
     roomNumber: '',
     time: '',
     notes: '',
     date: new Date().toISOString().split('T')[0]
   });
+  const [breakfastTimes, setBreakfastTimes] = useState(() => {
+    const saved = localStorage.getItem('hotel-breakfast-times');
+    return saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
+  });
+  const [isEditingBreakfast, setIsEditingBreakfast] = useState(false);
 
   // Use the real-time checklist hook
   const {
@@ -163,22 +170,48 @@ function App() {
     return false;
   }, [savedHandovers, handoverDate]);
 
+  // Breakfast time functions
+  const saveBreakfastTimes = useCallback(() => {
+    localStorage.setItem('hotel-breakfast-times', JSON.stringify(breakfastTimes));
+    setIsEditingBreakfast(false);
+  }, [breakfastTimes]);
+
+  const cancelBreakfastEdit = useCallback(() => {
+    const saved = localStorage.getItem('hotel-breakfast-times');
+    const savedTimes = saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
+    setBreakfastTimes(savedTimes);
+    setIsEditingBreakfast(false);
+  }, []);
+
   // Wake-up call functions
   const addWakeUpCall = useCallback(() => {
     if (!newWakeUpCall.roomNumber || !newWakeUpCall.time) {
-      alert('Please enter both room number and wake-up time.');
+      alert('Please enter both room number(s) and wake-up time.');
       return;
     }
 
-    const wakeUpCallWithId = {
+    // Parse room numbers - split by comma, space, or semicolon and clean up
+    const roomNumbers = newWakeUpCall.roomNumber
+      .split(/[,;\s]+/)
+      .map(room => room.trim())
+      .filter(room => room.length > 0)
+      .map(room => room.padStart(3, '0'));
+
+    if (roomNumbers.length === 0) {
+      alert('Please enter valid room number(s).');
+      return;
+    }
+
+    // Create separate wake-up call for each room
+    const newCalls = roomNumbers.map(roomNumber => ({
       ...newWakeUpCall,
-      id: Date.now(),
-      roomNumber: newWakeUpCall.roomNumber.toString().padStart(3, '0'),
+      id: Date.now() + Math.random(), // Ensure unique IDs
+      roomNumber,
       createdBy: initials,
       completed: false
-    };
+    }));
 
-    const updatedCalls = [...wakeUpCalls, wakeUpCallWithId].sort((a, b) => {
+    const updatedCalls = [...wakeUpCalls, ...newCalls].sort((a, b) => {
       // Sort by date first, then by time
       if (a.date !== b.date) {
         return new Date(a.date) - new Date(b.date);
@@ -377,7 +410,51 @@ function App() {
                 <span className="time-icon">🍳</span>
                 <div className="time-content">
                   <span className="time-label">Breakfast</span>
-                  <span className="time-value">07:00 - 11:00</span>
+                  {isEditingBreakfast ? (
+                    <div className="breakfast-edit-controls">
+                      <div className="breakfast-time-inputs">
+                        <input
+                          type="time"
+                          value={breakfastTimes.start}
+                          onChange={(e) => setBreakfastTimes({...breakfastTimes, start: e.target.value})}
+                          className="breakfast-time-input"
+                        />
+                        <span className="breakfast-separator">-</span>
+                        <input
+                          type="time"
+                          value={breakfastTimes.end}
+                          onChange={(e) => setBreakfastTimes({...breakfastTimes, end: e.target.value})}
+                          className="breakfast-time-input"
+                        />
+                      </div>
+                      <div className="breakfast-edit-buttons">
+                        <button 
+                          className="breakfast-save-btn"
+                          onClick={saveBreakfastTimes}
+                          title="Save"
+                        >
+                          ✓
+                        </button>
+                        <button 
+                          className="breakfast-cancel-btn"
+                          onClick={cancelBreakfastEdit}
+                          title="Cancel"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="breakfast-display">
+                      <span 
+                        className="time-value time-value-clickable"
+                        onClick={() => setIsEditingBreakfast(true)}
+                        title="Click to edit breakfast times"
+                      >
+                        {breakfastTimes.start} - {breakfastTimes.end}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -470,6 +547,13 @@ function App() {
                 {savedHandovers[handoverDate] ? "Edit Notes" : "Add Notes"}
               </button>
               
+              <button
+                className="handover-view-all-btn"
+                onClick={() => setShowHandoverFullscreen(true)}
+              >
+                View All Handovers
+              </button>
+              
               <div className="handover-stats">
                 <span className="handover-stat">
                   📅 {Object.keys(savedHandovers).length} days recorded
@@ -538,6 +622,13 @@ function App() {
                   onClick={() => setShowWakeUpModal(true)}
                 >
                   + Add Wake-Up Call
+                </button>
+                <button
+                  className="wakeup-fullscreen-btn"
+                  onClick={() => setShowWakeUpFullscreen(true)}
+                  title="View all wake-up calls"
+                >
+                  📋 View All
                 </button>
                 {wakeUpCalls.length > 0 && (
                   <button
@@ -1157,18 +1248,20 @@ function App() {
               }}
             >
               <div className="wakeup-form-group">
-                <label htmlFor="roomNumber">Room Number</label>
+                <label htmlFor="roomNumber">Room Number(s)</label>
                 <input
                   id="roomNumber"
                   type="text"
                   className="wakeup-input"
                   value={newWakeUpCall.roomNumber}
-                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, roomNumber: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
-                  placeholder="e.g. 102"
-                  maxLength={4}
+                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, roomNumber: e.target.value }))}
+                  placeholder="e.g. 102 or 102, 103, 205"
                   autoFocus
                   required
                 />
+                <div className="wakeup-input-help">
+                  Separate multiple rooms with commas (e.g., 102, 103, 205)
+                </div>
               </div>
               
               <div className="wakeup-form-group">
@@ -1217,6 +1310,397 @@ function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Wake-Up Calls Fullscreen Modal */}
+      {showWakeUpFullscreen && (
+        <div
+          className="wakeup-fullscreen-overlay"
+          onClick={() => setShowWakeUpFullscreen(false)}
+        >
+          <div
+            className="wakeup-fullscreen-container"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="wakeup-fullscreen-header">
+              <h2>☎️ All Wake-Up Calls</h2>
+              <div className="wakeup-fullscreen-actions">
+                <button
+                  className="wakeup-add-btn"
+                  onClick={() => {
+                    setShowWakeUpFullscreen(false);
+                    setShowWakeUpModal(true);
+                  }}
+                >
+                  + Add New
+                </button>
+                <button className="wakeup-fullscreen-close" onClick={() => setShowWakeUpFullscreen(false)} title="Close">
+                  &times;
+                </button>
+              </div>
+            </div>
+
+            <div className="wakeup-fullscreen-content">
+              <div className="wakeup-fullscreen-stats">
+                <div className="wakeup-fullscreen-stat">
+                  <span className="stat-number">{wakeUpCalls.filter(call => !call.completed && call.date >= new Date().toISOString().split('T')[0]).length}</span>
+                  <span className="stat-label">Pending Calls</span>
+                </div>
+                <div className="wakeup-fullscreen-stat">
+                  <span className="stat-number">{wakeUpCalls.filter(call => call.completed).length}</span>
+                  <span className="stat-label">Completed</span>
+                </div>
+                <div className="wakeup-fullscreen-stat">
+                  <span className="stat-number">{wakeUpCalls.length}</span>
+                  <span className="stat-label">Total Calls</span>
+                </div>
+              </div>
+
+              <div className="wakeup-fullscreen-filters">
+                <div className="wakeup-filter-tabs">
+                  <button className="wakeup-filter-tab active">All Calls</button>
+                  <button className="wakeup-filter-tab">Today</button>
+                  <button className="wakeup-filter-tab">Pending</button>
+                  <button className="wakeup-filter-tab">Completed</button>
+                </div>
+              </div>
+
+              <div className="wakeup-fullscreen-table-container">
+                <table className="wakeup-fullscreen-table">
+                  <thead>
+                    <tr>
+                      <th>Room</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Notes</th>
+                      <th>Created By</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {wakeUpCalls
+                      .sort((a, b) => {
+                        // Sort by date first, then by time
+                        if (a.date !== b.date) {
+                          return new Date(a.date) - new Date(b.date);
+                        }
+                        return a.time.localeCompare(b.time);
+                      })
+                      .map(call => (
+                        <tr key={call.id} className={call.completed ? 'wakeup-row-completed' : ''}>
+                          <td className="wakeup-room-cell">
+                            <span className="wakeup-room-number">Room {call.roomNumber}</span>
+                          </td>
+                          <td className="wakeup-date-cell">
+                            {new Date(call.date).toLocaleDateString('en-GB', { 
+                              weekday: 'short', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                            {call.date === new Date().toISOString().split('T')[0] && (
+                              <span className="wakeup-today-badge">Today</span>
+                            )}
+                          </td>
+                          <td className="wakeup-time-cell">
+                            <span className="wakeup-time-display">{call.time}</span>
+                          </td>
+                          <td className="wakeup-notes-cell">
+                            {call.notes ? (
+                              <span className="wakeup-notes-preview" title={call.notes}>
+                                {call.notes.length > 30 ? call.notes.substring(0, 30) + '...' : call.notes}
+                              </span>
+                            ) : (
+                              <span className="wakeup-no-notes">No notes</span>
+                            )}
+                          </td>
+                          <td className="wakeup-created-cell">
+                            <span className="wakeup-initials-small">{call.createdBy}</span>
+                          </td>
+                          <td className="wakeup-status-cell">
+                            {call.completed ? (
+                              <span className="wakeup-status-completed">
+                                ✅ Completed by {call.completedBy}
+                              </span>
+                            ) : (
+                              <span className="wakeup-status-pending">
+                                ⏰ Pending
+                              </span>
+                            )}
+                          </td>
+                          <td className="wakeup-actions-cell">
+                            <div className="wakeup-action-buttons">
+                              <button
+                                className={`wakeup-toggle-btn ${call.completed ? 'completed' : 'pending'}`}
+                                onClick={() => toggleWakeUpCallComplete(call.id)}
+                                title={call.completed ? 'Mark as pending' : 'Mark as completed'}
+                              >
+                                {call.completed ? '↩️' : '✅'}
+                              </button>
+                              <button
+                                className="wakeup-delete-btn"
+                                onClick={() => deleteWakeUpCall(call.id)}
+                                title="Delete wake-up call"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+
+                {wakeUpCalls.length === 0 && (
+                  <div className="wakeup-fullscreen-empty">
+                    <div className="wakeup-empty-icon">☎️</div>
+                    <h3>No Wake-Up Calls</h3>
+                    <p>Create your first wake-up call to get started.</p>
+                    <button
+                      className="wakeup-add-btn"
+                      onClick={() => {
+                        setShowWakeUpFullscreen(false);
+                        setShowWakeUpModal(true);
+                      }}
+                    >
+                      + Add Wake-Up Call
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="wakeup-fullscreen-footer">
+                <div className="wakeup-bulk-actions">
+                  {wakeUpCalls.length > 0 && (
+                    <>
+                      <button
+                        className="wakeup-bulk-btn"
+                        onClick={() => {
+                          const pendingCalls = wakeUpCalls.filter(call => !call.completed);
+                          if (pendingCalls.length === 0) {
+                            alert('No pending calls to mark as completed.');
+                            return;
+                          }
+                          if (window.confirm(`Mark all ${pendingCalls.length} pending calls as completed?`)) {
+                            const updatedCalls = wakeUpCalls.map(call => 
+                              !call.completed ? { ...call, completed: true, completedBy: initials } : call
+                            );
+                            setWakeUpCalls(updatedCalls);
+                            localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+                          }
+                        }}
+                      >
+                        ✅ Complete All Pending
+                      </button>
+                      <button
+                        className="wakeup-bulk-btn wakeup-bulk-clear"
+                        onClick={clearOldWakeUpCalls}
+                      >
+                        🧹 Clear Old Calls
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Handover Fullscreen Modal */}
+      {showHandoverFullscreen && (
+        <div className="handover-fullscreen-overlay">
+          <div className="handover-fullscreen-container">
+            <div className="handover-fullscreen-header">
+              <h2>📝 All Handover Notes</h2>
+              <div className="handover-fullscreen-actions">
+                <button
+                  className="handover-add-btn"
+                  onClick={() => {
+                    setShowHandoverFullscreen(false);
+                    setShowHandoverModal(true);
+                  }}
+                >
+                  + Add New
+                </button>
+                <button
+                  className="handover-fullscreen-close"
+                  onClick={() => setShowHandoverFullscreen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="handover-fullscreen-content">
+              <div className="handover-fullscreen-stats">
+                <div className="handover-fullscreen-stat">
+                  <span className="stat-number">{Object.keys(savedHandovers).length}</span>
+                  <span className="stat-label">Total Days</span>
+                </div>
+                <div className="handover-fullscreen-stat">
+                  <span className="stat-number">
+                    {Object.values(savedHandovers).reduce((total, notes) => total + notes.split(' ').length, 0)}
+                  </span>
+                  <span className="stat-label">Total Words</span>
+                </div>
+                <div className="handover-fullscreen-stat">
+                  <span className="stat-number">
+                    {Object.keys(savedHandovers).filter(date => 
+                      new Date(date).toDateString() === new Date().toDateString()
+                    ).length > 0 ? '✅' : '❌'}
+                  </span>
+                  <span className="stat-label">Today's Notes</span>
+                </div>
+              </div>
+
+              <div className="handover-fullscreen-table-container">
+                {Object.keys(savedHandovers).length === 0 ? (
+                  <div className="handover-fullscreen-empty">
+                    <div className="handover-empty-icon">📝</div>
+                    <h3>No Handover Notes Yet</h3>
+                    <p>Click "Add New" to create your first handover note.</p>
+                    <button
+                      className="handover-add-btn"
+                      onClick={() => {
+                        setShowHandoverFullscreen(false);
+                        setShowHandoverModal(true);
+                      }}
+                    >
+                      + Add First Note
+                    </button>
+                  </div>
+                ) : (
+                  <table className="handover-fullscreen-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Preview</th>
+                        <th>Word Count</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(savedHandovers)
+                        .sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
+                        .map(([date, notes]) => {
+                          const dateObj = new Date(date);
+                          const isToday = dateObj.toDateString() === new Date().toDateString();
+                          const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                          const wordCount = notes.split(' ').filter(word => word.trim().length > 0).length;
+                          
+                          return (
+                            <tr key={date} className={isToday ? 'handover-row-today' : ''}>
+                              <td className="handover-date-cell">
+                                <span className="handover-date-display">
+                                  {dateObj.toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                                {isToday && <span className="handover-today-badge">Today</span>}
+                              </td>
+                              <td className="handover-day-cell">
+                                <span className="handover-day-name">{dayName}</span>
+                              </td>
+                              <td className="handover-notes-cell">
+                                <div className="handover-notes-preview">
+                                  {notes.length > 100 ? `${notes.substring(0, 100)}...` : notes}
+                                </div>
+                              </td>
+                              <td className="handover-wordcount-cell">
+                                <span className="handover-word-badge">{wordCount} words</span>
+                              </td>
+                              <td className="handover-actions-cell">
+                                <div className="handover-action-buttons">
+                                  <button
+                                    className="handover-edit-btn"
+                                    onClick={() => {
+                                      setHandoverDate(date);
+                                      setShowHandoverFullscreen(false);
+                                      setShowHandoverModal(true);
+                                    }}
+                                    title="Edit"
+                                  >
+                                    ✏️
+                                  </button>
+                                  <button
+                                    className="handover-delete-small-btn"
+                                    onClick={() => {
+                                      if (window.confirm(`Delete handover notes for ${dateObj.toLocaleDateString()}?`)) {
+                                        const updatedHandovers = { ...savedHandovers };
+                                        delete updatedHandovers[date];
+                                        setSavedHandovers(updatedHandovers);
+                                        localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
+                                      }
+                                    }}
+                                    title="Delete"
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            <div className="handover-fullscreen-footer">
+              <div className="handover-bulk-actions">
+                {Object.keys(savedHandovers).length > 0 && (
+                  <>
+                    <button
+                      className="handover-export-btn"
+                      onClick={() => {
+                        const handoverText = Object.entries(savedHandovers)
+                          .sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
+                          .map(([date, notes]) => {
+                            const dateObj = new Date(date);
+                            const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            });
+                            return `${formattedDate}\n${'='.repeat(formattedDate.length)}\n${notes}\n\n`;
+                          }).join('');
+                        
+                        const blob = new Blob([handoverText], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `handover-notes-${new Date().toISOString().split('T')[0]}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      📄 Export All
+                    </button>
+                    <button
+                      className="handover-bulk-delete-btn"
+                      onClick={() => {
+                        if (window.confirm(`Delete all ${Object.keys(savedHandovers).length} handover notes? This action cannot be undone.`)) {
+                          setSavedHandovers({});
+                          localStorage.removeItem('hotel-handovers');
+                        }
+                      }}
+                    >
+                      🗑️ Clear All
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
