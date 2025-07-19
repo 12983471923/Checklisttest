@@ -211,21 +211,7 @@ Breakfast:
   - Room: 9007 → Reason: OTHER.
   - Comment: "GDPR bin is full. Please replace."`
   },
-  {
-    id: 22,
-    text: "Print Downtime Reports ☐ 01:00 ☐ 04:00 ☐ 07:00",
-    info: `• Check reception email for report attachments.
-• If missing:
-  - Opera Cloud → Reports → Manage Reports → Search "Downtime."
-  - Select "Shift Report" → Set correct time → Print.
-• Replace old report in drawer (above "PET Food").
-• These reports are critical for emergencies.
-
-Track your progress:
-☐ 01:00 Report printed
-☐ 04:00 Report printed  
-☐ 07:00 Report printed`
-  }
+  
 ];
 
 export default night;

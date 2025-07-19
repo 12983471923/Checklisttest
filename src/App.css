@@ -14,7 +14,7 @@ body {
 
 /* Container */
 .checklist-container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 20px auto;
   background: #ffffff;
   border-radius: 8px;
@@ -680,5 +680,117 @@ input[type="checkbox"]:hover {
   
   .header-card strong {
     font-size: 1.2rem;
+  }
+}
+
+/* Downtime Mini-Checklist */
+.downtime-checklist {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 24px 0 16px 0;
+  text-align: center;
+}
+
+.downtime-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.downtime-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.downtime-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.downtime-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.downtime-item:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.1);
+}
+
+.downtime-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4f46e5;
+  cursor: pointer;
+}
+
+.downtime-text {
+  font-weight: 500;
+  color: #374151;
+}
+
+.downtime-text-completed {
+  font-weight: 500;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.downtime-item .initials-chip {
+  background: #10b981;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Downtime Info Button - smaller and dark grey */
+.downtime-header .info-btn {
+  background: #4b5563;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  margin: 0;
+}
+
+.downtime-header .info-btn:hover {
+  background: #374151;
+}
+
+@media (max-width: 768px) {
+  .downtime-items {
+    gap: 12px;
+  }
+  
+  .downtime-item {
+    font-size: 0.8rem;
+  }
+  
+  .downtime-checklist {
+    padding: 12px 16px;
   }
 }

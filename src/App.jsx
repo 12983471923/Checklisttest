@@ -19,6 +19,31 @@ function App() {
   const [showNoteModal, setShowNoteModal] = useState(null);
   const [noteText, setNoteText] = useState("");
   const [showInitialsModal, setShowInitialsModal] = useState(false);
+  
+  // Generate downtime checklist based on current shift
+  const getDowntimeChecklist = (currentShift) => {
+    const downtimeTimes = {
+      Night: [
+        { id: 1, text: "1st 01:00", completed: false, doneBy: "" },
+        { id: 2, text: "2nd 04:00", completed: false, doneBy: "" },
+        { id: 3, text: "3rd 07:00", completed: false, doneBy: "" }
+      ],
+      Morning: [
+        { id: 1, text: "1st 09:00", completed: false, doneBy: "" },
+        { id: 2, text: "2nd 12:00", completed: false, doneBy: "" },
+        { id: 3, text: "3rd 15:00", completed: false, doneBy: "" }
+      ],
+      Evening: [
+        { id: 1, text: "1st 18:00", completed: false, doneBy: "" },
+        { id: 2, text: "2nd 21:00", completed: false, doneBy: "" },
+        { id: 3, text: "3rd 23:00", completed: false, doneBy: "" }
+      ]
+    };
+    return downtimeTimes[currentShift] || downtimeTimes.Night;
+  };
+  
+  const [downtimeChecklist, setDowntimeChecklist] = useState(getDowntimeChecklist(shift));
+  const [showDowntimeInfo, setShowDowntimeInfo] = useState(false);
 
   // Handle login submit
   const handleLogin = (e) => {
@@ -62,6 +87,7 @@ function App() {
   const handleShiftChange = useCallback((newShift) => {
     setShift(newShift);
     setTasks(checklists[newShift].map((task) => ({ ...task, completed: false, note: "", doneBy: "" })));
+    setDowntimeChecklist(getDowntimeChecklist(newShift));
     setShowInfo(null);
   }, []);
 
@@ -100,9 +126,24 @@ function App() {
     setNoteText("");
   }, []);
 
+  const toggleDowntimeTask = useCallback((id) => {
+    setDowntimeChecklist((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              completed: !task.completed,
+              doneBy: !task.completed ? initials : "",
+            }
+          : task
+      )
+    );
+  }, [initials]);
+
   const resetAll = useCallback(() => {
     if (window.confirm("Are you sure you want to reset all tasks? This cannot be undone.")) {
       setTasks(checklists[shift].map(task => ({ ...task, completed: false, note: "", doneBy: "" })));
+      setDowntimeChecklist(getDowntimeChecklist(shift));
       setShowInfo(null);
     }
   }, [shift]);
@@ -243,10 +284,15 @@ function App() {
 
       {/* Meta bar */}
       <div className="meta-bar">
-        <span>
-          <span role="img" aria-label="calendar">📅</span>
-          &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
-        </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <span style={{ color: "#718096", fontSize: "0.85rem", fontWeight: "500" }}>
+            Logged in as <strong style={{ color: "#4a5568" }}>{user.username}</strong>
+          </span>
+          <span>
+            <span role="img" aria-label="calendar">📅</span>
+            &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
+          </span>
+        </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
             <button className="reset-btn" onClick={resetAll}>Reset All</button>
             <span
@@ -287,8 +333,7 @@ function App() {
         <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
       </div>
       <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
-        {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)<br />
-        <span style={{ color: "#718096", fontSize: "1rem", fontWeight: "500" }}>Logged in as <strong>{user.username}</strong></span>
+        {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
       </div>
 
       {/* Checklist table */}
@@ -342,6 +387,38 @@ function App() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Downtime Reports Mini-Checklist */}
+      <div className="downtime-checklist">
+        <div className="downtime-header">
+          <h3 className="downtime-title">
+            Print Downtime Every 3 Hours 
+            <button
+              className="info-btn"
+              onClick={() => setShowDowntimeInfo(!showDowntimeInfo)}
+              aria-label="Show downtime report instructions"
+            >
+              i
+            </button>
+          </h3>
+        </div>
+        <div className="downtime-items">
+          {downtimeChecklist.map((item) => (
+            <div key={item.id} className="downtime-item">
+              <input
+                type="checkbox"
+                checked={item.completed}
+                onChange={() => toggleDowntimeTask(item.id)}
+                aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
+              />
+              <span className={item.completed ? "downtime-text-completed" : "downtime-text"}>
+                {item.text}
+              </span>
+              {item.completed && <span className="initials-chip">{item.doneBy}</span>}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="footer-text">
@@ -446,6 +523,35 @@ function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Downtime Info Modal */}
+      {showDowntimeInfo && (
+        <div
+          className="info-modal-overlay"
+          onClick={() => setShowDowntimeInfo(false)}
+        >
+          <div
+            className="info-modal-box"
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="info-modal-close" onClick={() => setShowDowntimeInfo(false)} title="Close">&times;</button>
+            <h3>Downtime Reports Instructions</h3>
+            <div className="info-detail">
+              • Check reception email for report attachments at 01:00, 04:00, and 07:00.
+              
+              • If missing:
+                - Opera Cloud → Reports → Manage Reports → Search "Downtime."
+                - Select "Shift Report" → Set correct time → Print.
+              
+              • Replace old report in drawer (above "PET Food").
+              
+              • These reports are critical for emergencies.
+              
+              • Use the checkboxes above to track completion of each time period.
+            </div>
           </div>
         </div>
       )}
