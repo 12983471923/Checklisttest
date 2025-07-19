@@ -25,6 +25,17 @@ function App() {
     const saved = localStorage.getItem('hotel-handovers');
     return saved ? JSON.parse(saved) : {};
   });
+  const [wakeUpCalls, setWakeUpCalls] = useState(() => {
+    const saved = localStorage.getItem('hotel-wakeup-calls');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showWakeUpModal, setShowWakeUpModal] = useState(false);
+  const [newWakeUpCall, setNewWakeUpCall] = useState({
+    roomNumber: '',
+    time: '',
+    notes: '',
+    date: new Date().toISOString().split('T')[0]
+  });
 
   // Use the real-time checklist hook
   const {
@@ -151,6 +162,74 @@ function App() {
     }
     return false;
   }, [savedHandovers, handoverDate]);
+
+  // Wake-up call functions
+  const addWakeUpCall = useCallback(() => {
+    if (!newWakeUpCall.roomNumber || !newWakeUpCall.time) {
+      alert('Please enter both room number and wake-up time.');
+      return;
+    }
+
+    const wakeUpCallWithId = {
+      ...newWakeUpCall,
+      id: Date.now(),
+      roomNumber: newWakeUpCall.roomNumber.toString().padStart(3, '0'),
+      createdBy: initials,
+      completed: false
+    };
+
+    const updatedCalls = [...wakeUpCalls, wakeUpCallWithId].sort((a, b) => {
+      // Sort by date first, then by time
+      if (a.date !== b.date) {
+        return new Date(a.date) - new Date(b.date);
+      }
+      return a.time.localeCompare(b.time);
+    });
+
+    setWakeUpCalls(updatedCalls);
+    localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+    
+    setNewWakeUpCall({
+      roomNumber: '',
+      time: '',
+      notes: '',
+      date: new Date().toISOString().split('T')[0]
+    });
+    setShowWakeUpModal(false);
+  }, [newWakeUpCall, wakeUpCalls, initials]);
+
+  const deleteWakeUpCall = useCallback((id) => {
+    if (window.confirm('Are you sure you want to delete this wake-up call?')) {
+      const updatedCalls = wakeUpCalls.filter(call => call.id !== id);
+      setWakeUpCalls(updatedCalls);
+      localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+    }
+  }, [wakeUpCalls]);
+
+  const toggleWakeUpCallComplete = useCallback((id) => {
+    const updatedCalls = wakeUpCalls.map(call => 
+      call.id === id 
+        ? { ...call, completed: !call.completed, completedBy: call.completed ? null : initials }
+        : call
+    );
+    setWakeUpCalls(updatedCalls);
+    localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+  }, [wakeUpCalls, initials]);
+
+  const clearOldWakeUpCalls = useCallback(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const activeCalls = wakeUpCalls.filter(call => call.date >= today);
+    
+    if (activeCalls.length === wakeUpCalls.length) {
+      alert('No old wake-up calls to clear.');
+      return;
+    }
+
+    if (window.confirm(`Clear ${wakeUpCalls.length - activeCalls.length} old wake-up calls?`)) {
+      setWakeUpCalls(activeCalls);
+      localStorage.setItem('hotel-wakeup-calls', JSON.stringify(activeCalls));
+    }
+  }, [wakeUpCalls]);
 
   // Show login form if not logged in
   if (!user) {
@@ -347,11 +426,11 @@ function App() {
                   </div>
                   <div className="price-item">
                     <span className="price-label">At check-in:</span>
-                    <span className="price-value">170 DKK</span>
+                    <span className="price-value">179 DKK</span>
                   </div>
                   <div className="price-item">
                     <span className="price-label">On the day:</span>
-                    <span className="price-value">220 DKK</span>
+                    <span className="price-value">229 DKK</span>
                   </div>
                 </div>
               </div>
@@ -395,6 +474,79 @@ function App() {
                 <span className="handover-stat">
                   📅 {Object.keys(savedHandovers).length} days recorded
                 </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="header-card">
+            <strong>☎️ Wake-Up Calls</strong>
+            
+            <div className="wakeup-section">
+              <div className="wakeup-summary">
+                <div className="wakeup-stats">
+                  <span className="wakeup-stat">
+                    📞 {wakeUpCalls.filter(call => !call.completed && call.date >= new Date().toISOString().split('T')[0]).length} pending
+                  </span>
+                  <span className="wakeup-stat">
+                    ✅ {wakeUpCalls.filter(call => call.completed).length} completed
+                  </span>
+                </div>
+              </div>
+              
+              <div className="wakeup-list">
+                {wakeUpCalls
+                  .filter(call => call.date >= new Date().toISOString().split('T')[0])
+                  .slice(0, 4)
+                  .map(call => (
+                    <div key={call.id} className={`wakeup-item ${call.completed ? 'completed' : ''}`}>
+                      <div className="wakeup-info">
+                        <span className="wakeup-room">Room {call.roomNumber}</span>
+                        <span className="wakeup-time">{call.time}</span>
+                        {call.date !== new Date().toISOString().split('T')[0] && (
+                          <span className="wakeup-date">{new Date(call.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</span>
+                        )}
+                      </div>
+                      <div className="wakeup-actions">
+                        <button
+                          className={`wakeup-toggle ${call.completed ? 'completed' : ''}`}
+                          onClick={() => toggleWakeUpCallComplete(call.id)}
+                          title={call.completed ? 'Mark as pending' : 'Mark as completed'}
+                        >
+                          {call.completed ? '✅' : '⏰'}
+                        </button>
+                        <button
+                          className="wakeup-delete"
+                          onClick={() => deleteWakeUpCall(call.id)}
+                          title="Delete wake-up call"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                
+                {wakeUpCalls.filter(call => call.date >= new Date().toISOString().split('T')[0]).length === 0 && (
+                  <div className="wakeup-empty">
+                    No upcoming wake-up calls
+                  </div>
+                )}
+              </div>
+              
+              <div className="wakeup-buttons">
+                <button
+                  className="wakeup-add-btn"
+                  onClick={() => setShowWakeUpModal(true)}
+                >
+                  + Add Wake-Up Call
+                </button>
+                {wakeUpCalls.length > 0 && (
+                  <button
+                    className="wakeup-clear-btn"
+                    onClick={clearOldWakeUpCalls}
+                  >
+                    Clear Old
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -599,6 +751,8 @@ function App() {
 
           <div className="footer-text">
             Contact Ayush if you find issues with the page.
+            <br />
+            <a href="mailto:ayush.gurung@scandichotels.com">ayush.gurung@scandichotels.com</a>
           </div>
 
       {/* Info Modal */}
@@ -980,6 +1134,89 @@ function App() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wake-Up Call Modal */}
+      {showWakeUpModal && (
+        <div
+          className="info-modal-overlay"
+          onClick={() => setShowWakeUpModal(false)}
+        >
+          <div
+            className="wakeup-modal-box"
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="info-modal-close" onClick={() => setShowWakeUpModal(false)} title="Close">&times;</button>
+            <h3>☎️ Add Wake-Up Call</h3>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                addWakeUpCall();
+              }}
+            >
+              <div className="wakeup-form-group">
+                <label htmlFor="roomNumber">Room Number</label>
+                <input
+                  id="roomNumber"
+                  type="text"
+                  className="wakeup-input"
+                  value={newWakeUpCall.roomNumber}
+                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, roomNumber: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
+                  placeholder="e.g. 102"
+                  maxLength={4}
+                  autoFocus
+                  required
+                />
+              </div>
+              
+              <div className="wakeup-form-group">
+                <label htmlFor="wakeupTime">Wake-Up Time</label>
+                <input
+                  id="wakeupTime"
+                  type="time"
+                  className="wakeup-input"
+                  value={newWakeUpCall.time}
+                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, time: e.target.value }))}
+                  required
+                />
+              </div>
+              
+              <div className="wakeup-form-group">
+                <label htmlFor="wakeupDate">Date</label>
+                <input
+                  id="wakeupDate"
+                  type="date"
+                  className="wakeup-input"
+                  value={newWakeUpCall.date}
+                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, date: e.target.value }))}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              
+              <div className="wakeup-form-group">
+                <label htmlFor="wakeupNotes">Notes (Optional)</label>
+                <textarea
+                  id="wakeupNotes"
+                  className="wakeup-textarea"
+                  value={newWakeUpCall.notes}
+                  onChange={e => setNewWakeUpCall(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Special instructions or guest preferences..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="note-modal-buttons">
+                <button type="submit" className="add-note-btn">
+                  Add Wake-Up Call
+                </button>
+                <button type="button" className="reset-btn" onClick={() => setShowWakeUpModal(false)} style={{ marginRight: 0 }}>
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

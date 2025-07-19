@@ -1619,3 +1619,254 @@ input[type="checkbox"]:hover {
     padding: 12px 16px;
   }
 }
+
+/* Wake-Up Call Styles */
+.wakeup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wakeup-summary {
+  padding: 12px 0;
+}
+
+.wakeup-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wakeup-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.wakeup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.wakeup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.wakeup-item:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wakeup-item.completed {
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.wakeup-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wakeup-room {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+.wakeup-time {
+  font-size: 0.8rem;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.wakeup-date {
+  font-size: 0.7rem;
+  color: #718096;
+}
+
+.wakeup-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.wakeup-toggle {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.wakeup-toggle:hover {
+  background: #f7fafc;
+}
+
+.wakeup-toggle.completed {
+  opacity: 0.8;
+}
+
+.wakeup-delete {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.wakeup-delete:hover {
+  background: #fed7d7;
+  opacity: 1;
+}
+
+.wakeup-empty {
+  text-align: center;
+  padding: 16px;
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.wakeup-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.wakeup-add-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wakeup-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.wakeup-clear-btn {
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wakeup-clear-btn:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+/* Wake-Up Call Modal */
+.wakeup-modal-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.wakeup-form-group {
+  margin-bottom: 16px;
+}
+
+.wakeup-form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.wakeup-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.wakeup-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.wakeup-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s ease;
+}
+
+.wakeup-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+@media (max-width: 768px) {
+  .wakeup-item {
+    padding: 8px 10px;
+  }
+  
+  .wakeup-room {
+    font-size: 0.85rem;
+  }
+  
+  .wakeup-time {
+    font-size: 0.75rem;
+  }
+  
+  .wakeup-buttons {
+    flex-direction: column;
+  }
+  
+  .wakeup-modal-box {
+    padding: 20px;
+    margin: 20px;
+  }
+}
