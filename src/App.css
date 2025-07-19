@@ -23,6 +23,37 @@ body {
   border: 1px solid #e5e7eb;
 }
 
+/* Main Layout */
+.main-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* Left Sidebar */
+.left-sidebar {
+  flex: 0 0 280px;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+}
+
+/* Top Header */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 20px;
+}
+
+.top-header .night-title {
+  margin: 0;
+  text-align: left;
+}
+
 /* Header Card */
 .header-card {
   background: #f9fafb;
@@ -30,8 +61,10 @@ body {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 20px 24px;
-  margin-bottom: 32px;
-  text-align: center;
+  margin-bottom: 0;
+  text-align: left;
+  position: sticky;
+  top: 20px;
 }
 
 .header-card strong {
@@ -55,12 +88,12 @@ body {
 
 /* Title */
 .night-title {
-  text-align: center;
+  text-align: left;
   font-size: 2rem;
   font-weight: 700;
   color: #111827;
   letter-spacing: -0.02em;
-  margin: 0 0 40px 0;
+  margin: 0;
 }
 
 /* Table Wrapper */
@@ -484,9 +517,9 @@ input[type="checkbox"]:hover {
 /* Shift Selector Styles */
 .shift-selector {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
   flex-wrap: wrap;
 }
 
@@ -553,6 +586,26 @@ input[type="checkbox"]:hover {
 /* Responsive Styles */
 /* Responsive Styles */
 @media (max-width: 1024px) {
+  .main-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .left-sidebar {
+    flex: none;
+    width: 100%;
+  }
+  
+  .top-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .shift-selector {
+    align-self: flex-end;
+  }
+  
   .checklist-container {
     max-width: 95%;
     padding: 24px 20px;
@@ -570,11 +623,12 @@ input[type="checkbox"]:hover {
     padding: 20px 24px;
     min-width: auto;
     width: 100%;
+    text-align: center;
+    position: static;
   }
   
   .night-title {
-    font-size: 2rem;
-    margin-bottom: 32px;
+    font-size: 1.8rem;
   }
   
   .shift-selector {
@@ -590,6 +644,24 @@ input[type="checkbox"]:hover {
 @media (max-width: 768px) {
   body {
     padding: 10px;
+  }
+  
+  .top-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .shift-selector {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .shift-btn {
+    width: 100%;
+    max-width: 200px;
   }
   
   .checklist-container {
@@ -613,12 +685,13 @@ input[type="checkbox"]:hover {
   
   .night-title {
     font-size: 1.75rem;
-    margin-bottom: 24px;
+    text-align: center;
   }
   
   .header-card {
     padding: 16px 20px;
     font-size: 0.85rem;
+    text-align: center;
   }
   
   .meta-bar {
@@ -630,17 +703,6 @@ input[type="checkbox"]:hover {
   
   .meta-bar > div {
     justify-content: center;
-  }
-  
-  .shift-selector {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .shift-btn {
-    width: 100%;
-    max-width: 200px;
   }
   
   .info-modal-box {

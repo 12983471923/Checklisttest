@@ -256,34 +256,40 @@ function App() {
     );
   }
 
-  return (
+    return (
     <div className="checklist-container">
-      {/* Header card */}
-      <div className="header-card">
-        <strong>Scandic Falkoner</strong>
-        Address: Falkoner Alle 9, 2000 Frederiksberg, Denmark<br />
-        Phone: +45 72 42 55 00<br />
-        Email: <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
-      </div>
+      {/* Main layout with sidebar and content */}
+      <div className="main-layout">
+        {/* Left sidebar with hotel info */}
+        <div className="left-sidebar">
+          <div className="header-card">
+            <strong>Scandic Falkoner</strong>
+            Address: Falkoner Alle 9, 2000 Frederiksberg, Denmark<br />
+            Phone: +45 72 42 55 00<br />
+            Email: <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+          </div>
+        </div>
 
-      {/* Page Title */}
-      <h2 className="night-title">{shift} Checklist</h2>
+        {/* Right content area */}
+        <div className="main-content">
+          {/* Top right header with title and shift selector */}
+          <div className="top-header">
+            <h2 className="night-title">{shift} Checklist</h2>
+            <div className="shift-selector">
+              {Object.keys(checklists).map((shiftName) => (
+                <button
+                  key={shiftName}
+                  onClick={() => handleShiftChange(shiftName)}
+                  className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
+                >
+                  {shiftName}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Shift Selector */}
-      <div className="shift-selector">
-        {Object.keys(checklists).map((shiftName) => (
-          <button
-            key={shiftName}
-            onClick={() => handleShiftChange(shiftName)}
-            className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
-          >
-            {shiftName}
-          </button>
-        ))}
-      </div>
-
-      {/* Meta bar */}
-      <div className="meta-bar">
+          {/* Meta bar */}
+          <div className="meta-bar">
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <span style={{ color: "#718096", fontSize: "0.85rem", fontWeight: "500" }}>
             Logged in as <strong style={{ color: "#4a5568" }}>{user.username}</strong>
@@ -326,104 +332,104 @@ function App() {
               Log Out
             </button>
           </div>
-      </div>
+          </div>
 
-      {/* Progress bar */}
-      <div className="progress-bar">
-        <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
-      </div>
-      <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
-        {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
-      </div>
+          {/* Progress bar */}
+          <div className="progress-bar">
+            <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
+          </div>
+          <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
+            {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
+          </div>
 
-      {/* Checklist table */}
-      <div className="table-wrap">
-        <table className="checklist-table">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Done</th>
-              <th>Initials</th>
-              <th>Info</th>
-              <th>Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id}>
-                <td className={task.completed ? "task-completed" : "task-incomplete"}>
-                  {task.text}
-                </td>
-                <td>
+          {/* Checklist table */}
+          <div className="table-wrap">
+            <table className="checklist-table">
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Done</th>
+                  <th>Initials</th>
+                  <th>Info</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td className={task.completed ? "task-completed" : "task-incomplete"}>
+                      {task.text}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => toggleTask(task.id)}
+                        aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
+                      />
+                    </td>
+                    <td>
+                      {task.completed ? <span className="initials-chip">{task.doneBy}</span> : ""}
+                    </td>
+                    <td>
+                      <button
+                        className="info-btn"
+                        onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
+                        aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
+                      >
+                        i
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className={task.note ? "edit-note-btn" : "add-note-btn"}
+                        onClick={() => handleNote(task.id)}
+                        title={task.note ? "View/Edit Note" : "Add Note"}
+                      >
+                        {task.note ? "Edit" : "Add Note"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Downtime Reports Mini-Checklist */}
+          <div className="downtime-checklist">
+            <div className="downtime-header">
+              <h3 className="downtime-title">
+                Print Downtime Every 3 Hours 
+                <button
+                  className="info-btn"
+                  onClick={() => setShowDowntimeInfo(!showDowntimeInfo)}
+                  aria-label="Show downtime report instructions"
+                >
+                  i
+                </button>
+              </h3>
+            </div>
+            <div className="downtime-items">
+              {downtimeChecklist.map((item) => (
+                <div key={item.id} className="downtime-item">
                   <input
                     type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTask(task.id)}
-                    aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
+                    checked={item.completed}
+                    onChange={() => toggleDowntimeTask(item.id)}
+                    aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
                   />
-                </td>
-                <td>
-                  {task.completed ? <span className="initials-chip">{task.doneBy}</span> : ""}
-                </td>
-                <td>
-                  <button
-                    className="info-btn"
-                    onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
-                    aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
-                  >
-                    i
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className={task.note ? "edit-note-btn" : "add-note-btn"}
-                    onClick={() => handleNote(task.id)}
-                    title={task.note ? "View/Edit Note" : "Add Note"}
-                  >
-                    {task.note ? "Edit" : "Add Note"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Downtime Reports Mini-Checklist */}
-      <div className="downtime-checklist">
-        <div className="downtime-header">
-          <h3 className="downtime-title">
-            Print Downtime Every 3 Hours 
-            <button
-              className="info-btn"
-              onClick={() => setShowDowntimeInfo(!showDowntimeInfo)}
-              aria-label="Show downtime report instructions"
-            >
-              i
-            </button>
-          </h3>
-        </div>
-        <div className="downtime-items">
-          {downtimeChecklist.map((item) => (
-            <div key={item.id} className="downtime-item">
-              <input
-                type="checkbox"
-                checked={item.completed}
-                onChange={() => toggleDowntimeTask(item.id)}
-                aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
-              />
-              <span className={item.completed ? "downtime-text-completed" : "downtime-text"}>
-                {item.text}
-              </span>
-              {item.completed && <span className="initials-chip">{item.doneBy}</span>}
+                  <span className={item.completed ? "downtime-text-completed" : "downtime-text"}>
+                    {item.text}
+                  </span>
+                  {item.completed && <span className="initials-chip">{item.doneBy}</span>}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      <div className="footer-text">
-        Contact Ayush if you find issues with the page.
-      </div>
+          <div className="footer-text">
+            Contact Ayush if you find issues with the page.
+          </div>
 
       {/* Info Modal */}
       {showInfo && (() => {
@@ -555,6 +561,8 @@ function App() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
