@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read and write access to checklist documents
+    match /checklists/{document} {
+      allow read, write: if true; // For development - you can add authentication later
+    }
+    
+    // Allow read and write access to downtime documents  
+    match /downtime/{document} {
+      allow read, write: if true; // For development - you can add authentication later
+    }
+  }
+}

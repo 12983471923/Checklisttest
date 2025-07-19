@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { checklists } from "./Checklists";
 import { users } from "./users";
+import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import "./App.css";
 
 function App() {
@@ -12,38 +13,23 @@ function App() {
   const [showChangeInitials, setShowChangeInitials] = useState(false);
   const [newInitials, setNewInitials] = useState("");
   const [shift, setShift] = useState("Night");
-  const [tasks, setTasks] = useState(
-    checklists[shift].map((task) => ({ ...task, completed: false, note: "", doneBy: "" }))
-  );
   const [showInfo, setShowInfo] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(null);
   const [noteText, setNoteText] = useState("");
   const [showInitialsModal, setShowInitialsModal] = useState(false);
-  
-  // Generate downtime checklist based on current shift
-  const getDowntimeChecklist = (currentShift) => {
-    const downtimeTimes = {
-      Night: [
-        { id: 1, text: "1st 01:00", completed: false, doneBy: "" },
-        { id: 2, text: "2nd 04:00", completed: false, doneBy: "" },
-        { id: 3, text: "3rd 07:00", completed: false, doneBy: "" }
-      ],
-      Morning: [
-        { id: 1, text: "1st 09:00", completed: false, doneBy: "" },
-        { id: 2, text: "2nd 12:00", completed: false, doneBy: "" },
-        { id: 3, text: "3rd 15:00", completed: false, doneBy: "" }
-      ],
-      Evening: [
-        { id: 1, text: "1st 18:00", completed: false, doneBy: "" },
-        { id: 2, text: "2nd 21:00", completed: false, doneBy: "" },
-        { id: 3, text: "3rd 23:00", completed: false, doneBy: "" }
-      ]
-    };
-    return downtimeTimes[currentShift] || downtimeTimes.Night;
-  };
-  
-  const [downtimeChecklist, setDowntimeChecklist] = useState(getDowntimeChecklist(shift));
   const [showDowntimeInfo, setShowDowntimeInfo] = useState(false);
+
+  // Use the real-time checklist hook
+  const {
+    tasks,
+    downtimeChecklist,
+    loading,
+    error,
+    toggleTask,
+    updateTaskNote,
+    toggleDowntimeTask,
+    resetAll
+  } = useRealtimeChecklist(shift, initials);
 
   // Handle login submit
   const handleLogin = (e) => {
@@ -70,12 +56,6 @@ function App() {
     }
     setInitials(trimmedInitials);
     setInitialsSubmitted(true);
-    // Assign current initials to any already-completed tasks
-    setTasks(tasks =>
-      tasks.map(t =>
-        t.completed ? { ...t, doneBy: trimmedInitials } : t
-      )
-    );
   };
 
   // Progress calculation - memoized for performance
@@ -86,24 +66,8 @@ function App() {
 
   const handleShiftChange = useCallback((newShift) => {
     setShift(newShift);
-    setTasks(checklists[newShift].map((task) => ({ ...task, completed: false, note: "", doneBy: "" })));
-    setDowntimeChecklist(getDowntimeChecklist(newShift));
     setShowInfo(null);
   }, []);
-
-  const toggleTask = useCallback((id) => {
-    setTasks((tasks) =>
-      tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              completed: !task.completed,
-              doneBy: !task.completed ? initials : "", // Set initials when marking complete, remove when unchecking
-            }
-          : task
-      )
-    );
-  }, [initials]);
 
   const handleNote = useCallback((id) => {
     const task = tasks.find(t => t.id === id);
@@ -113,40 +77,23 @@ function App() {
 
   const saveNote = useCallback(() => {
     if (showNoteModal) {
-      setTasks(tasks =>
-        tasks.map(t => t.id === showNoteModal ? { ...t, note: noteText } : t)
-      );
+      updateTaskNote(showNoteModal, noteText);
       setShowNoteModal(null);
       setNoteText("");
     }
-  }, [showNoteModal, noteText]);
+  }, [showNoteModal, noteText, updateTaskNote]);
 
   const cancelNote = useCallback(() => {
     setShowNoteModal(null);
     setNoteText("");
   }, []);
 
-  const toggleDowntimeTask = useCallback((id) => {
-    setDowntimeChecklist((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              completed: !task.completed,
-              doneBy: !task.completed ? initials : "",
-            }
-          : task
-      )
-    );
-  }, [initials]);
-
-  const resetAll = useCallback(() => {
+  const handleResetAll = useCallback(() => {
     if (window.confirm("Are you sure you want to reset all tasks? This cannot be undone.")) {
-      setTasks(checklists[shift].map(task => ({ ...task, completed: false, note: "", doneBy: "" })));
-      setDowntimeChecklist(getDowntimeChecklist(shift));
+      resetAll();
       setShowInfo(null);
     }
-  }, [shift]);
+  }, [resetAll]);
 
   const handleLogout = () => {
     setUser(null);
@@ -300,7 +247,7 @@ function App() {
           </span>
         </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <button className="reset-btn" onClick={resetAll}>Reset All</button>
+            <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
             <span
               className="initials-chip"
               style={{
@@ -341,6 +288,35 @@ function App() {
           <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
             {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
           </div>
+
+          {/* Loading and Error states */}
+          {loading && (
+            <div style={{ 
+              background: "#f7fafc", 
+              border: "1px solid #e2e8f0", 
+              borderRadius: "6px", 
+              padding: "12px", 
+              marginBottom: "16px",
+              color: "#4a5568",
+              fontSize: "0.95rem"
+            }}>
+              🔄 Syncing with database...
+            </div>
+          )}
+          
+          {error && (
+            <div style={{ 
+              background: "#fed7d7", 
+              border: "1px solid #feb2b2", 
+              borderRadius: "6px", 
+              padding: "12px", 
+              marginBottom: "16px",
+              color: "#c53030",
+              fontSize: "0.95rem"
+            }}>
+              ⚠️ Database sync error: {error}. Changes are saved locally and will sync when reconnected.
+            </div>
+          )}
 
           {/* Checklist table */}
           <div className="table-wrap">

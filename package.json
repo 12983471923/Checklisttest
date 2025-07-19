@@ -1,6 +1,7 @@
 {
   "name": "scandic-checklist",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "Real-time hotel checklist application with Firebase backend",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +10,7 @@
     "serve": "vite preview --port 3000"
   },
   "dependencies": {
+    "firebase": "^12.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
