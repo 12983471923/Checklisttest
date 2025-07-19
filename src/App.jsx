@@ -18,6 +18,13 @@ function App() {
   const [noteText, setNoteText] = useState("");
   const [showInitialsModal, setShowInitialsModal] = useState(false);
   const [showDowntimeInfo, setShowDowntimeInfo] = useState(false);
+  const [showHandoverModal, setShowHandoverModal] = useState(false);
+  const [handoverDate, setHandoverDate] = useState(new Date().toISOString().split('T')[0]);
+  const [handoverNotes, setHandoverNotes] = useState("");
+  const [savedHandovers, setSavedHandovers] = useState(() => {
+    const saved = localStorage.getItem('hotel-handovers');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Use the real-time checklist hook
   const {
@@ -102,6 +109,48 @@ function App() {
     setShowChangeInitials(false);
     setNewInitials("");
   };
+
+  // Handover functions
+  const loadHandoverNotes = useCallback((date) => {
+    setHandoverNotes(savedHandovers[date] || "");
+  }, [savedHandovers]);
+
+  const saveHandoverNotes = useCallback(() => {
+    const updatedHandovers = {
+      ...savedHandovers,
+      [handoverDate]: handoverNotes
+    };
+    setSavedHandovers(updatedHandovers);
+    localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
+    setShowHandoverModal(false);
+  }, [savedHandovers, handoverDate, handoverNotes]);
+
+  const openHandoverModal = useCallback(() => {
+    loadHandoverNotes(handoverDate);
+    setShowHandoverModal(true);
+  }, [handoverDate, loadHandoverNotes]);
+
+  const handleDateChange = useCallback((newDate) => {
+    setHandoverDate(newDate);
+    loadHandoverNotes(newDate);
+  }, [loadHandoverNotes]);
+
+  const deleteHandoverNotes = useCallback((dateToDelete) => {
+    if (window.confirm(`Are you sure you want to delete handover notes for ${new Date(dateToDelete).toLocaleDateString('en-GB')}? This cannot be undone.`)) {
+      const updatedHandovers = { ...savedHandovers };
+      delete updatedHandovers[dateToDelete];
+      setSavedHandovers(updatedHandovers);
+      localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
+      
+      // If we're deleting the currently selected date, clear the notes
+      if (dateToDelete === handoverDate) {
+        setHandoverNotes("");
+      }
+      
+      return true;
+    }
+    return false;
+  }, [savedHandovers, handoverDate]);
 
   // Show login form if not logged in
   if (!user) {
@@ -210,31 +259,143 @@ function App() {
         {/* Left sidebar with hotel info */}
         <div className="left-sidebar">
           <div className="header-card">
-            <strong>Scandic Falkoner</strong>
-            Address: Falkoner Alle 9, 2000 Frederiksberg, Denmark<br />
-            Phone: +45 72 42 55 00<br />
-            Email: <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+            <strong>🏨 Scandic Falkoner</strong>
+            
+            <div className="hotel-info-section">
+              <div className="info-item">
+                <span className="info-icon">📍</span>
+                <div className="info-content">
+                  <span className="info-label">Address</span>
+                  <span className="info-value">Falkoner Alle 9, 2000 Frederiksberg, Denmark</span>
+                </div>
+              </div>
+              
+              <div className="info-item">
+                <span className="info-icon">📞</span>
+                <div className="info-content">
+                  <span className="info-label">Phone</span>
+                  <span className="info-value">+45 72 42 55 00</span>
+                </div>
+              </div>
+              
+              <div className="info-item">
+                <span className="info-icon">✉️</span>
+                <div className="info-content">
+                  <span className="info-label">Email</span>
+                  <span className="info-value">
+                    <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="header-card">
-            <strong>Hotel Times</strong>
-            Breakfast time: 07:00 to 11:00<br />
-            CheckOut: 12:00<br />
-            CheckIn: 16:00
+            <strong>⏰ Hotel Times</strong>
+            
+            <div className="hotel-times-section">
+              <div className="time-item">
+                <span className="time-icon">🍳</span>
+                <div className="time-content">
+                  <span className="time-label">Breakfast</span>
+                  <span className="time-value">07:00 - 11:00</span>
+                </div>
+              </div>
+              
+              <div className="time-item">
+                <span className="time-icon">🚪</span>
+                <div className="time-content">
+                  <span className="time-label">Check-Out</span>
+                  <span className="time-value">12:00</span>
+                </div>
+              </div>
+              
+              <div className="time-item">
+                <span className="time-icon">🔑</span>
+                <div className="time-content">
+                  <span className="time-label">Check-In</span>
+                  <span className="time-value">16:00</span>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="header-card">
             <strong>Pricing Information</strong>
-            <div style={{ marginBottom: "10px" }}>
-              <strong>Bike rental:</strong><br />
-              • 175 DKK per person<br />
-              • (Lufthansa): 100 DKK
+            
+            <div className="pricing-section">
+              <div className="pricing-category">
+                <strong>🚴 Bike Rental</strong>
+                <div className="price-list">
+                  <div className="price-item">
+                    <span className="price-label">Regular rate:</span>
+                    <span className="price-value">175 DKK per person</span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">Lufthansa rate:</span>
+                    <span className="price-value">100 DKK per person</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pricing-category">
+                <strong>🍳 Breakfast Pricing</strong>
+                <div className="price-list">
+                  <div className="price-item">
+                    <span className="price-label">During booking:</span>
+                    <span className="price-value">140 DKK</span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">At check-in:</span>
+                    <span className="price-value">170 DKK</span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">On the day:</span>
+                    <span className="price-value">220 DKK</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <strong>Breakfast price:</strong><br />
-              • During booking: 140 DKK<br />
-              • CheckIn: 170 DKK<br />
-              • Breakfast on the day: 220 DKK
+          </div>
+          
+          <div className="header-card">
+            <strong>📝 Daily Handover</strong>
+            
+            <div className="handover-section">
+              <div className="handover-date-selector">
+                <input
+                  type="date"
+                  value={handoverDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="handover-date-input"
+                />
+              </div>
+              
+              <div className="handover-preview">
+                {savedHandovers[handoverDate] ? (
+                  <div className="handover-preview-text">
+                    {savedHandovers[handoverDate].substring(0, 80)}
+                    {savedHandovers[handoverDate].length > 80 ? "..." : ""}
+                  </div>
+                ) : (
+                  <div className="handover-preview-empty">
+                    No notes for this date
+                  </div>
+                )}
+              </div>
+              
+              <button
+                className="handover-btn"
+                onClick={openHandoverModal}
+              >
+                {savedHandovers[handoverDate] ? "Edit Notes" : "Add Notes"}
+              </button>
+              
+              <div className="handover-stats">
+                <span className="handover-stat">
+                  📅 {Object.keys(savedHandovers).length} days recorded
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -566,6 +727,258 @@ function App() {
               • These reports are critical for emergencies.
               
               • Use the checkboxes above to track completion of each time period.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Handover Modal */}
+      {showHandoverModal && (
+        <div
+          className="handover-modal-overlay"
+          onClick={() => setShowHandoverModal(false)}
+        >
+          <div
+            className="handover-modal-container"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="handover-modal-header">
+              <h2>📝 Daily Handover Management</h2>
+              <button className="handover-modal-close" onClick={() => setShowHandoverModal(false)} title="Close">
+                &times;
+              </button>
+            </div>
+
+            <div className="handover-modal-content">
+              {/* Left side - Date selection and navigation */}
+              <div className="handover-sidebar">
+                <div className="handover-current-date">
+                  <h3>Select Date</h3>
+                  <input
+                    type="date"
+                    value={handoverDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    className="handover-main-date-input"
+                  />
+                  <div className="handover-date-display">
+                    {new Date(handoverDate).toLocaleDateString('en-GB', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+
+                <div className="handover-quick-nav">
+                  <h4>Quick Navigation</h4>
+                  <div className="handover-nav-buttons">
+                    <button
+                      className="handover-nav-btn"
+                      onClick={() => {
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        handleDateChange(yesterday.toISOString().split('T')[0]);
+                      }}
+                    >
+                      ← Yesterday
+                    </button>
+                    <button
+                      className="handover-nav-btn"
+                      onClick={() => handleDateChange(new Date().toISOString().split('T')[0])}
+                    >
+                      Today
+                    </button>
+                    <button
+                      className="handover-nav-btn"
+                      onClick={() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        handleDateChange(tomorrow.toISOString().split('T')[0]);
+                      }}
+                    >
+                      Tomorrow →
+                    </button>
+                  </div>
+                </div>
+
+                <div className="handover-history">
+                  <h4>Recent Days with Notes</h4>
+                  <div className="handover-history-list">
+                    {Object.keys(savedHandovers)
+                      .sort((a, b) => new Date(b) - new Date(a))
+                      .slice(0, 8)
+                      .map(date => (
+                        <div
+                          key={date}
+                          className={`handover-history-item ${date === handoverDate ? 'active' : ''}`}
+                        >
+                          <button
+                            className="handover-history-btn"
+                            onClick={() => handleDateChange(date)}
+                          >
+                            <div className="handover-history-date">
+                              {new Date(date).toLocaleDateString('en-GB', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </div>
+                            <div className="handover-history-preview">
+                              {savedHandovers[date].substring(0, 40)}...
+                            </div>
+                          </button>
+                          <button
+                            className="handover-history-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteHandoverNotes(date);
+                            }}
+                            title={`Delete notes for ${new Date(date).toLocaleDateString('en-GB')}`}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                  
+                  <div className="handover-stats-detailed">
+                    <div className="handover-stat-item">
+                      <span className="handover-stat-number">{Object.keys(savedHandovers).length}</span>
+                      <span className="handover-stat-label">Total Days</span>
+                    </div>
+                    <div className="handover-stat-item">
+                      <span className="handover-stat-number">
+                        {Object.keys(savedHandovers).filter(date => {
+                          const noteDate = new Date(date);
+                          const weekAgo = new Date();
+                          weekAgo.setDate(weekAgo.getDate() - 7);
+                          return noteDate >= weekAgo;
+                        }).length}
+                      </span>
+                      <span className="handover-stat-label">This Week</span>
+                    </div>
+                  </div>
+
+                  {Object.keys(savedHandovers).length > 0 && (
+                    <div className="handover-bulk-actions">
+                      <h4>Bulk Actions</h4>
+                      <button
+                        className="handover-bulk-delete-btn"
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete ALL ${Object.keys(savedHandovers).length} handover notes? This cannot be undone.`)) {
+                            setSavedHandovers({});
+                            localStorage.setItem('hotel-handovers', JSON.stringify({}));
+                            setHandoverNotes("");
+                          }
+                        }}
+                      >
+                        🗑️ Delete All Notes
+                      </button>
+                      <button
+                        className="handover-bulk-delete-old-btn"
+                        onClick={() => {
+                          const oneWeekAgo = new Date();
+                          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                          
+                          const oldDates = Object.keys(savedHandovers).filter(date => 
+                            new Date(date) < oneWeekAgo
+                          );
+                          
+                          if (oldDates.length === 0) {
+                            alert('No notes older than 7 days found.');
+                            return;
+                          }
+                          
+                          if (window.confirm(`Delete ${oldDates.length} notes older than 7 days? This cannot be undone.`)) {
+                            const updatedHandovers = { ...savedHandovers };
+                            oldDates.forEach(date => delete updatedHandovers[date]);
+                            setSavedHandovers(updatedHandovers);
+                            localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
+                            
+                            if (oldDates.includes(handoverDate)) {
+                              setHandoverNotes("");
+                            }
+                          }
+                        }}
+                      >
+                        🧹 Delete Old Notes (7+ days)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right side - Notes editing */}
+              <div className="handover-editor">
+                <div className="handover-editor-header">
+                  <h3>
+                    {savedHandovers[handoverDate] ? '📝 Edit Notes' : '➕ Add New Notes'}
+                  </h3>
+                  <div className="handover-editor-info">
+                    {savedHandovers[handoverDate] && (
+                      <span className="handover-word-count">
+                        {handoverNotes.split(' ').filter(word => word.length > 0).length} words
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <textarea
+                  className="handover-main-textarea"
+                  value={handoverNotes}
+                  onChange={e => setHandoverNotes(e.target.value)}
+                  placeholder={`What happened on ${new Date(handoverDate).toLocaleDateString('en-GB')}?
+
+🏨 Hotel Operations:
+• Guest requests and special needs
+• Room status updates
+• Equipment issues
+
+🔧 Maintenance & Repairs:
+• Broken or malfunctioning equipment
+• Scheduled maintenance
+• Repair requests
+
+👥 Staff & Schedule:
+• Staff schedule changes
+• Important announcements
+• Training or meetings
+
+📦 Supplies & Inventory:
+• Low stock items
+• Supply deliveries
+• Restocking needs
+
+⚠️ Incidents & Issues:
+• Guest complaints
+• Safety incidents
+• System problems
+
+📋 Next Shift Notes:
+• Urgent tasks for next shift
+• Follow-up required
+• Special instructions`}
+                  rows={20}
+                  autoFocus
+                />
+
+                <div className="handover-editor-actions">
+                  <button className="handover-save-btn" onClick={saveHandoverNotes}>
+                    💾 Save Notes
+                  </button>
+                  <button className="handover-cancel-btn" onClick={() => setShowHandoverModal(false)}>
+                    ❌ Cancel
+                  </button>
+                  {savedHandovers[handoverDate] && (
+                    <button 
+                      className="handover-delete-btn"
+                      onClick={() => deleteHandoverNotes(handoverDate)}
+                    >
+                      🗑️ Delete Notes
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
