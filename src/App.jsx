@@ -290,7 +290,8 @@ function App() {
           </div>
 
           {/* Loading and Error states */}
-          {loading && (
+          {/* Loading state hidden - syncing happens silently in background */}
+          {false && loading && (
             <div style={{ 
               position: "fixed",
               top: "20px",
