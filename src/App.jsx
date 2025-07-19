@@ -215,6 +215,28 @@ function App() {
             Phone: +45 72 42 55 00<br />
             Email: <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
           </div>
+          
+          <div className="header-card">
+            <strong>Hotel Times</strong>
+            Breakfast time: 07:00 to 11:00<br />
+            CheckOut: 12:00<br />
+            CheckIn: 16:00
+          </div>
+          
+          <div className="header-card">
+            <strong>Pricing Information</strong>
+            <div style={{ marginBottom: "10px" }}>
+              <strong>Bike rental:</strong><br />
+              • 175 DKK per person<br />
+              • (Lufthansa): 100 DKK
+            </div>
+            <div>
+              <strong>Breakfast price:</strong><br />
+              • During booking: 140 DKK<br />
+              • CheckIn: 170 DKK<br />
+              • Breakfast on the day: 220 DKK
+            </div>
+          </div>
         </div>
 
         {/* Right content area */}
