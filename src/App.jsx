@@ -292,13 +292,18 @@ function App() {
           {/* Loading and Error states */}
           {loading && (
             <div style={{ 
+              position: "fixed",
+              top: "20px",
+              left: "20px",
               background: "#f7fafc", 
               border: "1px solid #e2e8f0", 
               borderRadius: "6px", 
               padding: "12px", 
-              marginBottom: "16px",
               color: "#4a5568",
-              fontSize: "0.95rem"
+              fontSize: "0.95rem",
+              zIndex: 1000,
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+              maxWidth: "250px"
             }}>
               🔄 Syncing with database...
             </div>
@@ -306,13 +311,18 @@ function App() {
           
           {error && (
             <div style={{ 
+              position: "fixed",
+              top: "20px",
+              left: "20px",
               background: "#fed7d7", 
               border: "1px solid #feb2b2", 
               borderRadius: "6px", 
               padding: "12px", 
-              marginBottom: "16px",
               color: "#c53030",
-              fontSize: "0.95rem"
+              fontSize: "0.95rem",
+              zIndex: 1000,
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+              maxWidth: "250px"
             }}>
               ⚠️ Database sync error: {error}. Changes are saved locally and will sync when reconnected.
             </div>
