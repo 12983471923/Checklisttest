@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { checklists } from "./checklists";
+import React, { useState, useMemo, useCallback } from "react";
+import { checklists } from "./Checklists";
 import { users } from "./users";
 import "./App.css";
 
@@ -16,13 +16,15 @@ function App() {
     checklists[shift].map((task) => ({ ...task, completed: false, note: "", doneBy: "" }))
   );
   const [showInfo, setShowInfo] = useState(null);
+  const [showNoteModal, setShowNoteModal] = useState(null);
+  const [noteText, setNoteText] = useState("");
+  const [showInitialsModal, setShowInitialsModal] = useState(false);
 
   // Handle login submit
   const handleLogin = (e) => {
     e.preventDefault();
     const match = users.find(
-      (u) =>
-        u.username === loginForm.username && u.password === loginForm.password
+      (u) => u.username === loginForm.username && u.password === loginForm.password
     );
     if (match) {
       setUser(match);
@@ -36,56 +38,74 @@ function App() {
   // Handle initials submit
   const handleInitialsSubmit = (e) => {
     e.preventDefault();
-    if (initials.trim().length < 2) {
+    const trimmedInitials = initials.trim().toUpperCase();
+    if (trimmedInitials.length < 2) {
       alert("Please enter at least 2 letters for initials.");
       return;
     }
+    setInitials(trimmedInitials);
     setInitialsSubmitted(true);
     // Assign current initials to any already-completed tasks
     setTasks(tasks =>
       tasks.map(t =>
-        t.completed ? { ...t, doneBy: initials.trim().toUpperCase() } : t
+        t.completed ? { ...t, doneBy: trimmedInitials } : t
       )
     );
   };
 
-  // Progress calculation
-  const percent = Math.round((tasks.filter((t) => t.completed).length / tasks.length) * 100);
+  // Progress calculation - memoized for performance
+  const percent = useMemo(() => 
+    Math.round((tasks.filter((t) => t.completed).length / tasks.length) * 100),
+    [tasks]
+  );
 
-  const handleShiftChange = (e) => {
-    const newShift = e.target.value;
+  const handleShiftChange = useCallback((newShift) => {
     setShift(newShift);
     setTasks(checklists[newShift].map((task) => ({ ...task, completed: false, note: "", doneBy: "" })));
     setShowInfo(null);
-  };
+  }, []);
 
-  const toggleTask = (id) => {
+  const toggleTask = useCallback((id) => {
     setTasks((tasks) =>
       tasks.map((task) =>
         task.id === id
           ? {
               ...task,
               completed: !task.completed,
-              doneBy: !task.completed ? initials.trim().toUpperCase() : "", // Set initials when marking complete, remove when unchecking
+              doneBy: !task.completed ? initials : "", // Set initials when marking complete, remove when unchecking
             }
           : task
       )
     );
-  };
+  }, [initials]);
 
-  const handleNote = (id) => {
-    const note = prompt("Add a note for this task:");
-    if (note !== null) {
+  const handleNote = useCallback((id) => {
+    const task = tasks.find(t => t.id === id);
+    setNoteText(task?.note || "");
+    setShowNoteModal(id);
+  }, [tasks]);
+
+  const saveNote = useCallback(() => {
+    if (showNoteModal) {
       setTasks(tasks =>
-        tasks.map(t => t.id === id ? { ...t, note } : t)
+        tasks.map(t => t.id === showNoteModal ? { ...t, note: noteText } : t)
       );
+      setShowNoteModal(null);
+      setNoteText("");
     }
-  };
+  }, [showNoteModal, noteText]);
 
-  const resetAll = () => {
-    setTasks(checklists[shift].map(task => ({ ...task, completed: false, note: "", doneBy: "" })));
-    setShowInfo(null);
-  };
+  const cancelNote = useCallback(() => {
+    setShowNoteModal(null);
+    setNoteText("");
+  }, []);
+
+  const resetAll = useCallback(() => {
+    if (window.confirm("Are you sure you want to reset all tasks? This cannot be undone.")) {
+      setTasks(checklists[shift].map(task => ({ ...task, completed: false, note: "", doneBy: "" })));
+      setShowInfo(null);
+    }
+  }, [shift]);
 
   const handleLogout = () => {
     setUser(null);
@@ -98,60 +118,47 @@ function App() {
   // Show login form if not logged in
   if (!user) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f6f8fa" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <form
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            boxShadow: "0 2px 24px rgba(50,50,93,0.10)",
-            padding: 40,
-            minWidth: 300
-          }}
+          className="login-form"
           onSubmit={handleLogin}
+          style={{ maxWidth: "320px", padding: "24px", minWidth: "280px" }}
         >
-          <h2 style={{ textAlign: "center", marginBottom: 24 }}>Staff Login</h2>
+          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Staff Login</h2>
           <div style={{ marginBottom: 16 }}>
             <input
+              className="form-input"
               type="text"
               placeholder="User ID"
               value={loginForm.username}
-              onChange={e => setLoginForm(f => ({ ...f, username: e.target.value }))}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #b3c7ee",
-                fontSize: "1.03em"
-              }}
+              onChange={e => setLoginForm(f => ({ ...f, username: e.target.value.trim() }))}
               autoFocus
               required
+              autoComplete="username"
+              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
             />
           </div>
-          <div style={{ marginBottom: 18 }}>
+          <div style={{ marginBottom: 20 }}>
             <input
+              className="form-input"
               type="password"
               placeholder="Password"
               value={loginForm.password}
               onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #b3c7ee",
-                fontSize: "1.03em"
-              }}
               required
+              autoComplete="current-password"
+              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
             />
           </div>
           {loginError && (
-            <div style={{ color: "#e53935", marginBottom: 12, textAlign: "center" }}>
+            <div className="form-error" style={{ padding: "10px 12px", fontSize: "0.9rem", marginBottom: "12px" }}>
               {loginError}
             </div>
           )}
           <button
             type="submit"
             className="add-note-btn"
-            style={{ width: "100%", fontWeight: 700, fontSize: "1.05em" }}
+            style={{ width: "100%", fontSize: "1rem", padding: "12px 16px" }}
           >
             Log In
           </button>
@@ -163,32 +170,26 @@ function App() {
   // Show initials input after login if not set yet
   if (!initialsSubmitted) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f6f8fa" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <form
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            boxShadow: "0 2px 24px rgba(50,50,93,0.10)",
-            padding: 36,
-            minWidth: 260,
-            textAlign: "center"
-          }}
+          className="initials-form"
+          style={{ textAlign: "center", maxWidth: "320px", padding: "24px", minWidth: "280px" }}
           onSubmit={handleInitialsSubmit}
         >
-          <h2 style={{ marginBottom: 18 }}>Enter Your Initials</h2>
+          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Enter Your Initials</h2>
           <input
+            className="form-input"
             type="text"
-            placeholder="Your initials (e.g. AG)"
+            placeholder="e.g. AG"
             value={initials}
             onChange={e => setInitials(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
             style={{
-              width: "100%",
-              padding: 10,
-              borderRadius: 8,
-              border: "1px solid #b3c7ee",
-              fontSize: "1.2em",
               textAlign: "center",
-              letterSpacing: "2px"
+              letterSpacing: "2px",
+              fontSize: "1.1rem",
+              fontWeight: "700",
+              marginBottom: "20px",
+              padding: "10px 14px"
             }}
             maxLength={4}
             required
@@ -197,14 +198,14 @@ function App() {
           <button
             type="submit"
             className="add-note-btn"
-            style={{ width: "100%", fontWeight: 700, marginTop: 22 }}
+            style={{ width: "100%", fontSize: "1rem", padding: "12px 16px", marginBottom: "10px" }}
           >
             Continue
           </button>
           <button
             type="button"
-            className="add-note-btn"
-            style={{ width: "100%", marginTop: 10, background: "#aaa" }}
+            className="reset-btn"
+            style={{ width: "100%", fontSize: "0.95rem", padding: "10px 16px" }}
             onClick={handleLogout}
           >
             Log Out
@@ -228,23 +229,12 @@ function App() {
       <h2 className="night-title">{shift} Checklist</h2>
 
       {/* Shift Selector */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 24, gap: 12 }}>
+      <div className="shift-selector">
         {Object.keys(checklists).map((shiftName) => (
           <button
             key={shiftName}
-            onClick={() => {
-              setShift(shiftName);
-              setTasks(checklists[shiftName].map((task) => ({ ...task, completed: false, note: "" })));
-              setShowInfo(null);
-            }}
-            className="add-note-btn"
-            style={{
-              background: shift === shiftName ? "#1976d2" : "#e3eaf6",
-              color: shift === shiftName ? "#fff" : "#222",
-              border: shift === shiftName ? "none" : "1px solid #b6d4fa",
-              fontWeight: shift === shiftName ? 700 : 500,
-              boxShadow: shift === shiftName ? "0 2px 8px #b3c7ee33" : "none"
-            }}
+            onClick={() => handleShiftChange(shiftName)}
+            className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
           >
             {shiftName}
           </button>
@@ -257,107 +247,48 @@ function App() {
           <span role="img" aria-label="calendar">📅</span>
           &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button className="reset-btn" onClick={resetAll}>Reset All</button>
-          <span
-            className="initials-chip"
-            style={{
-              cursor: "pointer",
-              transition: "background 0.2s, color 0.2s",
-              background: showChangeInitials ? "#1976d2" : "#ececec",
-              color: showChangeInitials ? "#fff" : "#222",
-              border: showChangeInitials ? "1px solid #1976d2" : "1px solid #bbb"
-            }}
-            title="Click to change initials"
-            onClick={() => {
-              setNewInitials(initials);
-              setShowChangeInitials(true);
-            }}
-          >
-            {initials}
-          </span>
-          <button
-            className="add-note-btn"
-            style={{
-              background: "#444",
-              fontWeight: 600,
-              fontSize: "0.98em",
-              padding: "4px 18px"
-            }}
-            onClick={handleLogout}
-          >
-            Log Out
-          </button>
-        </div>
-      </div>
-
-      {/* Change Initials Form */}
-      {showChangeInitials && (
-        <div style={{ marginBottom: 16 }}>
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              if (newInitials.trim().length < 2) {
-                alert("Please enter at least 2 letters for initials.");
-                return;
-              }
-              setInitials(newInitials.trim().toUpperCase());
-              setShowChangeInitials(false);
-            }}
-            style={{
-              background: "#fff",
-              border: "1px solid #cce3fa",
-              borderRadius: 8,
-              padding: 10,
-              marginTop: 10,
-              textAlign: "center"
-            }}
-          >
-            <input
-              type="text"
-              value={newInitials}
-              onChange={e => setNewInitials(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
-              placeholder="New initials"
-              maxLength={4}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <button className="reset-btn" onClick={resetAll}>Reset All</button>
+            <span
+              className="initials-chip"
               style={{
-                padding: 7,
-                borderRadius: 6,
-                border: "1px solid #b3c7ee",
-                fontSize: "1.1em",
-                letterSpacing: "2px",
-                textAlign: "center",
-                width: 80,
-                marginRight: 8
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                background: showInitialsModal ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)",
+                color: showInitialsModal ? "white" : "#4a5568",
+                border: showInitialsModal ? "2px solid #667eea" : "2px solid #e2e8f0",
+                transform: showInitialsModal ? "translateY(-1px)" : "none"
               }}
-              autoFocus
-              required
-            />
-            <button
-              type="submit"
-              className="add-note-btn"
-              style={{ fontSize: "1em", marginRight: 6 }}
+              title="Click to change initials"
+              onClick={() => {
+                setNewInitials(initials);
+                setShowInitialsModal(true);
+              }}
             >
-              Save
-            </button>
+              {initials}
+            </span>
             <button
-              type="button"
               className="add-note-btn"
-              style={{ background: "#ccc", color: "#333", fontSize: "1em" }}
-              onClick={() => setShowChangeInitials(false)}
+              style={{
+                background: "linear-gradient(135deg, #4a5568 0%, #2d3748 100%)",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                padding: "8px 16px"
+              }}
+              onClick={handleLogout}
             >
-              Cancel
+              Log Out
             </button>
-          </form>
-        </div>
-      )}
+          </div>
+      </div>
 
       {/* Progress bar */}
       <div className="progress-bar">
         <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
       </div>
-      <div style={{ fontSize: "0.98em", color: "#1565c0", marginBottom: 5 }}>
-        {percent}% Complete<br />
-        <span style={{ color: "#333" }}>Logged in as <strong>{user.username}</strong></span>
+      <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
+        {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)<br />
+        <span style={{ color: "#718096", fontSize: "1rem", fontWeight: "500" }}>Logged in as <strong>{user.username}</strong></span>
       </div>
 
       {/* Checklist table */}
@@ -375,12 +306,7 @@ function App() {
           <tbody>
             {tasks.map((task) => (
               <tr key={task.id}>
-                <td style={{
-                  color: task.completed ? "#bbb" : "#222",
-                  textDecoration: task.completed ? "line-through" : "none",
-                  fontWeight: task.completed ? "400" : "500",
-                  opacity: task.completed ? 0.6 : 1
-                }}>
+                <td className={task.completed ? "task-completed" : "task-incomplete"}>
                   {task.text}
                 </td>
                 <td>
@@ -388,6 +314,7 @@ function App() {
                     type="checkbox"
                     checked={task.completed}
                     onChange={() => toggleTask(task.id)}
+                    aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
                   />
                 </td>
                 <td>
@@ -397,28 +324,19 @@ function App() {
                   <button
                     className="info-btn"
                     onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
+                    aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
                   >
                     i
                   </button>
                 </td>
                 <td>
                   <button
-                    className="add-note-btn"
+                    className={task.note ? "edit-note-btn" : "add-note-btn"}
                     onClick={() => handleNote(task.id)}
+                    title={task.note ? "View/Edit Note" : "Add Note"}
                   >
-                    {task.note ? "Edit Note" : "Add Note"}
+                    {task.note ? "Edit" : "Add Note"}
                   </button>
-                  {task.note && (
-                    <div style={{
-                      fontSize: "0.92em",
-                      color: "#1565c0",
-                      marginTop: 3,
-                      maxWidth: 150,
-                      whiteSpace: "pre-line"
-                    }}>
-                      {task.note}
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}
@@ -426,12 +344,7 @@ function App() {
         </table>
       </div>
 
-      <div style={{
-        textAlign: "center",
-        color: "#888",
-        fontSize: "1em",
-        marginTop: 25
-      }}>
+      <div className="footer-text">
         Contact Ayush if you find issues with the page.
       </div>
 
@@ -454,6 +367,88 @@ function App() {
           </div>
         );
       })()}
+
+      {/* Note Modal */}
+      {showNoteModal && (() => {
+        const task = tasks.find(t => t.id === showNoteModal) || {};
+        return (
+          <div
+            className="info-modal-overlay"
+            onClick={cancelNote}
+          >
+            <div
+              className="note-modal-box"
+              onClick={e => e.stopPropagation()}
+            >
+              <button className="info-modal-close" onClick={cancelNote} title="Close">&times;</button>
+              <h3>{task.note ? "Edit Note" : "Add Note"}</h3>
+              <textarea
+                className="note-textarea"
+                value={noteText}
+                onChange={e => setNoteText(e.target.value)}
+                placeholder="Enter your note here..."
+                rows={4}
+                autoFocus
+              />
+              <div className="note-modal-buttons">
+                <button className="add-note-btn" onClick={saveNote}>
+                  Save Note
+                </button>
+                <button className="reset-btn" onClick={cancelNote} style={{ marginRight: 0 }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Initials Modal */}
+      {showInitialsModal && (
+        <div
+          className="info-modal-overlay"
+          onClick={() => setShowInitialsModal(false)}
+        >
+          <div
+            className="initials-modal-box"
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="info-modal-close" onClick={() => setShowInitialsModal(false)} title="Close">&times;</button>
+            <h3>Change Initials</h3>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                const trimmedInitials = newInitials.trim().toUpperCase();
+                if (trimmedInitials.length < 2) {
+                  alert("Please enter at least 2 letters for initials.");
+                  return;
+                }
+                setInitials(trimmedInitials);
+                setShowInitialsModal(false);
+              }}
+            >
+              <input
+                type="text"
+                className="initials-input"
+                value={newInitials}
+                onChange={e => setNewInitials(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
+                placeholder="Enter initials"
+                maxLength={4}
+                autoFocus
+                required
+              />
+              <div className="note-modal-buttons">
+                <button type="submit" className="add-note-btn">
+                  Save
+                </button>
+                <button type="button" className="reset-btn" onClick={() => setShowInitialsModal(false)} style={{ marginRight: 0 }}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
