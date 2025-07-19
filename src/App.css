@@ -1,0 +1,218 @@
+body {
+    background: #f6f8fa;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+.checklist-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(50,50,93,0.08);
+    padding: 32px 32px 16px 32px;
+}
+
+.header-card {
+    display: inline-block;
+    background: #f1f7ff;
+    border: 1px solid #d6eaff;
+    border-radius: 10px;
+    padding: 18px 26px;
+    margin-bottom: 18px;
+    font-size: 15px;
+}
+
+.header-card strong {
+    font-size: 1.08em;
+    color: #1976d2;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.night-title {
+    text-align: center;
+    margin-top: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #222f3e;
+    letter-spacing: 0.03em;
+}
+
+.table-wrap {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.checklist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    background: #f9fafd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.checklist-table th, .checklist-table td {
+    padding: 9px 10px;
+    text-align: left;
+    border-bottom: 1px solid #f2f4f7;
+}
+
+.checklist-table th {
+    background: #eef4fa;
+    color: #3a3f50;
+    font-size: 1.05em;
+    font-weight: 600;
+}
+
+.checklist-table tr:last-child td {
+    border-bottom: none;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #2d9cf5;
+}
+
+.info-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1em;
+    transition: background 0.15s;
+}
+.info-btn:hover { background: #125aa1; }
+
+.add-note-btn {
+    background: #2196f3;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 6px 15px;
+    cursor: pointer;
+    font-size: 0.98em;
+    font-weight: 500;
+    margin-left: 3px;
+    transition: background 0.18s;
+}
+.add-note-btn:hover {
+    background: #1565c0;
+}
+
+.reset-btn {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background 0.18s;
+}
+.reset-btn:hover { background: #ab1816; }
+
+.initials-chip {
+    display: inline-block;
+    background: #ececec;
+    color: #2c2c2c;
+    border-radius: 6px;
+    font-size: 0.97em;
+    font-weight: 600;
+    padding: 4px 9px;
+    margin-left: 5px;
+    border: 1px solid #bbb;
+    letter-spacing: 1px;
+}
+
+.progress-bar {
+    height: 7px;
+    background: #e3eaf6;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 15px 0 8px 0;
+}
+.progress-bar-inner {
+    background: #1976d2;
+    height: 100%;
+    transition: width 0.2s;
+}
+.meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #546e7a;
+    margin-bottom: 10px;
+    font-size: 0.99em;
+}
+
+@media (max-width: 800px) {
+    .checklist-container { padding: 12px; }
+    .checklist-table th, .checklist-table td { padding: 7px 6px; }
+    .header-card { font-size: 14px; padding: 10px 10px; }
+}
+
+/* Modal Overlay */
+.info-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44,62,80,0.15);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInBg 0.17s;
+}
+@keyframes fadeInBg { from { opacity: 0; } to { opacity: 1; } }
+
+/* Modal Box */
+.info-modal-box {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 90vw;
+  padding: 34px 28px 18px 28px;
+  box-shadow: 0 8px 40px 8px rgba(44,62,80,0.18);
+  position: relative;
+  animation: popIn 0.17s;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-32px) scale(0.95);}
+  to   { opacity: 1; transform: translateY(0) scale(1);}
+}
+.info-modal-box h3 {
+  font-size: 1.23em;
+  font-weight: 600;
+  color: #1976d2;
+  margin: 0 0 13px 0;
+  letter-spacing: 0.02em;
+}
+.info-modal-box .info-detail {
+  color: #222;
+  font-size: 1.05em;
+  line-height: 1.58;
+  margin-bottom: 18px;
+}
+.info-modal-close {
+  position: absolute;
+  top: 13px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+.info-modal-close:hover {
+  color: #d32f2f;
+}
