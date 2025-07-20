@@ -1,7 +1,18 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
 import { users } from "./users";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
+import { 
+  saveHandoverNotes as saveHandoverNotesToDB,
+  getHandoverNotes,
+  deleteHandoverNotes as deleteHandoverNotesFromDB,
+  subscribeToHandoverNotes,
+  saveWakeUpCalls,
+  subscribeToWakeUpCalls,
+  saveBreakfastTimes as saveBreakfastTimesToDB,
+  getBreakfastTimes,
+  subscribeToBreakfastTimes
+} from "./firebase/database";
 import "./App.css";
 
 function App() {
@@ -22,14 +33,8 @@ function App() {
   const [showHandoverFullscreen, setShowHandoverFullscreen] = useState(false);
   const [handoverDate, setHandoverDate] = useState(new Date().toISOString().split('T')[0]);
   const [handoverNotes, setHandoverNotes] = useState("");
-  const [savedHandovers, setSavedHandovers] = useState(() => {
-    const saved = localStorage.getItem('hotel-handovers');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [wakeUpCalls, setWakeUpCalls] = useState(() => {
-    const saved = localStorage.getItem('hotel-wakeup-calls');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [savedHandovers, setSavedHandovers] = useState({});
+  const [wakeUpCalls, setWakeUpCalls] = useState([]);
   const [showWakeUpModal, setShowWakeUpModal] = useState(false);
   const [showWakeUpFullscreen, setShowWakeUpFullscreen] = useState(false);
   const [newWakeUpCall, setNewWakeUpCall] = useState({
@@ -38,10 +43,7 @@ function App() {
     notes: '',
     date: new Date().toISOString().split('T')[0]
   });
-  const [breakfastTimes, setBreakfastTimes] = useState(() => {
-    const saved = localStorage.getItem('hotel-breakfast-times');
-    return saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
-  });
+  const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
   const [showBreakfastModal, setShowBreakfastModal] = useState(false);
 
   // Use the real-time checklist hook
@@ -55,6 +57,27 @@ function App() {
     toggleDowntimeTask,
     resetAll
   } = useRealtimeChecklist(shift, initials);
+
+  // Subscribe to Firebase data
+  useEffect(() => {
+    const unsubscribeHandovers = subscribeToHandoverNotes(setSavedHandovers);
+    const unsubscribeWakeUpCalls = subscribeToWakeUpCalls(setWakeUpCalls);
+    const unsubscribeBreakfastTimes = subscribeToBreakfastTimes(setBreakfastTimes);
+
+    // Load handover notes for current date
+    getHandoverNotes(handoverDate).then(setHandoverNotes);
+
+    return () => {
+      unsubscribeHandovers();
+      unsubscribeWakeUpCalls();
+      unsubscribeBreakfastTimes();
+    };
+  }, []);
+
+  // Load handover notes when date changes
+  useEffect(() => {
+    getHandoverNotes(handoverDate).then(setHandoverNotes);
+  }, [handoverDate]);
 
   // Handle login submit
   const handleLogin = (e) => {
@@ -129,62 +152,137 @@ function App() {
   };
 
   // Handover functions
-  const loadHandoverNotes = useCallback((date) => {
-    setHandoverNotes(savedHandovers[date] || "");
-  }, [savedHandovers]);
+  const loadHandoverNotes = useCallback(async (date) => {
+    const notes = await getHandoverNotes(date);
+    setHandoverNotes(notes);
+  }, []);
 
-  const saveHandoverNotes = useCallback(() => {
-    const updatedHandovers = {
-      ...savedHandovers,
-      [handoverDate]: handoverNotes
-    };
-    setSavedHandovers(updatedHandovers);
-    localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
-    setShowHandoverModal(false);
-  }, [savedHandovers, handoverDate, handoverNotes]);
+  const saveHandoverNotes = useCallback(async () => {
+    try {
+      await saveHandoverNotesToDB(handoverDate, handoverNotes);
+      setShowHandoverModal(false);
+    } catch (error) {
+      console.error('Error saving handover notes:', error);
+      alert('Failed to save handover notes. Please try again.');
+    }
+  }, [handoverDate, handoverNotes]);
 
   const openHandoverModal = useCallback(() => {
-    loadHandoverNotes(handoverDate);
     setShowHandoverModal(true);
-  }, [handoverDate, loadHandoverNotes]);
+  }, []);
 
   const handleDateChange = useCallback((newDate) => {
     setHandoverDate(newDate);
     loadHandoverNotes(newDate);
   }, [loadHandoverNotes]);
 
-  const deleteHandoverNotes = useCallback((dateToDelete) => {
+  const deleteHandoverNotes = useCallback(async (dateToDelete) => {
     if (window.confirm(`Are you sure you want to delete handover notes for ${new Date(dateToDelete).toLocaleDateString('en-GB')}? This cannot be undone.`)) {
-      const updatedHandovers = { ...savedHandovers };
-      delete updatedHandovers[dateToDelete];
-      setSavedHandovers(updatedHandovers);
-      localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
-      
-      // If we're deleting the currently selected date, clear the notes
-      if (dateToDelete === handoverDate) {
-        setHandoverNotes("");
+      try {
+        await deleteHandoverNotesFromDB(dateToDelete);
+        
+        // If we're deleting the currently selected date, clear the notes
+        if (dateToDelete === handoverDate) {
+          setHandoverNotes("");
+        }
+        
+        return true;
+      } catch (error) {
+        console.error('Error deleting handover notes:', error);
+        alert('Failed to delete handover notes. Please try again.');
+        return false;
       }
-      
-      return true;
     }
     return false;
-  }, [savedHandovers, handoverDate]);
+  }, [handoverDate]);
+
+  // Bulk operations for handover notes
+  const deleteAllHandoverNotes = useCallback(async () => {
+    if (window.confirm(`Are you sure you want to delete ALL ${Object.keys(savedHandovers).length} handover notes? This cannot be undone.`)) {
+      try {
+        // Delete all handover notes by setting each one to empty
+        const deletePromises = Object.keys(savedHandovers).map(date => 
+          deleteHandoverNotesFromDB(date)
+        );
+        await Promise.all(deletePromises);
+        setHandoverNotes("");
+      } catch (error) {
+        console.error('Error deleting all handover notes:', error);
+        alert('Failed to delete all handover notes. Please try again.');
+      }
+    }
+  }, [savedHandovers]);
+
+  const deleteOldHandoverNotes = useCallback(async () => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const cutoffDate = sevenDaysAgo.toISOString().split('T')[0];
+    
+    const oldDates = Object.keys(savedHandovers).filter(date => date < cutoffDate);
+    
+    if (oldDates.length === 0) {
+      alert('No old handover notes to delete.');
+      return;
+    }
+    
+    if (window.confirm(`Are you sure you want to delete ${oldDates.length} handover notes older than 7 days? This cannot be undone.`)) {
+      try {
+        const deletePromises = oldDates.map(date => deleteHandoverNotesFromDB(date));
+        await Promise.all(deletePromises);
+      } catch (error) {
+        console.error('Error deleting old handover notes:', error);
+        alert('Failed to delete old handover notes. Please try again.');
+      }
+    }
+  }, [savedHandovers]);
+
+  // Bulk operations for wake-up calls
+  const completeAllPendingWakeUpCalls = useCallback(async () => {
+    const pendingCalls = wakeUpCalls.filter(call => !call.completed);
+    
+    if (pendingCalls.length === 0) {
+      alert('No pending wake-up calls to complete.');
+      return;
+    }
+    
+    if (window.confirm(`Are you sure you want to mark all ${pendingCalls.length} pending wake-up calls as completed?`)) {
+      try {
+        const updatedCalls = wakeUpCalls.map(call => 
+          !call.completed ? { ...call, completed: true, completedBy: initials } : call
+        );
+        await saveWakeUpCalls(updatedCalls);
+      } catch (error) {
+        console.error('Error completing all wake-up calls:', error);
+        alert('Failed to complete all wake-up calls. Please try again.');
+      }
+    }
+  }, [wakeUpCalls, initials]);
 
   // Breakfast time functions
-  const saveBreakfastTimes = useCallback(() => {
-    localStorage.setItem('hotel-breakfast-times', JSON.stringify(breakfastTimes));
-    setShowBreakfastModal(false);
+  const saveBreakfastTimes = useCallback(async () => {
+    try {
+      await saveBreakfastTimesToDB(breakfastTimes);
+      setShowBreakfastModal(false);
+    } catch (error) {
+      console.error('Error saving breakfast times:', error);
+      alert('Failed to save breakfast times. Please try again.');
+    }
   }, [breakfastTimes]);
 
-  const cancelBreakfastEdit = useCallback(() => {
-    const saved = localStorage.getItem('hotel-breakfast-times');
-    const savedTimes = saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
-    setBreakfastTimes(savedTimes);
-    setShowBreakfastModal(false);
+  const cancelBreakfastEdit = useCallback(async () => {
+    try {
+      const savedTimes = await getBreakfastTimes();
+      setBreakfastTimes(savedTimes);
+      setShowBreakfastModal(false);
+    } catch (error) {
+      console.error('Error getting breakfast times:', error);
+      setBreakfastTimes({ start: '07:00', end: '11:00' });
+      setShowBreakfastModal(false);
+    }
   }, []);
 
   // Wake-up call functions
-  const addWakeUpCall = useCallback(() => {
+  const addWakeUpCall = useCallback(async () => {
     if (!newWakeUpCall.roomNumber || !newWakeUpCall.time) {
       alert('Please enter both room number(s) and wake-up time.');
       return;
@@ -219,37 +317,49 @@ function App() {
       return a.time.localeCompare(b.time);
     });
 
-    setWakeUpCalls(updatedCalls);
-    localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
-    
-    setNewWakeUpCall({
-      roomNumber: '',
-      time: '',
-      notes: '',
-      date: new Date().toISOString().split('T')[0]
-    });
-    setShowWakeUpModal(false);
+    try {
+      await saveWakeUpCalls(updatedCalls);
+      
+      setNewWakeUpCall({
+        roomNumber: '',
+        time: '',
+        notes: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+      setShowWakeUpModal(false);
+    } catch (error) {
+      console.error('Error saving wake-up calls:', error);
+      alert('Failed to save wake-up call. Please try again.');
+    }
   }, [newWakeUpCall, wakeUpCalls, initials]);
 
-  const deleteWakeUpCall = useCallback((id) => {
+  const deleteWakeUpCall = useCallback(async (id) => {
     if (window.confirm('Are you sure you want to delete this wake-up call?')) {
-      const updatedCalls = wakeUpCalls.filter(call => call.id !== id);
-      setWakeUpCalls(updatedCalls);
-      localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+      try {
+        const updatedCalls = wakeUpCalls.filter(call => call.id !== id);
+        await saveWakeUpCalls(updatedCalls);
+      } catch (error) {
+        console.error('Error deleting wake-up call:', error);
+        alert('Failed to delete wake-up call. Please try again.');
+      }
     }
   }, [wakeUpCalls]);
 
-  const toggleWakeUpCallComplete = useCallback((id) => {
-    const updatedCalls = wakeUpCalls.map(call => 
-      call.id === id 
-        ? { ...call, completed: !call.completed, completedBy: call.completed ? null : initials }
-        : call
-    );
-    setWakeUpCalls(updatedCalls);
-    localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
+  const toggleWakeUpCallComplete = useCallback(async (id) => {
+    try {
+      const updatedCalls = wakeUpCalls.map(call => 
+        call.id === id 
+          ? { ...call, completed: !call.completed, completedBy: call.completed ? null : initials }
+          : call
+      );
+      await saveWakeUpCalls(updatedCalls);
+    } catch (error) {
+      console.error('Error updating wake-up call:', error);
+      alert('Failed to update wake-up call. Please try again.');
+    }
   }, [wakeUpCalls, initials]);
 
-  const clearOldWakeUpCalls = useCallback(() => {
+  const clearOldWakeUpCalls = useCallback(async () => {
     const today = new Date().toISOString().split('T')[0];
     const activeCalls = wakeUpCalls.filter(call => call.date >= today);
     
@@ -259,8 +369,12 @@ function App() {
     }
 
     if (window.confirm(`Clear ${wakeUpCalls.length - activeCalls.length} old wake-up calls?`)) {
-      setWakeUpCalls(activeCalls);
-      localStorage.setItem('hotel-wakeup-calls', JSON.stringify(activeCalls));
+      try {
+        await saveWakeUpCalls(activeCalls);
+      } catch (error) {
+        console.error('Error clearing old wake-up calls:', error);
+        alert('Failed to clear old wake-up calls. Please try again.');
+      }
     }
   }, [wakeUpCalls]);
 
@@ -1073,42 +1187,13 @@ function App() {
                       <h4>Bulk Actions</h4>
                       <button
                         className="handover-bulk-delete-btn"
-                        onClick={() => {
-                          if (window.confirm(`Are you sure you want to delete ALL ${Object.keys(savedHandovers).length} handover notes? This cannot be undone.`)) {
-                            setSavedHandovers({});
-                            localStorage.setItem('hotel-handovers', JSON.stringify({}));
-                            setHandoverNotes("");
-                          }
-                        }}
+                        onClick={deleteAllHandoverNotes}
                       >
                         🗑️ Delete All Notes
                       </button>
                       <button
                         className="handover-bulk-delete-old-btn"
-                        onClick={() => {
-                          const oneWeekAgo = new Date();
-                          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-                          
-                          const oldDates = Object.keys(savedHandovers).filter(date => 
-                            new Date(date) < oneWeekAgo
-                          );
-                          
-                          if (oldDates.length === 0) {
-                            alert('No notes older than 7 days found.');
-                            return;
-                          }
-                          
-                          if (window.confirm(`Delete ${oldDates.length} notes older than 7 days? This cannot be undone.`)) {
-                            const updatedHandovers = { ...savedHandovers };
-                            oldDates.forEach(date => delete updatedHandovers[date]);
-                            setSavedHandovers(updatedHandovers);
-                            localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
-                            
-                            if (oldDates.includes(handoverDate)) {
-                              setHandoverNotes("");
-                            }
-                          }
-                        }}
+                        onClick={deleteOldHandoverNotes}
                       >
                         🧹 Delete Old Notes (7+ days)
                       </button>
@@ -1441,20 +1526,7 @@ function App() {
                     <>
                       <button
                         className="wakeup-bulk-btn"
-                        onClick={() => {
-                          const pendingCalls = wakeUpCalls.filter(call => !call.completed);
-                          if (pendingCalls.length === 0) {
-                            alert('No pending calls to mark as completed.');
-                            return;
-                          }
-                          if (window.confirm(`Mark all ${pendingCalls.length} pending calls as completed?`)) {
-                            const updatedCalls = wakeUpCalls.map(call => 
-                              !call.completed ? { ...call, completed: true, completedBy: initials } : call
-                            );
-                            setWakeUpCalls(updatedCalls);
-                            localStorage.setItem('hotel-wakeup-calls', JSON.stringify(updatedCalls));
-                          }
-                        }}
+                        onClick={completeAllPendingWakeUpCalls}
                       >
                         ✅ Complete All Pending
                       </button>
@@ -1589,14 +1661,7 @@ function App() {
                                   </button>
                                   <button
                                     className="handover-delete-small-btn"
-                                    onClick={() => {
-                                      if (window.confirm(`Delete handover notes for ${dateObj.toLocaleDateString()}?`)) {
-                                        const updatedHandovers = { ...savedHandovers };
-                                        delete updatedHandovers[date];
-                                        setSavedHandovers(updatedHandovers);
-                                        localStorage.setItem('hotel-handovers', JSON.stringify(updatedHandovers));
-                                      }
-                                    }}
+                                    onClick={() => deleteHandoverNotes(date)}
                                     title="Delete"
                                   >
                                     🗑️
@@ -1647,12 +1712,7 @@ function App() {
                     </button>
                     <button
                       className="handover-bulk-delete-btn"
-                      onClick={() => {
-                        if (window.confirm(`Delete all ${Object.keys(savedHandovers).length} handover notes? This action cannot be undone.`)) {
-                          setSavedHandovers({});
-                          localStorage.removeItem('hotel-handovers');
-                        }
-                      }}
+                      onClick={deleteAllHandoverNotes}
                     >
                       🗑️ Clear All
                     </button>
