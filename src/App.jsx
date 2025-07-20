@@ -49,6 +49,9 @@ function App() {
   });
   const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
   const [showBreakfastModal, setShowBreakfastModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+  const [lastCompletedShift, setLastCompletedShift] = useState('');
 
   // Use the real-time checklist hook
   const {
@@ -82,6 +85,74 @@ function App() {
   useEffect(() => {
     getHandoverNotes(handoverDate).then(setHandoverNotes);
   }, [handoverDate]);
+
+  // Check for shift completion and trigger celebration
+  useEffect(() => {
+    if (tasks.length > 0 && tasks.every(task => task.completed)) {
+      const currentShiftKey = `${shift}-${new Date().toDateString()}`;
+      if (lastCompletedShift !== currentShiftKey) {
+        setShowCelebrationModal(true);
+        setLastCompletedShift(currentShiftKey);
+      }
+    }
+  }, [tasks, shift, lastCompletedShift]);
+
+  // Enhanced scroll animations for left sidebar
+  useEffect(() => {
+    let scrollTimeout;
+    let isScrolling = false;
+
+    const handleScroll = () => {
+      const sidebarCards = document.querySelectorAll('.left-sidebar .header-card');
+      
+      if (!isScrolling) {
+        isScrolling = true;
+        sidebarCards.forEach((card, index) => {
+          setTimeout(() => {
+            card.classList.add('floating');
+          }, index * 50);
+        });
+      }
+
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        sidebarCards.forEach(card => {
+          card.classList.remove('floating');
+        });
+      }, 150);
+    };
+
+    // Add intersection observer for initial animation
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('scroll-visible');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all header cards
+    const sidebarCards = document.querySelectorAll('.left-sidebar .header-card');
+    sidebarCards.forEach(card => {
+      observer.observe(card);
+    });
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
 
   // Session management functions
   const saveLoginSession = useCallback((userData, userInitials = "", initialsSubmitted = false) => {
@@ -211,6 +282,9 @@ function App() {
     setInitials(trimmedInitials);
     setInitialsSubmitted(true);
     updateSessionInitials(trimmedInitials, true); // Update session with initials
+    
+    // Show welcome modal after initials are submitted
+    setShowWelcomeModal(true);
   };
 
   // Progress calculation - memoized for performance
@@ -1905,6 +1979,123 @@ function App() {
             <button 
               className="info-modal-close"
               onClick={() => setShowBreakfastModal(false)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Celebration Modal for Completed Shift */}
+      {showCelebrationModal && (
+        <div className="celebration-modal-overlay" onClick={() => setShowCelebrationModal(false)}>
+          <div className="celebration-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="celebration-content">
+              <div className="celebration-emoji-burst">
+                🎉 🎊 ✨ 🌟 🎉 🎊 ✨ 🌟
+              </div>
+              <h2 className="celebration-title">
+                🎉 SHIFT COMPLETED! 🎉
+              </h2>
+              <div className="celebration-message">
+                <p className="celebration-main-text">
+                  Fantastic work, <strong>{initials}</strong>! 
+                </p>
+                <p className="celebration-sub-text">
+                  You've successfully completed all <strong>{tasks.length}</strong> tasks for the <strong>{shift}</strong> shift!
+                </p>
+              </div>
+              
+              <div className="celebration-stats">
+                <div className="celebration-stat-item">
+                  <span className="celebration-stat-number">{tasks.length}</span>
+                  <span className="celebration-stat-label">Tasks Completed</span>
+                </div>
+                <div className="celebration-stat-item">
+                  <span className="celebration-stat-number">100%</span>
+                  <span className="celebration-stat-label">Success Rate</span>
+                </div>
+                <div className="celebration-stat-item">
+                  <span className="celebration-stat-number">⭐</span>
+                  <span className="celebration-stat-label">Excellence</span>
+                </div>
+              </div>
+
+              <div className="celebration-achievement">
+                <div className="celebration-badge">
+                  <div className="celebration-badge-icon">🏆</div>
+                  <div className="celebration-badge-text">
+                    <span className="celebration-badge-title">{shift} Shift Champion</span>
+                    <span className="celebration-badge-subtitle">All tasks completed flawlessly</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="celebration-quotes">
+                <p className="celebration-quote">
+                  {shift === 'Night' && '"The night team keeps the hotel running smoothly while the world sleeps."'}
+                  {shift === 'Morning' && '"Every great day starts with a dedicated morning team."'}
+                  {shift === 'Evening' && '"The evening team ensures every guest feels welcomed and cared for."'}
+                </p>
+              </div>
+
+              <div className="celebration-actions">
+                <button 
+                  className="celebration-continue-btn"
+                  onClick={() => setShowCelebrationModal(false)}
+                >
+                  🌟 Keep Up The Great Work! 🌟
+                </button>
+              </div>
+
+              <div className="celebration-footer">
+                <p>Thanks for your dedication to excellent guest service! 🏨</p>
+              </div>
+            </div>
+            
+            <button 
+              className="celebration-modal-close"
+              onClick={() => setShowCelebrationModal(false)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Modal for Test Week */}
+      {showWelcomeModal && (
+        <div className="info-modal-overlay" onClick={() => setShowWelcomeModal(false)}>
+          <div className="welcome-modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#2c3e50' }}>
+              🎉 Welcome to the Digital Checklist System!
+            </h3>
+            <div className="welcome-modal-content">
+              <p style={{ textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' }}>
+                Welcome to the new digital way of doing checklists. 
+              </p>
+              <p style={{ textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' }}>
+                This is the <strong>test week</strong> - I am evaluating how well this system works for our daily operations.
+              </p>
+              <p style={{ textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' }}>
+                If you find any bugs, errors, or have suggestions for improvement, please contact <strong>Ayush</strong>.
+              </p>
+              <p style={{ textAlign: 'center', lineHeight: '1.6', fontSize: '0.9rem', color: '#7f8c8d' }}>
+                Your feedback will help make this system even better! 🚀
+              </p>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <button 
+                className="add-note-btn"
+                onClick={() => setShowWelcomeModal(false)}
+                style={{ padding: '12px 24px', fontSize: '1rem' }}
+              >
+                Let's Get Started!
+              </button>
+            </div>
+            <button 
+              className="info-modal-close"
+              onClick={() => setShowWelcomeModal(false)}
             >
               ×
             </button>
