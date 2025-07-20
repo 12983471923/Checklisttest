@@ -15,6 +15,10 @@ import {
 } from "./firebase/database";
 import "./App.css";
 
+// Login session constants
+const LOGIN_STORAGE_KEY = 'checklistapp_login_session';
+const SESSION_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+
 function App() {
   const [user, setUser] = useState(null);
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
@@ -79,6 +83,107 @@ function App() {
     getHandoverNotes(handoverDate).then(setHandoverNotes);
   }, [handoverDate]);
 
+  // Session management functions
+  const saveLoginSession = useCallback((userData, userInitials = "", initialsSubmitted = false) => {
+    const sessionData = {
+      user: userData,
+      initials: userInitials,
+      initialsSubmitted: initialsSubmitted,
+      timestamp: Date.now(),
+      expiry: Date.now() + SESSION_DURATION
+    };
+    localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(sessionData));
+  }, []);
+
+  const loadLoginSession = useCallback(() => {
+    try {
+      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
+      if (!sessionData) return null;
+
+      const parsed = JSON.parse(sessionData);
+      const now = Date.now();
+
+      // Check if session has expired
+      if (now > parsed.expiry) {
+        localStorage.removeItem(LOGIN_STORAGE_KEY);
+        return null;
+      }
+
+      return {
+        user: parsed.user,
+        initials: parsed.initials || "",
+        initialsSubmitted: parsed.initialsSubmitted || false
+      };
+    } catch (error) {
+      console.error('Error loading login session:', error);
+      localStorage.removeItem(LOGIN_STORAGE_KEY);
+      return null;
+    }
+  }, []);
+
+  const updateSessionInitials = useCallback((userInitials, initialsSubmitted) => {
+    try {
+      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
+      if (sessionData) {
+        const parsed = JSON.parse(sessionData);
+        parsed.initials = userInitials;
+        parsed.initialsSubmitted = initialsSubmitted;
+        localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(parsed));
+      }
+    } catch (error) {
+      console.error('Error updating session initials:', error);
+    }
+  }, []);
+
+  const clearLoginSession = useCallback(() => {
+    localStorage.removeItem(LOGIN_STORAGE_KEY);
+  }, []);
+
+  // Check for existing login session on app load
+  useEffect(() => {
+    const sessionData = loadLoginSession();
+    if (sessionData) {
+      setUser(sessionData.user);
+      setInitials(sessionData.initials);
+      setInitialsSubmitted(sessionData.initialsSubmitted);
+    }
+  }, [loadLoginSession]);
+
+  // Auto-logout when session expires
+  useEffect(() => {
+    if (!user) return;
+
+    const checkSessionExpiry = () => {
+      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
+      if (!sessionData) {
+        setUser(null);
+        setInitials("");
+        setInitialsSubmitted(false);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(sessionData);
+        if (Date.now() > parsed.expiry) {
+          clearLoginSession();
+          setUser(null);
+          setInitials("");
+          setInitialsSubmitted(false);
+        }
+      } catch (error) {
+        console.error('Error checking session expiry:', error);
+        clearLoginSession();
+        setUser(null);
+        setInitials("");
+        setInitialsSubmitted(false);
+      }
+    };
+
+    // Check session expiry every 30 seconds
+    const interval = setInterval(checkSessionExpiry, 30000);
+    return () => clearInterval(interval);
+  }, [user, clearLoginSession]);
+
   // Handle login submit
   const handleLogin = (e) => {
     e.preventDefault();
@@ -87,6 +192,7 @@ function App() {
     );
     if (match) {
       setUser(match);
+      saveLoginSession(match); // Save session to localStorage
       setLoginForm({ username: "", password: "" });
       setLoginError("");
     } else {
@@ -104,6 +210,7 @@ function App() {
     }
     setInitials(trimmedInitials);
     setInitialsSubmitted(true);
+    updateSessionInitials(trimmedInitials, true); // Update session with initials
   };
 
   // Progress calculation - memoized for performance
@@ -144,6 +251,7 @@ function App() {
   }, [resetAll]);
 
   const handleLogout = () => {
+    clearLoginSession(); // Clear stored session
     setUser(null);
     setInitials("");
     setInitialsSubmitted(false);
@@ -1000,6 +1108,7 @@ function App() {
                   return;
                 }
                 setInitials(trimmedInitials);
+                updateSessionInitials(trimmedInitials, true); // Update session with new initials
                 setShowInitialsModal(false);
               }}
             >
