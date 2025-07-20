@@ -1585,94 +1585,6 @@ input[type="checkbox"]:hover {
 }
 
 /* Breakfast Time Editing Styles */
-.breakfast-edit-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-end;
-  flex: 1;
-}
-
-.breakfast-time-inputs {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f8fafc;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 2px solid #e5e7eb;
-}
-
-.breakfast-time-input {
-  padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  background: white;
-  transition: border-color 0.2s ease;
-  width: 85px;
-}
-
-.breakfast-time-input:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.breakfast-separator {
-  color: #6b7280;
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0 4px;
-}
-
-.breakfast-edit-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.breakfast-save-btn,
-.breakfast-cancel-btn {
-  background: white;
-  border: 2px solid #d1d5db;
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.breakfast-save-btn {
-  color: #059669;
-  border-color: #34d399;
-}
-
-.breakfast-save-btn:hover {
-  background: #ecfdf5;
-  border-color: #10b981;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
-}
-
-.breakfast-cancel-btn {
-  color: #dc2626;
-  border-color: #f87171;
-}
-
-.breakfast-cancel-btn:hover {
-  background: #fef2f2;
-  border-color: #ef4444;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
-}
-
 .breakfast-display {
   display: flex;
   align-items: center;
@@ -1681,32 +1593,117 @@ input[type="checkbox"]:hover {
   min-height: 40px;
 }
 
+/* Breakfast Modal Styles */
+.breakfast-modal-box {
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90vw;
+  padding: 32px 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  border: 1px solid #e5e7eb;
+}
+
+.breakfast-modal-box h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.breakfast-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.breakfast-modal-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.breakfast-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakfast-input-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.breakfast-modal-input {
+  padding: 12px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  background: white;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  font-weight: 600;
+}
+
+.breakfast-modal-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.breakfast-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.breakfast-modal-save-btn,
+.breakfast-modal-cancel-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.breakfast-modal-save-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.breakfast-modal-save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.breakfast-modal-cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.breakfast-modal-cancel-btn:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
 /* Responsive breakfast editing */
 @media (max-width: 768px) {
-  .breakfast-edit-controls {
-    align-items: stretch;
+  .breakfast-modal-box {
+    padding: 24px 20px;
   }
   
-  .breakfast-time-inputs {
-    justify-content: center;
-    padding: 6px 10px;
+  .breakfast-modal-buttons {
+    flex-direction: column;
+    gap: 8px;
   }
-  
-  .breakfast-time-input {
-    width: 75px;
-    font-size: 0.85rem;
-  }
-  
-  .breakfast-edit-buttons {
-    justify-content: center;
-  }
-  
-  .breakfast-save-btn,
-  .breakfast-cancel-btn {
-    width: 32px;
-    height: 32px;
-  }
-  
+
   .time-item {
     padding: 12px 0;
     gap: 12px;
@@ -2039,41 +2036,60 @@ input[type="checkbox"]:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
   padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .handover-fullscreen-container {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   width: 95%;
   max-width: 1400px;
-  height: 90vh;
-  max-height: 900px;
+  height: 85vh;
+  max-height: 800px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 .handover-fullscreen-header {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
   padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 16px 16px 0 0;
 }
 
 .handover-fullscreen-header h2 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
+  color: #1e293b;
 }
 
 .handover-fullscreen-actions {
@@ -2083,39 +2099,39 @@ input[type="checkbox"]:hover {
 }
 
 .handover-add-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: #3b82f6;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .handover-add-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: #2563eb;
 }
 
 .handover-fullscreen-close {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .handover-fullscreen-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #e2e8f0;
+  color: #475569;
 }
 
 .handover-fullscreen-content {
@@ -2127,11 +2143,10 @@ input[type="checkbox"]:hover {
 
 .handover-fullscreen-stats {
   display: flex;
-  gap: 32px;
-  padding: 20px 24px;
+  gap: 24px;
+  padding: 16px 24px;
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
-  justify-content: center;
 }
 
 .handover-fullscreen-stat {
@@ -2139,35 +2154,55 @@ input[type="checkbox"]:hover {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  min-width: 80px;
+}
+
+.handover-stat-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  background-clip: text;
+  line-height: 1;
+}
+
+.handover-stat-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .handover-fullscreen-table-container {
   flex: 1;
   overflow-y: auto;
-  padding: 0 24px;
+  padding: 24px;
+  background: white;
 }
 
 .handover-fullscreen-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .handover-fullscreen-table th {
   background: #f8fafc;
-  padding: 12px 8px;
+  padding: 12px 16px;
   text-align: left;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
   font-weight: 600;
-  color: #4a5568;
-  font-size: 0.9rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  color: #64748b;
+  font-size: 0.85rem;
 }
 
 .handover-fullscreen-table td {
-  padding: 16px 8px;
+  padding: 16px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: top;
 }
@@ -2180,60 +2215,62 @@ input[type="checkbox"]:hover {
   background: #fef3e2 !important;
 }
 
-.handover-row-today:hover {
-  background: #fed7aa !important;
-}
-
 .handover-date-cell {
   position: relative;
 }
 
 .handover-date-display {
+  background: #3b82f6;
+  color: white;
   font-weight: 600;
-  color: #2d3748;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
 }
 
 .handover-today-badge {
-  background: #f6ad55;
-  color: #744210;
+  background: #f59e0b;
+  color: white;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 600;
-  margin-left: 8px;
+  margin-left: 6px;
+  display: inline-block;
 }
 
 .handover-day-cell {
-  color: #4a5568;
-  font-weight: 500;
+  color: #6366f1;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .handover-day-name {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  text-transform: capitalize;
 }
 
 .handover-notes-cell {
-  max-width: 400px;
+  max-width: 500px;
+  padding-right: 20px;
 }
 
 .handover-notes-preview {
-  color: #4a5568;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
   word-wrap: break-word;
-}
-
-.handover-wordcount-cell {
-  text-align: center;
-}
-
-.handover-word-badge {
-  background: #edf2f7;
-  color: #4a5568;
-  padding: 4px 8px;
+  background: #f8fafc;
+  padding: 12px;
   border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  margin: 4px 0;
+  max-height: none;
+  overflow: visible;
+  white-space: pre-wrap;
 }
 
 .handover-actions-cell {
@@ -2242,29 +2279,74 @@ input[type="checkbox"]:hover {
 
 .handover-action-buttons {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
+  align-items: center;
+}
+
+.handover-action-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.handover-action-buttons .edit-button {
+  background: #3b82f6;
+  color: white;
+}
+
+.handover-action-buttons .edit-button:hover {
+  background: #2563eb;
+}
+
+.handover-action-buttons .delete-button {
+  background: #ef4444;
+  color: white;
+}
+
+.handover-action-buttons .delete-button:hover {
+  background: #dc2626;
 }
 
 .handover-edit-btn,
 .handover-delete-small-btn {
-  background: none;
-  border: 1px solid #e2e8f0;
-  padding: 6px 8px;
-  border-radius: 4px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.handover-edit-btn {
+  color: #4f46e5;
+  border-color: #c7d2fe;
 }
 
 .handover-edit-btn:hover {
   background: #f0f4ff;
   border-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.2);
+}
+
+.handover-delete-small-btn {
+  color: #ef4444;
+  border-color: #fecaca;
 }
 
 .handover-delete-small-btn:hover {
-  background: #fed7d7;
-  border-color: #feb2b2;
+  background: #fef2f2;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
 }
 
 .handover-fullscreen-empty {
@@ -2361,10 +2443,34 @@ input[type="checkbox"]:hover {
   }
 
   .handover-notes-cell {
-    max-width: 200px;
+    max-width: 250px;
   }
 
   .handover-notes-preview {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .handover-date-display {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    min-width: 80px;
+  }
+
+  .handover-today-badge {
+    font-size: 0.6rem;
+    padding: 3px 6px;
+    margin-left: 6px;
+  }
+
+  .handover-action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .handover-edit-btn,
+  .handover-delete-small-btn {
+    padding: 6px 8px;
     font-size: 0.8rem;
   }
 

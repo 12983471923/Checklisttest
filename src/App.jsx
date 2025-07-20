@@ -42,7 +42,7 @@ function App() {
     const saved = localStorage.getItem('hotel-breakfast-times');
     return saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
   });
-  const [isEditingBreakfast, setIsEditingBreakfast] = useState(false);
+  const [showBreakfastModal, setShowBreakfastModal] = useState(false);
 
   // Use the real-time checklist hook
   const {
@@ -173,14 +173,14 @@ function App() {
   // Breakfast time functions
   const saveBreakfastTimes = useCallback(() => {
     localStorage.setItem('hotel-breakfast-times', JSON.stringify(breakfastTimes));
-    setIsEditingBreakfast(false);
+    setShowBreakfastModal(false);
   }, [breakfastTimes]);
 
   const cancelBreakfastEdit = useCallback(() => {
     const saved = localStorage.getItem('hotel-breakfast-times');
     const savedTimes = saved ? JSON.parse(saved) : { start: '07:00', end: '11:00' };
     setBreakfastTimes(savedTimes);
-    setIsEditingBreakfast(false);
+    setShowBreakfastModal(false);
   }, []);
 
   // Wake-up call functions
@@ -410,51 +410,15 @@ function App() {
                 <span className="time-icon">🍳</span>
                 <div className="time-content">
                   <span className="time-label">Breakfast</span>
-                  {isEditingBreakfast ? (
-                    <div className="breakfast-edit-controls">
-                      <div className="breakfast-time-inputs">
-                        <input
-                          type="time"
-                          value={breakfastTimes.start}
-                          onChange={(e) => setBreakfastTimes({...breakfastTimes, start: e.target.value})}
-                          className="breakfast-time-input"
-                        />
-                        <span className="breakfast-separator">-</span>
-                        <input
-                          type="time"
-                          value={breakfastTimes.end}
-                          onChange={(e) => setBreakfastTimes({...breakfastTimes, end: e.target.value})}
-                          className="breakfast-time-input"
-                        />
-                      </div>
-                      <div className="breakfast-edit-buttons">
-                        <button 
-                          className="breakfast-save-btn"
-                          onClick={saveBreakfastTimes}
-                          title="Save"
-                        >
-                          ✓
-                        </button>
-                        <button 
-                          className="breakfast-cancel-btn"
-                          onClick={cancelBreakfastEdit}
-                          title="Cancel"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="breakfast-display">
-                      <span 
-                        className="time-value time-value-clickable"
-                        onClick={() => setIsEditingBreakfast(true)}
-                        title="Click to edit breakfast times"
-                      >
-                        {breakfastTimes.start} - {breakfastTimes.end}
-                      </span>
-                    </div>
-                  )}
+                  <div className="breakfast-display">
+                    <span 
+                      className="time-value time-value-clickable"
+                      onClick={() => setShowBreakfastModal(true)}
+                      title="Click to edit breakfast times"
+                    >
+                      {breakfastTimes.start} - {breakfastTimes.end}
+                    </span>
+                  </div>
                 </div>
               </div>
               
@@ -1579,7 +1543,6 @@ function App() {
                         <th>Date</th>
                         <th>Day</th>
                         <th>Preview</th>
-                        <th>Word Count</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -1590,7 +1553,6 @@ function App() {
                           const dateObj = new Date(date);
                           const isToday = dateObj.toDateString() === new Date().toDateString();
                           const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                          const wordCount = notes.split(' ').filter(word => word.trim().length > 0).length;
                           
                           return (
                             <tr key={date} className={isToday ? 'handover-row-today' : ''}>
@@ -1611,9 +1573,6 @@ function App() {
                                 <div className="handover-notes-preview">
                                   {notes.length > 100 ? `${notes.substring(0, 100)}...` : notes}
                                 </div>
-                              </td>
-                              <td className="handover-wordcount-cell">
-                                <span className="handover-word-badge">{wordCount} words</span>
                               </td>
                               <td className="handover-actions-cell">
                                 <div className="handover-action-buttons">
@@ -1701,6 +1660,57 @@ function App() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Breakfast Time Modal */}
+      {showBreakfastModal && (
+        <div className="info-modal-overlay" onClick={() => setShowBreakfastModal(false)}>
+          <div className="breakfast-modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>Edit Breakfast Times</h3>
+            <div className="breakfast-modal-content">
+              <div className="breakfast-modal-inputs">
+                <div className="breakfast-input-group">
+                  <label>Start Time:</label>
+                  <input
+                    type="time"
+                    value={breakfastTimes.start}
+                    onChange={(e) => setBreakfastTimes({...breakfastTimes, start: e.target.value})}
+                    className="breakfast-modal-input"
+                  />
+                </div>
+                <div className="breakfast-input-group">
+                  <label>End Time:</label>
+                  <input
+                    type="time"
+                    value={breakfastTimes.end}
+                    onChange={(e) => setBreakfastTimes({...breakfastTimes, end: e.target.value})}
+                    className="breakfast-modal-input"
+                  />
+                </div>
+              </div>
+              <div className="breakfast-modal-buttons">
+                <button 
+                  className="breakfast-modal-save-btn"
+                  onClick={saveBreakfastTimes}
+                >
+                  Save Times
+                </button>
+                <button 
+                  className="breakfast-modal-cancel-btn"
+                  onClick={cancelBreakfastEdit}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <button 
+              className="info-modal-close"
+              onClick={() => setShowBreakfastModal(false)}
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
