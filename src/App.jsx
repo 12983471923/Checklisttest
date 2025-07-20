@@ -1037,19 +1037,47 @@ function App() {
             onClick={e => e.stopPropagation()}
           >
             <button className="info-modal-close" onClick={() => setShowDowntimeInfo(false)} title="Close">&times;</button>
-            <h3>Downtime Reports Instructions</h3>
-            <div className="info-detail">
-              • Check reception email for report attachments at 01:00, 04:00, and 07:00.
-              
-              • If missing:
-                - Opera Cloud → Reports → Manage Reports → Search "Downtime."
-                - Select "Shift Report" → Set correct time → Print.
-              
-              • Replace old report in drawer (above "PET Food").
-              
-              • These reports are critical for emergencies.
-              
-              • Use the checkboxes above to track completion of each time period.
+            <h3>📊 Downtime Reports Instructions</h3>
+            <div className="downtime-info-content">
+              <div className="downtime-info-section">
+                <div className="downtime-info-header">
+                  <span className="downtime-info-icon">🖨️</span>
+                  <h4>Print New Report</h4>
+                </div>
+                <ol className="downtime-info-steps">
+                  <li>Open <strong>Cloud Opera</strong> system</li>
+                  <li>Navigate to <strong>Reports</strong> → <strong>Manage reports</strong></li>
+                  <li>Search for <strong>"Downtime"</strong> in the search bar</li>
+                  <li>Click the <strong>three dots (⋯)</strong> on shift reports</li>
+                  <li>Select <strong>Print it</strong> option</li>
+                </ol>
+              </div>
+
+              <div className="downtime-info-section">
+                <div className="downtime-info-header">
+                  <span className="downtime-info-icon">📁</span>
+                  <h4>File the Report</h4>
+                </div>
+                <ol className="downtime-info-steps">
+                  <li>Locate the <strong>downtime report cabinet</strong></li>
+                  <li>Remove the <strong>old downtime report</strong></li>
+                  <li>Replace with the <strong>newly printed report</strong></li>
+                  <li>Ensure proper chronological filing</li>
+                </ol>
+              </div>
+
+              <div className="downtime-info-section downtime-info-important">
+                <div className="downtime-info-header">
+                  <span className="downtime-info-icon">⚠️</span>
+                  <h4>Important Notes</h4>
+                </div>
+                <ul className="downtime-info-points">
+                  <li><strong>Critical for emergencies:</strong> These reports provide essential system status information</li>
+                  <li><strong>Required frequency:</strong> Must be printed every 3 hours during shift</li>
+                  <li><strong>Tracking:</strong> Use the checkboxes above to track each 3-hour period</li>
+                  <li><strong>Compliance:</strong> Essential for audit and regulatory requirements</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
