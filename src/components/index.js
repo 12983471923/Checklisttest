@@ -5,3 +5,11 @@ export { default as ShiftSelector } from './ShiftSelector';
 export { default as Sidebar } from './Sidebar';
 export { default as ChecklistTable } from './ChecklistTable';
 export { default as ProgressBar } from './ProgressBar';
+
+// Authentication components
+export { default as AuthLoginForm } from './AuthLoginForm';
+export { default as UserManagement } from './UserManagement';
+
+// Backup components
+export { default as BackupManagement } from './BackupManagement';
+export { default as BackupStatusWidget } from './BackupStatusWidget';
