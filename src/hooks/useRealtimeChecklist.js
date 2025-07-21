@@ -8,6 +8,8 @@ import {
   initializeSession,
   resetSession
 } from '../firebase/database';
+import { auditTaskChange } from '../firebase/audit';
+import { useAuth } from './useAuth';
 
 // Generate downtime checklist based on shift
 const getDowntimeChecklist = (currentShift) => {
@@ -32,6 +34,7 @@ const getDowntimeChecklist = (currentShift) => {
 };
 
 export const useRealtimeChecklist = (shift, initials) => {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [downtimeChecklist, setDowntimeChecklist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,6 +117,15 @@ export const useRealtimeChecklist = (shift, initials) => {
   // Toggle task completion
   const toggleTask = useCallback(async (id) => {
     try {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const beforeState = {
+        completed: task.completed,
+        doneBy: task.doneBy,
+        note: task.note
+      };
+
       const updatedTasks = tasks.map((task) =>
         task.id === id
           ? {
@@ -129,15 +141,42 @@ export const useRealtimeChecklist = (shift, initials) => {
       if (sessionId) {
         await updateTasks(sessionId, updatedTasks);
       }
+
+      // Audit log the change
+      if (user) {
+        const updatedTask = updatedTasks.find(t => t.id === id);
+        const afterState = {
+          completed: updatedTask.completed,
+          doneBy: updatedTask.doneBy,
+          note: updatedTask.note
+        };
+
+        await auditTaskChange(
+          user,
+          { id, text: task.text, shift },
+          updatedTask.completed ? 'completed' : 'uncompleted',
+          beforeState,
+          afterState
+        );
+      }
     } catch (err) {
       console.error('Error toggling task:', err);
       setError(err.message);
     }
-  }, [tasks, initials, sessionId]);
+  }, [tasks, initials, sessionId, user, shift]);
 
   // Update task note
   const updateTaskNote = useCallback(async (id, note) => {
     try {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const beforeState = {
+        completed: task.completed,
+        doneBy: task.doneBy,
+        note: task.note
+      };
+
       const updatedTasks = tasks.map(t => 
         t.id === id ? { ...t, note } : t
       );
@@ -147,11 +186,28 @@ export const useRealtimeChecklist = (shift, initials) => {
       if (sessionId) {
         await updateTasks(sessionId, updatedTasks);
       }
+
+      // Audit log the note change
+      if (user && beforeState.note !== note) {
+        const afterState = {
+          completed: task.completed,
+          doneBy: task.doneBy,
+          note: note
+        };
+
+        await auditTaskChange(
+          user,
+          { id, text: task.text, shift },
+          'note_updated',
+          beforeState,
+          afterState
+        );
+      }
     } catch (err) {
       console.error('Error updating task note:', err);
       setError(err.message);
     }
-  }, [tasks, sessionId]);
+  }, [tasks, sessionId, user, shift]);
 
   // Toggle downtime task
   const toggleDowntimeTask = useCallback(async (id) => {

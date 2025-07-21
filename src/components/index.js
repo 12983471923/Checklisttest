@@ -13,3 +13,7 @@ export { default as UserManagement } from './UserManagement';
 // Backup components
 export { default as BackupManagement } from './BackupManagement';
 export { default as BackupStatusWidget } from './BackupStatusWidget';
+
+// Audit Trail components
+export { default as AuditTrailDashboard } from './AuditTrailDashboard';
+export { default as AuditStatusWidget } from './AuditStatusWidget';

@@ -12,6 +12,7 @@ import {
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './config';
 import { logSecurityEvent } from '../utils/security';
+import { auditUserAction } from './audit';
 
 // User roles for the hotel
 export const USER_ROLES = {
@@ -96,6 +97,9 @@ export const signInUser = async (email, password) => {
   try {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
     
+    // Get user profile for audit logging
+    const userProfile = await getUserProfile(user.uid);
+    
     // Update last login time
     const userRef = doc(db, 'users', user.uid);
     await updateDoc(userRef, {
@@ -106,6 +110,15 @@ export const signInUser = async (email, password) => {
       userId: user.uid, 
       email 
     });
+
+    // Audit log the login
+    await auditUserAction(
+      userProfile, 
+      userProfile, 
+      'login',
+      null,
+      { lastLogin: new Date() }
+    );
     
     return { user, error: null };
   } catch (error) {
@@ -118,11 +131,22 @@ export const signInUser = async (email, password) => {
 export const signOutUser = async () => {
   try {
     const currentUser = auth.currentUser;
-    await signOut(auth);
     
     if (currentUser) {
+      // Get user profile for audit logging
+      const userProfile = await getUserProfile(currentUser.uid);
+      
+      // Audit log the logout
+      await auditUserAction(
+        userProfile, 
+        userProfile, 
+        'logout'
+      );
+      
       logSecurityEvent('logout', { userId: currentUser.uid });
     }
+    
+    await signOut(auth);
     
     return { error: null };
   } catch (error) {
