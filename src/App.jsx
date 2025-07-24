@@ -13,6 +13,7 @@ import {
   getBreakfastTimes,
   subscribeToBreakfastTimes
 } from "./firebase/database";
+import { generateShiftSessionId, getShiftSessionDate } from "./utils/shiftTiming";
 import "./App.css";
 
 // Login session constants
@@ -907,7 +908,14 @@ function App() {
         <div className="main-content">
           {/* Top right header with title and shift selector */}
           <div className="top-header">
-            <h2 className="night-title">{shift} Checklist</h2>
+            <div className="header-left">
+              <h2 className="night-title">{shift} Checklist</h2>
+              <div className="session-indicator" title="Current session - your progress is saved here even after midnight">
+                <span style={{ fontSize: '0.8rem', color: '#666', opacity: 0.8 }}>
+                  📋 Session: {generateShiftSessionId(shift)}
+                </span>
+              </div>
+            </div>
             <div className="shift-selector">
               {Object.keys(checklists).map((shiftName) => (
                 <button
