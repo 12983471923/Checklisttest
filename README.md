@@ -45,10 +45,21 @@ A React-based checklist application with Firebase real-time database integration
 ## 🌐 Real-time Database Features
 
 - **Live Updates**: Changes appear instantly across all connected devices
-- **Daily Sessions**: Each shift gets its own document per day (format: `night_2025-07-19`)
+- **Shift-Based Sessions**: Each shift gets its own session based on actual shift timing (not calendar days)
+- **Midnight Protection**: Night shifts maintain the same session even after midnight
 - **Collision Handling**: Multiple users can edit simultaneously without conflicts
 - **Connection Status**: Visual indicators show sync status and errors
 - **Data Persistence**: All tasks, notes, and completion status automatically saved to cloud
+
+### 📅 Session Management
+
+The app uses intelligent shift-based session IDs to prevent data loss:
+
+- **Night Shift**: 10 PM - 7 AM (crosses midnight, uses start date)
+- **Morning Shift**: 7 AM - 7 PM (12-hour day shift)  
+- **Evening Shift**: 10 PM - 8 AM (alternative night shift pattern)
+
+**Example**: A night shift starting July 23rd at 9:30 PM will use session `night_2025-07-23` until 7 AM on July 24th.
 
 ## 🗄️ Database Structure
 
