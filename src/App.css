@@ -114,9 +114,27 @@ body {
   gap: 20px;
 }
 
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .top-header .night-title {
   margin: 0;
   text-align: left;
+}
+
+.session-indicator {
+  margin-top: 2px;
+}
+
+.session-indicator span {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 /* Header Card */
