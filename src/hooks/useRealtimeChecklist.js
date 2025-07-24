@@ -10,6 +10,7 @@ import {
 } from '../firebase/database';
 import { auditTaskChange } from '../firebase/audit';
 import { useAuth } from './useAuth';
+import { generateShiftSessionId } from '../utils/shiftTiming';
 
 // Generate downtime checklist based on shift
 const getDowntimeChecklist = (currentShift) => {
@@ -41,11 +42,9 @@ export const useRealtimeChecklist = (shift, initials) => {
   const [error, setError] = useState(null);
   const [sessionId, setSessionId] = useState(null);
 
-  // Generate session ID
+  // Generate session ID using proper shift timing logic
   const generateSessionId = useCallback((currentShift) => {
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
-    return `${currentShift.toLowerCase()}_${dateStr}`;
+    return generateShiftSessionId(currentShift);
   }, []);
 
   // Initialize session

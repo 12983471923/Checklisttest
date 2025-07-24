@@ -11,21 +11,15 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from './config';
+import { generateShiftSessionId } from '../utils/shiftTiming';
 
 // Collection names
 const CHECKLISTS_COLLECTION = 'checklists';
 const DOWNTIME_COLLECTION = 'downtime';
 
-// Generate a session ID based on shift and date
-const generateSessionId = (shift) => {
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-  return `${shift.toLowerCase()}_${dateStr}`;
-};
-
 // Get or create a checklist session
 export const getOrCreateChecklistSession = async (shift) => {
-  const sessionId = generateSessionId(shift);
+  const sessionId = generateShiftSessionId(shift);
   const docRef = doc(db, CHECKLISTS_COLLECTION, sessionId);
   
   try {
