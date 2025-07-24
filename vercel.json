@@ -1,9 +1,8 @@
 {
-  "redirects": [
+  "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://checklistv3.vercel.app/$1",
-      "permanent": true
+      "destination": "/index.html"
     }
   ]
 }
