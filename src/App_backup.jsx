@@ -28,17 +28,6 @@ const LOGIN_STORAGE_KEY = 'checklistapp_login_session';
 const SESSION_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
 
 function App() {
-  // Temporary simple test to see if the issue is with our components
-  return (
-    <div style={{ padding: '20px', background: 'lightblue' }}>
-      <h1>Test - App is working</h1>
-      <p>If you see this, the app is loading correctly</p>
-    </div>
-  );
-}
-
-export default App;
-
   // Use the real-time checklist hook
   const {
     tasks,
@@ -46,6 +35,7 @@ export default App;
     loading,
     error,
     toggleTask,
+    toggleTaskInProgress,
     updateTaskNote,
     toggleDowntimeTask,
     resetAll

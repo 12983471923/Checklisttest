@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
 import { users } from "./users";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
+import WeatherWidget from "./components/WeatherWidget";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
   getHandoverNotes,
@@ -61,6 +62,7 @@ function App() {
     loading,
     error,
     toggleTask,
+    toggleTaskInProgress,
     updateTaskNote,
     toggleDowntimeTask,
     resetAll
@@ -916,16 +918,19 @@ function App() {
                 </span>
               </div>
             </div>
-            <div className="shift-selector">
-              {Object.keys(checklists).map((shiftName) => (
-                <button
-                  key={shiftName}
-                  onClick={() => handleShiftChange(shiftName)}
-                  className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
-                >
-                  {shiftName}
-                </button>
-              ))}
+            <div className="header-right">
+              <WeatherWidget />
+              <div className="shift-selector">
+                {Object.keys(checklists).map((shiftName) => (
+                  <button
+                    key={shiftName}
+                    onClick={() => handleShiftChange(shiftName)}
+                    className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
+                  >
+                    {shiftName}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1029,8 +1034,9 @@ function App() {
               <thead>
                 <tr>
                   <th>Task</th>
+                  <th>Working</th>
                   <th>Done</th>
-                  <th>Initials</th>
+                  <th>By</th>
                   <th>Info</th>
                   <th>Note</th>
                 </tr>
@@ -1040,6 +1046,31 @@ function App() {
                   <tr key={task.id}>
                     <td className={task.completed ? "task-completed" : "task-incomplete"}>
                       {task.text}
+                    </td>
+                    <td>
+                      <button
+                        className={`working-btn ${task.inProgressBy === initials ? "working-active" : (task.inProgressBy ? "working-other" : "")}`}
+                        onClick={() => toggleTaskInProgress(task.id)}
+                        disabled={task.completed || (task.inProgressBy && task.inProgressBy !== initials)}
+                        title={task.inProgressBy && task.inProgressBy !== initials ? `${task.inProgressBy} is working on this task` : task.inProgressBy === initials ? "Stop working on this task" : "Start working on this task"}
+                      >
+                        {task.inProgressBy === initials ? (
+                          <>
+                            <span>🛑</span>
+                            <span>Stop</span>
+                          </>
+                        ) : task.inProgressBy ? (
+                          <>
+                            <span>👤</span>
+                            <span>{task.inProgressBy}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>�</span>
+                            <span>Work</span>
+                          </>
+                        )}
+                      </button>
                     </td>
                     <td>
                       <input

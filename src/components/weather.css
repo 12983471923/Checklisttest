@@ -1,0 +1,136 @@
+/* Weather Widget Styles */
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  min-width: 120px;
+  max-width: 160px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.weather-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.weather-widget:hover::before {
+  left: 100%;
+}
+
+.weather-widget:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.weather-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.weather-temp {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.weather-location {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Loading state */
+.weather-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.weather-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: weather-spin 1s linear infinite;
+}
+
+@keyframes weather-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.weather-loading span {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+/* Error state */
+.weather-widget.weather-error {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  opacity: 0.8;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .weather-widget {
+    padding: 8px 12px;
+    min-width: 100px;
+  }
+  
+  .weather-icon {
+    font-size: 1.2rem;
+  }
+  
+  .weather-temp {
+    font-size: 1rem;
+  }
+  
+  .weather-location {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .weather-widget {
+    padding: 6px 10px;
+    min-width: 90px;
+  }
+  
+  .weather-icon {
+    font-size: 1.1rem;
+  }
+  
+  .weather-temp {
+    font-size: 0.9rem;
+  }
+  
+  .weather-location {
+    font-size: 0.6rem;
+  }
+}

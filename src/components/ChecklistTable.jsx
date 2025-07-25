@@ -3,10 +3,12 @@ import React from 'react';
 const ChecklistTable = ({ 
   tasks, 
   loading, 
-  onToggleTask, 
+  onToggleTask,
+  onToggleTaskInProgress,
   onShowInfo, 
   onShowNoteModal, 
-  onEditNote 
+  onEditNote,
+  initials
 }) => {
   if (loading) {
     return (
@@ -23,8 +25,9 @@ const ChecklistTable = ({
         <thead>
           <tr>
             <th>Task</th>
+            <th>Working</th>
             <th>Done</th>
-            <th>Initials</th>
+            <th>By</th>
             <th>Notes</th>
             <th>Info</th>
           </tr>
@@ -36,6 +39,31 @@ const ChecklistTable = ({
                 <span className={`task-text ${task.completed ? "task-text-completed" : ""}`}>
                   {task.text}
                 </span>
+              </td>
+              <td>
+                <button
+                  className={`working-btn ${task.inProgressBy === initials ? "working-active" : (task.inProgressBy ? "working-other" : "")}`}
+                  onClick={() => onToggleTaskInProgress(task.id)}
+                  disabled={task.completed || (task.inProgressBy && task.inProgressBy !== initials)}
+                  title={task.inProgressBy && task.inProgressBy !== initials ? `${task.inProgressBy} is working on this task` : task.inProgressBy === initials ? "Stop working on this task" : "Start working on this task"}
+                >
+                  {task.inProgressBy === initials ? (
+                    <>
+                      <span>🛑</span>
+                      <span>Stop</span>
+                    </>
+                  ) : task.inProgressBy ? (
+                    <>
+                      <span>👤</span>
+                      <span>{task.inProgressBy}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>�</span>
+                      <span>Work</span>
+                    </>
+                  )}
+                </button>
               </td>
               <td>
                 <input
