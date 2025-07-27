@@ -482,11 +482,11 @@ export const scheduleAutomaticBackups = () => {
   // Check immediately
   checkBackupNeeded();
 
-  // Set up daily check (every 24 hours)
-  const dailyBackupCheck = setInterval(checkBackupNeeded, 24 * 60 * 60 * 1000);
+  // Daily backup check removed to prevent midnight interference
+  // If you need manual backups, use the backup management interface
 
   // Return cleanup function
   return () => {
-    clearInterval(dailyBackupCheck);
+    // No interval to clear anymore
   };
 };
