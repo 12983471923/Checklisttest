@@ -3,6 +3,7 @@ import { checklists } from "./Checklists";
 import { users } from "./users";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import WeatherWidget from "./components/WeatherWidget";
+import ManualResetButton from "./components/ManualResetButton";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
   getHandoverNotes,
@@ -64,8 +65,7 @@ function App() {
     toggleTask,
     toggleTaskInProgress,
     updateTaskNote,
-    toggleDowntimeTask,
-    resetAll
+    toggleDowntimeTask
   } = useRealtimeChecklist(shift, initials);
 
   // Subscribe to Firebase data
@@ -319,13 +319,6 @@ function App() {
     setShowNoteModal(null);
     setNoteText("");
   }, []);
-
-  const handleResetAll = useCallback(() => {
-    if (window.confirm("Are you sure you want to reset all tasks? This cannot be undone.")) {
-      resetAll();
-      setShowInfo(null);
-    }
-  }, [resetAll]);
 
   const handleLogout = () => {
     clearLoginSession(); // Clear stored session
@@ -946,7 +939,7 @@ function App() {
           </span>
         </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
+            <ManualResetButton onResetComplete={() => window.location.reload()} />
             <span
               className="initials-chip"
               style={{

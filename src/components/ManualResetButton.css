@@ -1,0 +1,148 @@
+/* Manual Reset Button Styles */
+.manual-reset-container {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff5f5, #fef2f2);
+  border: 2px solid #fecaca;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+}
+
+.manual-reset-btn {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.manual-reset-btn:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+.manual-reset-btn:active {
+  transform: translateY(0);
+}
+
+.manual-reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+}
+
+.reset-confirmation {
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reset-confirmation p {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.reset-warning {
+  font-size: 0.85rem !important;
+  color: #7f1d1d !important;
+  font-weight: 500 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.confirm-reset-btn, .cancel-reset-btn {
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.confirm-reset-btn {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+.cancel-reset-btn {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
+}
+
+.confirm-reset-btn:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+}
+
+.cancel-reset-btn:hover {
+  background: linear-gradient(135deg, #4b5563, #374151);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.3);
+}
+
+.confirm-reset-btn:disabled, .cancel-reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .manual-reset-container {
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+  }
+
+  .manual-reset-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .confirmation-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .confirm-reset-btn, .cancel-reset-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .reset-confirmation p {
+    font-size: 0.9rem;
+  }
+
+  .reset-warning {
+    font-size: 0.8rem !important;
+  }
+}

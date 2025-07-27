@@ -6,6 +6,7 @@ export { default as Sidebar } from './Sidebar';
 export { default as ChecklistTable } from './ChecklistTable';
 export { default as ProgressBar } from './ProgressBar';
 export { default as WeatherWidget } from './WeatherWidget';
+export { default as ManualResetButton } from './ManualResetButton';
 
 // Authentication components
 export { default as AuthLoginForm } from './AuthLoginForm';

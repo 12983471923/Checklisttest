@@ -57,15 +57,16 @@ export const getShiftSessionDate = (shift, currentTime = new Date()) => {
 };
 
 /**
- * Generate a session ID based on shift and shift-specific date logic
- * @param {string} shift - The shift name
- * @param {Date} currentTime - Current time (defaults to now)
- * @returns {string} Session ID in format: "shift_YYYY-MM-DD"
+ * Generate a persistent session ID that doesn't change with dates or shifts
+ * This ensures the checklist persists until manually reset
+ * @param {string} shift - The shift name (kept for compatibility but not used for ID generation)
+ * @param {Date} currentTime - Current time (kept for compatibility but not used)
+ * @returns {string} Persistent session ID
  */
 export const generateShiftSessionId = (shift, currentTime = new Date()) => {
-  const sessionDate = getShiftSessionDate(shift, currentTime);
-  const dateStr = sessionDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-  return `${shift.toLowerCase()}_${dateStr}`;
+  // Use a persistent session ID that doesn't change with date/shift
+  // This ensures checklist data persists until manually reset
+  return 'persistent-checklist-session';
 };
 
 /**
