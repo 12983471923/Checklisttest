@@ -13,45 +13,52 @@ import {
   getBreakfastTimes,
   subscribeToBreakfastTimes
 } from "./firebase/database";
+import { 
+  LoginForm, 
+  InitialsForm, 
+  ShiftSelector, 
+  Sidebar, 
+  ChecklistTable, 
+  ProgressBar 
+} from "./components";
 import "./App.css";
+
 
 // Login session constants
 const LOGIN_STORAGE_KEY = 'checklistapp_login_session';
 const SESSION_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
 
 function App() {
+  // All useState, useEffect, and other React hooks go here
+  // First, we need to declare all our state variables
   const [user, setUser] = useState(null);
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
-  const [loginError, setLoginError] = useState("");
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
-  const [showChangeInitials, setShowChangeInitials] = useState(false);
-  const [newInitials, setNewInitials] = useState("");
   const [shift, setShift] = useState("Night");
-  const [showInfo, setShowInfo] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(null);
   const [noteText, setNoteText] = useState("");
-  const [showInitialsModal, setShowInitialsModal] = useState(false);
-  const [showDowntimeInfo, setShowDowntimeInfo] = useState(false);
+  const [showInfo, setShowInfo] = useState(null);
+  const [loginError, setLoginError] = useState("");
+  const [showChangeInitials, setShowChangeInitials] = useState(false);
+  const [newInitials, setNewInitials] = useState("");
+  const [lastCompletedShift, setLastCompletedShift] = useState("");
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  
+  // Sidebar state
+  const [handoverNotes, setHandoverNotes] = useState("");
+  const [handoverDate, setHandoverDate] = useState(new Date().toISOString().split('T')[0]);
   const [showHandoverModal, setShowHandoverModal] = useState(false);
   const [showHandoverFullscreen, setShowHandoverFullscreen] = useState(false);
-  const [handoverDate, setHandoverDate] = useState(new Date().toISOString().split('T')[0]);
-  const [handoverNotes, setHandoverNotes] = useState("");
   const [savedHandovers, setSavedHandovers] = useState({});
+  
   const [wakeUpCalls, setWakeUpCalls] = useState([]);
+  const [newWakeUpCall, setNewWakeUpCall] = useState({ roomNumber: '', time: '', date: new Date().toISOString().split('T')[0] });
   const [showWakeUpModal, setShowWakeUpModal] = useState(false);
   const [showWakeUpFullscreen, setShowWakeUpFullscreen] = useState(false);
-  const [newWakeUpCall, setNewWakeUpCall] = useState({
-    roomNumber: '',
-    time: '',
-    notes: '',
-    date: new Date().toISOString().split('T')[0]
-  });
+  
   const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
   const [showBreakfastModal, setShowBreakfastModal] = useState(false);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
-  const [lastCompletedShift, setLastCompletedShift] = useState('');
 
   // Use the real-time checklist hook
   const {
@@ -256,36 +263,26 @@ function App() {
   }, [user, clearLoginSession]);
 
   // Handle login submit
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const match = users.find(
-      (u) => u.username === loginForm.username && u.password === loginForm.password
-    );
-    if (match) {
-      setUser(match);
-      saveLoginSession(match); // Save session to localStorage
-      setLoginForm({ username: "", password: "" });
-      setLoginError("");
-    } else {
-      setLoginError("Incorrect username or password.");
-    }
-  };
+  const handleLogin = useCallback((user) => {
+    setUser(user);
+    saveLoginSession(user); // Save session to localStorage
+    setLoginError("");
+  }, [saveLoginSession]);
+
+  // Handle login error
+  const handleLoginError = useCallback((error) => {
+    setLoginError(error);
+  }, []);
 
   // Handle initials submit
-  const handleInitialsSubmit = (e) => {
-    e.preventDefault();
-    const trimmedInitials = initials.trim().toUpperCase();
-    if (trimmedInitials.length < 2) {
-      alert("Please enter at least 2 letters for initials.");
-      return;
-    }
+  const handleInitialsSubmit = useCallback((trimmedInitials) => {
     setInitials(trimmedInitials);
     setInitialsSubmitted(true);
     updateSessionInitials(trimmedInitials, true); // Update session with initials
     
     // Show welcome modal after initials are submitted
     setShowWelcomeModal(true);
-  };
+  }, [updateSessionInitials]);
 
   // Progress calculation - memoized for performance
   const percent = useMemo(() => 
@@ -296,6 +293,32 @@ function App() {
   const handleShiftChange = useCallback((newShift) => {
     setShift(newShift);
     setShowInfo(null);
+  }, []);
+
+  // Sidebar handlers
+  const handleBreakfastEdit = useCallback(() => {
+    setShowBreakfastModal(true);
+  }, []);
+
+  const handleHandoverDateChange = useCallback((newDate) => {
+    setHandoverDate(newDate);
+    loadHandoverNotes(newDate);
+  }, [loadHandoverNotes]);
+
+  const handleHandoverEdit = useCallback(() => {
+    setShowHandoverModal(true);
+  }, []);
+
+  const handleHandoverViewAll = useCallback(() => {
+    setShowHandoverFullscreen(true);
+  }, []);
+
+  const handleWakeUpAdd = useCallback(() => {
+    setShowWakeUpModal(true);
+  }, []);
+
+  const handleWakeUpViewAll = useCallback(() => {
+    setShowWakeUpFullscreen(true);
   }, []);
 
   const handleNote = useCallback((id) => {
@@ -563,104 +586,24 @@ function App() {
   // Show login form if not logged in
   if (!user) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <form
-          className="login-form"
-          onSubmit={handleLogin}
-          style={{ maxWidth: "320px", padding: "24px", minWidth: "280px" }}
-        >
-          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Staff Login</h2>
-          <div style={{ marginBottom: 16 }}>
-            <input
-              className="form-input"
-              type="text"
-              placeholder="User ID"
-              value={loginForm.username}
-              onChange={e => setLoginForm(f => ({ ...f, username: e.target.value.trim() }))}
-              autoFocus
-              required
-              autoComplete="username"
-              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
-            />
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <input
-              className="form-input"
-              type="password"
-              placeholder="Password"
-              value={loginForm.password}
-              onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
-              required
-              autoComplete="current-password"
-              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
-            />
-          </div>
-          {loginError && (
-            <div className="form-error" style={{ padding: "10px 12px", fontSize: "0.9rem", marginBottom: "12px" }}>
-              {loginError}
-            </div>
-          )}
-          <button
-            type="submit"
-            className="add-note-btn"
-            style={{ width: "100%", fontSize: "1rem", padding: "12px 16px" }}
-          >
-            Log In
-          </button>
-        </form>
-      </div>
+      <LoginForm 
+        onLogin={handleLogin}
+        onError={handleLoginError}
+      />
     );
   }
 
   // Show initials input after login if not set yet
   if (!initialsSubmitted) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <form
-          className="initials-form"
-          style={{ textAlign: "center", maxWidth: "320px", padding: "24px", minWidth: "280px" }}
-          onSubmit={handleInitialsSubmit}
-        >
-          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Enter Your Initials</h2>
-          <input
-            className="form-input"
-            type="text"
-            placeholder="e.g. AG"
-            value={initials}
-            onChange={e => setInitials(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
-            style={{
-              textAlign: "center",
-              letterSpacing: "2px",
-              fontSize: "1.1rem",
-              fontWeight: "700",
-              marginBottom: "20px",
-              padding: "10px 14px"
-            }}
-            maxLength={4}
-            required
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="add-note-btn"
-            style={{ width: "100%", fontSize: "1rem", padding: "12px 16px", marginBottom: "10px" }}
-          >
-            Continue
-          </button>
-          <button
-            type="button"
-            className="reset-btn"
-            style={{ width: "100%", fontSize: "0.95rem", padding: "10px 16px" }}
-            onClick={handleLogout}
-          >
-            Log Out
-          </button>
-        </form>
-      </div>
+      <InitialsForm 
+        onSubmit={handleInitialsSubmit}
+        currentInitials={initials}
+      />
     );
   }
 
-    return (
+  return (
     <div className="checklist-container">
       {/* Main layout with sidebar and content */}
       <div className="main-layout">
@@ -908,17 +851,10 @@ function App() {
           {/* Top right header with title and shift selector */}
           <div className="top-header">
             <h2 className="night-title">{shift} Checklist</h2>
-            <div className="shift-selector">
-              {Object.keys(checklists).map((shiftName) => (
-                <button
-                  key={shiftName}
-                  onClick={() => handleShiftChange(shiftName)}
-                  className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
-                >
-                  {shiftName}
-                </button>
-              ))}
-            </div>
+            <ShiftSelector 
+              currentShift={shift}
+              onShiftChange={handleShiftChange}
+            />
           </div>
 
           {/* Meta bar */}
@@ -968,9 +904,11 @@ function App() {
           </div>
 
           {/* Progress bar */}
-          <div className="progress-bar">
-            <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
-          </div>
+          <ProgressBar 
+            percent={percent}
+            tasksCompleted={tasks.filter(t => t.completed).length}
+            totalTasks={tasks.length}
+          />
           <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
             {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
           </div>
@@ -1016,57 +954,14 @@ function App() {
           )}
 
           {/* Checklist table */}
-          <div className="table-wrap">
-            <table className="checklist-table">
-              <thead>
-                <tr>
-                  <th>Task</th>
-                  <th>Done</th>
-                  <th>Initials</th>
-                  <th>Info</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td className={task.completed ? "task-completed" : "task-incomplete"}>
-                      {task.text}
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                        aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
-                      />
-                    </td>
-                    <td>
-                      {task.completed ? <span className="initials-chip">{task.doneBy}</span> : ""}
-                    </td>
-                    <td>
-                      <button
-                        className="info-btn"
-                        onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
-                        aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
-                      >
-                        i
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        className={task.note ? "edit-note-btn" : "add-note-btn"}
-                        onClick={() => handleNote(task.id)}
-                        title={task.note ? "View/Edit Note" : "Add Note"}
-                      >
-                        {task.note ? "Edit" : "Add Note"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ChecklistTable 
+            tasks={tasks}
+            loading={loading}
+            onToggleTask={toggleTask}
+            onShowInfo={(task) => setShowInfo(showInfo === task.id ? null : task.id)}
+            onShowNoteModal={setShowNoteModal}
+            onEditNote={handleNote}
+          />
 
           {/* Downtime Reports Mini-Checklist */}
           <div className="downtime-checklist">
