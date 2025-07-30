@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { signUpUser, USER_ROLES, SHIFT_TYPES } from '../firebase/auth';
 import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '../hooks/useAuth';
 
 const UserManagement = ({ onClose }) => {
   const { isManager, isAdmin } = useAuth();

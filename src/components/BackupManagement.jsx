@@ -7,7 +7,7 @@ import {
   exportBackupAsJSON,
   deleteBackup 
 } from '../firebase/backup';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '../hooks/useAuth';
 import './backup.css';
 
 const BackupManagement = ({ onClose }) => {
