@@ -38,11 +38,9 @@ export const useRealtimeChecklist = (shift, initials) => {
   const [error, setError] = useState(null);
   const [sessionId, setSessionId] = useState(null);
 
-  // Generate session ID
+  // Generate session ID (persistent across dates)
   const generateSessionId = useCallback((currentShift) => {
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
-    return `${currentShift.toLowerCase()}_${dateStr}`;
+    return `${currentShift.toLowerCase()}_current`;
   }, []);
 
   // Initialize session

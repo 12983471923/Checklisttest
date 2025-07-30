@@ -16,11 +16,9 @@ import { db } from './config';
 const CHECKLISTS_COLLECTION = 'checklists';
 const DOWNTIME_COLLECTION = 'downtime';
 
-// Generate a session ID based on shift and date
+// Generate a session ID based on shift only (persistent across dates)
 const generateSessionId = (shift) => {
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-  return `${shift.toLowerCase()}_${dateStr}`;
+  return `${shift.toLowerCase()}_current`;
 };
 
 // Get or create a checklist session
@@ -41,6 +39,7 @@ export const getOrCreateChecklistSession = async (shift) => {
         tasks: [],
         downtimeChecklist: [],
         createdAt: Timestamp.now(),
+        lastReset: Timestamp.now(),
         lastUpdated: Timestamp.now()
       };
       
@@ -132,6 +131,7 @@ export const initializeSession = async (sessionId, shift, initialTasks, initialD
       tasks: initialTasks,
       downtimeChecklist: initialDowntime,
       createdAt: Timestamp.now(),
+      lastReset: Timestamp.now(),
       lastUpdated: Timestamp.now()
     });
   } catch (error) {
@@ -148,6 +148,7 @@ export const resetSession = async (sessionId, shift, initialTasks, initialDownti
     await updateDoc(docRef, {
       tasks: initialTasks,
       downtimeChecklist: initialDowntime,
+      lastReset: Timestamp.now(),
       lastUpdated: Timestamp.now()
     });
   } catch (error) {
