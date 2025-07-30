@@ -5,6 +5,7 @@ export { default as ShiftSelector } from './ShiftSelector';
 export { default as Sidebar } from './Sidebar';
 export { default as ChecklistTable } from './ChecklistTable';
 export { default as ProgressBar } from './ProgressBar';
+export { default as WeatherWidget } from './WeatherWidget';
 
 // Authentication components
 export { default as AuthLoginForm } from './AuthLoginForm';

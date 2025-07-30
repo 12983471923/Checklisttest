@@ -13,6 +13,7 @@ import {
   getBreakfastTimes,
   subscribeToBreakfastTimes
 } from "./firebase/database";
+import WeatherWidget from "./components/WeatherWidget";
 import "./App.css";
 
 // Login session constants
@@ -933,6 +934,7 @@ function App() {
           </span>
         </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <WeatherWidget />
             <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
             <span
               className="initials-chip"
