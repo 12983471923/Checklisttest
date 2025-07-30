@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getBackupsList } from '../firebase/backup';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const BackupStatusWidget = ({ onClick }) => {
   const { isManager, isAdmin } = useAuth();

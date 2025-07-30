@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { scheduleAutomaticBackups } from '../firebase/backup';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const useBackupScheduler = () => {
   const { isAuthenticated } = useAuth();
