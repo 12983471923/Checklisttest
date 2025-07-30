@@ -56,8 +56,12 @@ export const useRealtimeChecklist = (shift, initials) => {
       const session = await getOrCreateChecklistSession(currentShift);
       
       if (session.tasks && session.tasks.length > 0) {
-        // Session exists with data
-        setTasks(session.tasks);
+        // Session exists with data - ensure all tasks have inProgressBy field
+        const tasksWithInProgress = session.tasks.map(task => ({
+          ...task,
+          inProgressBy: task.inProgressBy || ""
+        }));
+        setTasks(tasksWithInProgress);
         setDowntimeChecklist(session.downtimeChecklist || getDowntimeChecklist(currentShift));
       } else {
         // New session or empty session - initialize with default data
@@ -65,7 +69,8 @@ export const useRealtimeChecklist = (shift, initials) => {
           ...task, 
           completed: false, 
           note: "", 
-          doneBy: "" 
+          doneBy: "",
+          inProgressBy: ""
         }));
         const initialDowntime = getDowntimeChecklist(currentShift);
         
@@ -81,7 +86,8 @@ export const useRealtimeChecklist = (shift, initials) => {
         ...task, 
         completed: false, 
         note: "", 
-        doneBy: "" 
+        doneBy: "",
+        inProgressBy: ""
       }));
       setTasks(fallbackTasks);
       setDowntimeChecklist(getDowntimeChecklist(currentShift));
@@ -96,7 +102,14 @@ export const useRealtimeChecklist = (shift, initials) => {
 
     const unsubscribe = subscribeToChecklistSession(sessionId, (data) => {
       if (data) {
-        if (data.tasks) setTasks(data.tasks);
+        if (data.tasks) {
+          // Ensure all tasks have inProgressBy field
+          const tasksWithInProgress = data.tasks.map(task => ({
+            ...task,
+            inProgressBy: task.inProgressBy || ""
+          }));
+          setTasks(tasksWithInProgress);
+        }
         if (data.downtimeChecklist) setDowntimeChecklist(data.downtimeChecklist);
       }
     });
@@ -118,8 +131,12 @@ export const useRealtimeChecklist = (shift, initials) => {
               ...task,
               completed: !task.completed,
               doneBy: !task.completed ? initials : "",
+              inProgressBy: !task.completed ? "" : (task.inProgressBy || ""), // Clear in progress when completing
             }
-          : task
+          : {
+              ...task,
+              inProgressBy: task.inProgressBy || "" // Ensure no undefined values
+            }
       );
       
       setTasks(updatedTasks);
@@ -137,7 +154,14 @@ export const useRealtimeChecklist = (shift, initials) => {
   const updateTaskNote = useCallback(async (id, note) => {
     try {
       const updatedTasks = tasks.map(t => 
-        t.id === id ? { ...t, note } : t
+        t.id === id ? { 
+          ...t, 
+          note,
+          inProgressBy: t.inProgressBy || "" // Ensure no undefined values
+        } : {
+          ...t,
+          inProgressBy: t.inProgressBy || "" // Ensure no undefined values
+        }
       );
       
       setTasks(updatedTasks);
@@ -175,6 +199,35 @@ export const useRealtimeChecklist = (shift, initials) => {
     }
   }, [downtimeChecklist, initials, sessionId]);
 
+  // Toggle task in progress status
+  const toggleTaskInProgress = useCallback(async (id) => {
+    try {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const updatedTasks = tasks.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              inProgressBy: (task.inProgressBy || "") === initials ? "" : initials,
+            }
+          : {
+              ...task,
+              inProgressBy: task.inProgressBy || "" // Ensure no undefined values
+            }
+      );
+      
+      setTasks(updatedTasks);
+      
+      if (sessionId) {
+        await updateTasks(sessionId, updatedTasks);
+      }
+    } catch (err) {
+      console.error('Error toggling task in progress:', err);
+      setError(err.message);
+    }
+  }, [tasks, initials, sessionId]);
+
   // Reset all tasks
   const resetAll = useCallback(async () => {
     try {
@@ -182,7 +235,8 @@ export const useRealtimeChecklist = (shift, initials) => {
         ...task, 
         completed: false, 
         note: "", 
-        doneBy: "" 
+        doneBy: "",
+        inProgressBy: ""
       }));
       const initialDowntime = getDowntimeChecklist(shift);
       
@@ -204,6 +258,7 @@ export const useRealtimeChecklist = (shift, initials) => {
     loading,
     error,
     toggleTask,
+    toggleTaskInProgress,
     updateTaskNote,
     toggleDowntimeTask,
     resetAll

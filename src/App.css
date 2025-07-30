@@ -1160,6 +1160,8 @@ body {
   border-radius: 8px;
   background: white;
   border: 1px solid #e5e7eb;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 /* Table Styling */
@@ -1174,7 +1176,6 @@ body {
 .checklist-table th,
 .checklist-table td {
   padding: 20px 32px;
-  text-align: left;
   border-bottom: 1px solid rgba(226, 232, 240, 0.6);
   vertical-align: middle;
   word-wrap: break-word;
@@ -1192,18 +1193,23 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
+  white-space: nowrap;
 }
 
-.checklist-table th:nth-child(1) { width: 46%; }
-.checklist-table th:nth-child(2),
-.checklist-table th:nth-child(3),
-.checklist-table th:nth-child(4) { width: 13%; text-align: center; }
-.checklist-table th:nth-child(5) { width: 15%; }
+.checklist-table th:nth-child(1) { width: 45%; text-align: left; }
+.checklist-table th:nth-child(2) { width: 12%; text-align: center; }
+.checklist-table th:nth-child(3) { width: 8%; text-align: center; }
+.checklist-table th:nth-child(4) { width: 8%; text-align: center; }
+.checklist-table th:nth-child(5) { width: 8%; text-align: center; }
+.checklist-table th:nth-child(6) { width: 19%; text-align: left; }
 
 /* Align table data cells to match header alignment */
+.checklist-table td:nth-child(1) { text-align: left; }
 .checklist-table td:nth-child(2),
 .checklist-table td:nth-child(3),
-.checklist-table td:nth-child(4) { text-align: center; }
+.checklist-table td:nth-child(4),
+.checklist-table td:nth-child(5) { text-align: center; }
+.checklist-table td:nth-child(6) { text-align: left; }
 
 /* Rows */
 .checklist-table tbody tr {
@@ -1249,6 +1255,98 @@ input[type="checkbox"]:hover {
 
 .info-btn:hover {
   background: #3730a3;
+}
+
+/* Working Button */
+.working-btn {
+  background: linear-gradient(135deg, #fafbfc 0%, #f4f6f8 100%);
+  color: #64748b;
+  border: 1.5px solid #e1e7ef;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  min-width: 70px;
+  height: 34px;
+  position: relative;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  backdrop-filter: blur(8px);
+}
+
+.working-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+  border-color: #cbd5e1;
+  color: #475569;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.working-btn.working-active {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
+  color: white;
+  border-color: #b91c1c;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2), 
+              inset 0 1px 0 rgba(255,255,255,0.15);
+  animation: working-shimmer 3s ease-in-out infinite;
+}
+
+.working-btn.working-active:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+  border-color: #991b1b;
+  color: white;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25), 
+              inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.working-btn.working-other {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  border-color: #4b5563;
+  cursor: not-allowed;
+  opacity: 0.85;
+  box-shadow: 0 1px 3px rgba(75, 85, 99, 0.15);
+}
+
+@keyframes working-shimmer {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2), 
+                inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  50% {
+    box-shadow: 0 3px 12px rgba(220, 38, 38, 0.3), 
+                inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+}
+
+.working-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.working-btn:disabled::before {
+  display: none;
+}
+
+.working-btn span:first-child {
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.working-btn span:last-child {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
 
 /* Add Note Button */
@@ -1803,11 +1901,25 @@ input[type="checkbox"]:hover {
   }
   
   .checklist-table th:nth-child(1) {
-    width: 55%;
+    width: 40%;
+    text-align: left;
   }
   
+  .checklist-table th:nth-child(2) {
+    width: 13%;
+    text-align: center;
+  }
+  
+  .checklist-table th:nth-child(3),
+  .checklist-table th:nth-child(4),
   .checklist-table th:nth-child(5) {
+    width: 9%;
+    text-align: center;
+  }
+  
+  .checklist-table th:nth-child(6) {
     width: 20%;
+    text-align: left;
   }
   
   .night-title {
@@ -1852,6 +1964,11 @@ input[type="checkbox"]:hover {
     font-size: 0.8rem;
   }
   
+  .checklist-table th {
+    font-size: 0.7rem;
+    padding: 10px 8px;
+  }
+  
   .add-note-btn {
     padding: 8px 12px;
     font-size: 0.8rem;
@@ -1861,6 +1978,22 @@ input[type="checkbox"]:hover {
     width: 32px;
     height: 32px;
     font-size: 1rem;
+  }
+  
+  .working-btn {
+    padding: 4px 6px;
+    font-size: 0.65rem;
+    min-width: 52px;
+    height: 26px;
+    gap: 3px;
+  }
+  
+  .working-btn span:first-child {
+    font-size: 0.75rem;
+  }
+  
+  .working-btn span:last-child {
+    font-size: 0.65rem;
   }
   
   .night-title {

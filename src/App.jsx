@@ -61,6 +61,7 @@ function App() {
     loading,
     error,
     toggleTask,
+    toggleTaskInProgress,
     updateTaskNote,
     toggleDowntimeTask,
     resetAll
@@ -1023,8 +1024,9 @@ function App() {
               <thead>
                 <tr>
                   <th>Task</th>
+                  <th>Working</th>
                   <th>Done</th>
-                  <th>Initials</th>
+                  <th>By</th>
                   <th>Info</th>
                   <th>Note</th>
                 </tr>
@@ -1034,6 +1036,31 @@ function App() {
                   <tr key={task.id}>
                     <td className={task.completed ? "task-completed" : "task-incomplete"}>
                       {task.text}
+                    </td>
+                    <td>
+                      <button
+                        className={`working-btn ${task.inProgressBy === initials ? "working-active" : (task.inProgressBy ? "working-other" : "")}`}
+                        onClick={() => toggleTaskInProgress(task.id)}
+                        disabled={task.completed || (task.inProgressBy && task.inProgressBy !== initials)}
+                        title={task.inProgressBy && task.inProgressBy !== initials ? `${task.inProgressBy} is working on this task` : task.inProgressBy === initials ? "Stop working on this task" : "Start working on this task"}
+                      >
+                        {task.inProgressBy === initials ? (
+                          <>
+                            <span>●</span>
+                            <span>Stop</span>
+                          </>
+                        ) : task.inProgressBy ? (
+                          <>
+                            <span>●</span>
+                            <span>{task.inProgressBy}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>○</span>
+                            <span>Work</span>
+                          </>
+                        )}
+                      </button>
                     </td>
                     <td>
                       <input
