@@ -12,7 +12,7 @@ const night = [
     text: "Count Cash Float (10,000 DKK - Danish currency only)",
     info: `• Before the evening shift leaves, open the cash drawer and count all physical money.
 • Make sure the float total is exactly 10,000 DKK. If it's more or less, inform the evening shift and resolve the discrepancy.
-• Use only Danish currency—no Euros or foreign bills.
+• Use only Danish currency no Euros or foreign bills.
 • After 00:00, avoid accepting any further cash payments unless necessary (optional procedure).`
   },
   {

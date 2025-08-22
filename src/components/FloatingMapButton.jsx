@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CategoryMapModal from './CategoryMapModal';
+import SimpleMapModal from './CategoryMapModal';
 import './FloatingMapButton.css';
 
 const FloatingMapButton = () => {
@@ -43,7 +43,7 @@ const FloatingMapButton = () => {
         )}
       </button>
       
-      <CategoryMapModal 
+      <SimpleMapModal 
         isOpen={isMapOpen} 
         onClose={handleCloseMap} 
       />
