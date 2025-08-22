@@ -22,7 +22,7 @@ const SimpleMapModal = ({ isOpen, onClose }) => {
       { name: "Bouillon", description: "Warm, casual dining spot serving hearty European-style meals known locally and convenient for quick meals.", distance: "3 min walk" },
       { name: "Frb Rådhuskælder", description: "Charming basement café/bar with a quiet, local atmosphere great for relaxed lunches or light dinners.", distance: "3 min walk", website: "https://frbraadhuskaelder.dk" },
       { name: "Café Vivaldi", description: "Cozy café/bar offering coffee, wine, simple bites, and a calm environment great for informal meets.", distance: "1 min walk", website: "https://cafevivaldi.dk" },
-      { name: "Lagkagehuset", description: "Popular Danish bakery chain serving top-quality pastries, coffee, and snacks ideal for casual or non‑alcoholic options.", distance: "1 min walk", website: "https://lagkagehuset.dk" },
+      { name: "Lagkagehuset", description: "Popular Danish bakery chain serving top-quality pastries, coffee, and snacks ideal for casual or non-alcoholic options.", distance: "1 min walk", website: "https://lagkagehuset.dk" },
       { name: "McDonald's", description: "International fast-food chain good for convenient, quick bites or for younger guests.", distance: "1 min walk" },
       { name: "Restaurant Frederiks Have", description: "Refined gourmet restaurant in an elegant 19th-century setting. Known for seasonal Nordic menus, thoughtful ambiance, and Bib Gourmand recognition.", distance: "5 min walk", website: "http://frederikshave.dk" },
       { name: "Mielcke & Hurtigkarl", description: "Artistic fine-dining nestled in the Frederiksberg Gardens. Features creative tasting menus inspired by global influences.", distance: "8 min walk", website: "https://www.mhcph.com" },
