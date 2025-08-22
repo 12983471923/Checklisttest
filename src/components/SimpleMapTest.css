@@ -1,0 +1,101 @@
+.simple-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.simple-modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90vw;
+  height: 85vh;
+  max-width: 800px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.simple-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e1e5e9;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.simple-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.simple-modal-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.simple-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.simple-modal-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.simple-modal-body h3 {
+  color: #2d3748;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.simple-modal-body p {
+  color: #4a5568;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.recommended-places-list h4 {
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+.recommended-places-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recommended-places-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.recommended-places-list li:last-child {
+  border-bottom: none;
+}

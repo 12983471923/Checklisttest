@@ -6,6 +6,8 @@ export { default as Sidebar } from './Sidebar';
 export { default as ChecklistTable } from './ChecklistTable';
 export { default as ProgressBar } from './ProgressBar';
 export { default as WeatherWidget } from './WeatherWidget';
+export { default as FloatingMapButton } from './FloatingMapButton';
+export { default as SimpleMapModal } from './SimpleMapModal';
 
 // Authentication components
 export { default as AuthLoginForm } from './AuthLoginForm';

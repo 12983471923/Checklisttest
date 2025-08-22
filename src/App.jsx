@@ -14,6 +14,8 @@ import {
   subscribeToBreakfastTimes
 } from "./firebase/database";
 import WeatherWidget from "./components/WeatherWidget";
+import FloatingMapButton from "./components/FloatingMapButton";
+import 'leaflet/dist/leaflet.css';
 import "./App.css";
 
 // Login session constants
@@ -2133,6 +2135,9 @@ function App() {
       )}
         </div>
       </div>
+
+      {/* Floating Map Button */}
+      <FloatingMapButton />
     </div>
   );
 }
