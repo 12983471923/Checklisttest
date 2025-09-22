@@ -567,12 +567,29 @@ function App() {
   // Show login form if not logged in
   if (!user) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <form
           className="login-form"
           onSubmit={handleLogin}
           style={{ maxWidth: "320px", padding: "24px", minWidth: "280px" }}
         >
+          {/* Hotel Logo */}
+          <div style={{ 
+            textAlign: "center", 
+            marginBottom: "24px",
+            paddingBottom: "16px",
+            borderBottom: "1px solid #e2e8f0"
+          }}>
+            <img 
+              src="/logo.png" 
+              alt="Scandic Falkoner Logo" 
+              style={{ 
+                maxWidth: "180px", 
+                height: "auto"
+              }}
+            />
+          </div>
+          
           <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Staff Login</h2>
           <div style={{ marginBottom: 16 }}>
             <input
@@ -612,6 +629,22 @@ function App() {
             Log In
           </button>
         </form>
+        
+        {/* Privacy Disclaimer - Minimalistic */}
+        <div style={{ 
+          marginTop: "40px", 
+          padding: "16px 20px", 
+          backgroundColor: "#f8fafc", 
+          border: "1px solid #e2e8f0", 
+          borderRadius: "8px",
+          fontSize: "0.85rem",
+          color: "#64748b",
+          textAlign: "center",
+          maxWidth: "400px",
+          width: "100%"
+        }}>
+          This tool is for internal use at Scandic Falkoner. No guest data or sensitive personal data is stored. Task records are limited to staff initials and completion logs.
+        </div>
       </div>
     );
   }
