@@ -3998,7 +3998,7 @@ input[type="checkbox"]:hover {
 
   /* Top header - Mobile optimized */
   .top-header {
-    padding: 16px;
+    padding: 12px 16px;
     margin-bottom: 0;
     background: #ffffff;
     border-bottom: 1px solid #e5e7eb;
@@ -4006,14 +4006,15 @@ input[type="checkbox"]:hover {
     top: 0;
     z-index: 100;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     align-items: stretch;
   }
 
   .top-header .night-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     text-align: center;
     margin: 0;
+    font-weight: 600;
   }
 
   /* Left sidebar - Now at top on mobile */
@@ -4022,7 +4023,7 @@ input[type="checkbox"]:hover {
     width: 100%;
     order: 1;
     background: #f8fafc;
-    padding: 16px;
+    padding: 12px;
     position: relative;
     top: auto;
   }
@@ -4032,20 +4033,20 @@ input[type="checkbox"]:hover {
     flex: none;
     width: 100%;
     order: 2;
-    padding: 16px;
+    padding: 12px;
   }
 
   /* Header cards - Compact mobile style */
   .header-card {
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
     position: relative;
     top: auto;
     backdrop-filter: none;
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .header-card:hover {
@@ -4055,12 +4056,12 @@ input[type="checkbox"]:hover {
 
   /* Hotel info section */
   .hotel-info-section {
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 
   .info-item {
-    padding: 6px 0;
+    padding: 4px 0;
     border-bottom: 1px solid #f1f5f9;
   }
 
@@ -4068,51 +4069,51 @@ input[type="checkbox"]:hover {
     border-bottom: none;
   }
 
-  /* Shift selector - Full width buttons */
+  /* Shift selector - Compact buttons */
   .shift-selector {
     display: flex;
     flex-direction: row;
-    gap: 8px;
-    margin: 12px 0;
+    gap: 6px;
+    margin: 8px 0;
   }
 
   .shift-btn {
     flex: 1;
-    padding: 12px 8px;
-    font-size: 0.85rem;
+    padding: 8px 6px;
+    font-size: 0.8rem;
     font-weight: 600;
-    border-radius: 8px;
-    min-height: 44px;
+    border-radius: 6px;
+    min-height: 36px;
     white-space: nowrap;
   }
 
   /* Progress bar */
   .progress-bar {
-    height: 8px;
-    margin: 12px 0;
-    border-radius: 4px;
+    height: 6px;
+    margin: 8px 0;
+    border-radius: 3px;
   }
 
   .progress-bar-inner {
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   /* Task list optimization */
   .checklist-table {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .task-row {
-    padding: 16px;
+    padding: 12px;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
   }
 
   .task-row:last-child {
@@ -4123,37 +4124,37 @@ input[type="checkbox"]:hover {
     flex: 1;
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
   }
 
   .task-right {
     flex: none;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: flex-end;
   }
 
   .task-checkbox {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
     margin-top: 2px;
   }
 
   .task-text {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.85rem;
+    line-height: 1.4;
     flex: 1;
   }
 
-  /* Buttons - Touch optimized */
+  /* Buttons - Optimized for large phones */
   .add-note-btn, .info-btn, .reset-btn {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    min-width: 40px;
-    min-height: 40px;
-    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 6px;
     font-weight: 600;
   }
 
@@ -4162,26 +4163,26 @@ input[type="checkbox"]:hover {
     background: #3b82f6;
     color: white;
     border: none;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   /* Wake-up calls section */
   .wakeup-section {
-    padding: 12px;
+    padding: 10px;
     background: #ffffff;
     border-radius: 8px;
   }
 
   .wakeup-item {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    margin-bottom: 6px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
     border-radius: 6px;
     background: #f8fafc;
   }
@@ -4189,82 +4190,79 @@ input[type="checkbox"]:hover {
   .wakeup-buttons {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 4px;
+    margin-top: 6px;
   }
 
   .wakeup-add-btn, .wakeup-fullscreen-btn, .wakeup-clear-btn {
     width: 100%;
-    padding: 8px;
-    font-size: 0.8rem;
+    padding: 6px;
+    font-size: 0.75rem;
     border-radius: 6px;
-    min-height: 40px;
+    min-height: 36px;
   }
 
   /* Breakfast section */
   .breakfast-display {
-    font-size: 0.85rem;
-    padding: 8px 12px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
     background: #f8fafc;
     border-radius: 6px;
   }
 
   /* Weather widget mobile */
   .weather-widget {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    border-radius: 8px;
-    margin: 8px 0;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    margin: 6px 0;
   }
 
   /* Floating elements */
   .floating-map-button {
     bottom: 16px;
     right: 16px;
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 
-/* Small phones (iPhone SE, small Android) */
-@media (max-width: 480px) {
-  .top-header .night-title {
-    font-size: 1.3rem;
-  }
-
-  .shift-btn {
-    padding: 10px 6px;
-    font-size: 0.8rem;
-  }
-
-  .task-row {
-    padding: 12px;
-  }
-
-  .task-text {
-    font-size: 0.85rem;
-  }
-
-  .header-card {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-  }
-
-  .wakeup-item {
-    font-size: 0.8rem;
-    padding: 6px 8px;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 360px) {
+/* Large phones (Galaxy S24 Ultra, iPhone Pro Max) - Better space utilization */
+@media (max-width: 768px) and (min-width: 400px) and (min-height: 800px) {
+  /* Take advantage of larger screen */
   .left-sidebar, .main-content {
-    padding: 12px;
+    padding: 16px;
   }
 
   .top-header {
-    padding: 12px;
+    padding: 16px;
+  }
+
+  .header-card {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .hotel-info-section {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .info-item {
+    padding: 6px 0;
+  }
+
+  .shift-btn {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+
+  .task-row {
+    padding: 14px;
+    gap: 12px;
   }
 
   .task-checkbox {
@@ -4272,9 +4270,129 @@ input[type="checkbox"]:hover {
     height: 20px;
   }
 
+  .task-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .add-note-btn, .reset-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .info-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .wakeup-section {
+    padding: 12px;
+  }
+
+  .wakeup-item {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+
+  .wakeup-buttons {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .wakeup-add-btn, .wakeup-fullscreen-btn, .wakeup-clear-btn {
+    padding: 8px;
+    font-size: 0.8rem;
+    min-height: 40px;
+  }
+
+  .breakfast-display {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .weather-widget {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    margin: 8px 0;
+  }
+
+  .floating-map-button {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Standard phones (iPhone 13/14, Galaxy S23) */
+@media (max-width: 480px) {
+  .top-header .night-title {
+    font-size: 1.15rem;
+  }
+
   .shift-btn {
+    padding: 8px 6px;
     font-size: 0.75rem;
-    padding: 8px 4px;
+    min-height: 34px;
+  }
+
+  .task-row {
+    padding: 10px;
+  }
+
+  .task-text {
+    font-size: 0.8rem;
+  }
+
+  .header-card {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .wakeup-item {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  .add-note-btn, .reset-btn {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    min-height: 34px;
+  }
+
+  .info-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .left-sidebar, .main-content {
+    padding: 10px;
+  }
+
+  .top-header {
+    padding: 10px;
+  }
+
+  .task-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+
+  .shift-btn {
+    font-size: 0.7rem;
+    padding: 6px 4px;
+    min-height: 32px;
+  }
+
+  .header-card {
+    padding: 6px 10px;
+    font-size: 0.75rem;
   }
 }
 
@@ -4296,31 +4414,32 @@ input[type="checkbox"]:hover {
   }
 
   .note-textarea {
-    min-height: 100px;
+    min-height: 80px;
     font-size: 16px; /* Prevents zoom on iOS */
-    padding: 12px;
-    border-radius: 8px;
+    padding: 10px;
+    border-radius: 6px;
   }
 
   .info-modal-box {
-    padding: 20px;
+    padding: 16px;
+    font-size: 0.9rem;
   }
 
   .info-modal-close {
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 1.1rem;
   }
 }
 
 /* Form inputs mobile */
 @media (max-width: 768px) {
   .form-input, .initials-input {
-    padding: 12px 16px;
+    padding: 10px 14px;
     font-size: 16px; /* Prevents zoom on iOS */
-    border-radius: 8px;
+    border-radius: 6px;
     width: 100%;
   }
 
@@ -4340,17 +4459,17 @@ input[type="checkbox"]:hover {
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
   .task-checkbox {
-    width: 24px;
-    height: 24px;
+    min-width: 20px;
+    min-height: 20px;
   }
 
   .add-note-btn, .info-btn, .reset-btn {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .shift-btn {
-    min-height: 44px;
+    min-height: 36px;
   }
 
   /* Remove hover effects on touch */
@@ -4382,12 +4501,13 @@ input[type="checkbox"]:hover {
   }
 
   .left-sidebar {
-    flex: 0 0 280px;
+    flex: 0 0 240px;
     order: 1;
     height: 100vh;
     overflow-y: auto;
     background: #f8fafc;
     border-right: 1px solid #e5e7eb;
+    padding: 12px;
   }
 
   .main-content {
@@ -4395,16 +4515,33 @@ input[type="checkbox"]:hover {
     order: 2;
     height: 100vh;
     overflow-y: auto;
+    padding: 12px;
   }
 
   .top-header {
     position: relative;
     background: transparent;
     border-bottom: none;
-    padding: 12px 16px;
+    padding: 8px 12px;
+  }
+
+  .top-header .night-title {
+    font-size: 1.1rem;
   }
 
   .checklist-container {
     padding: 0;
+  }
+
+  .header-card {
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+  }
+
+  .shift-btn {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    min-height: 32px;
   }
 }
