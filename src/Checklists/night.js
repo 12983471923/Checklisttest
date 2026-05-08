@@ -17,7 +17,7 @@ const night = [
   },
   {
     id: 3,
-    text: "Assign Remaining Rooms / Handle Overbookings / Set Country Code",
+    text: "Assign Remaining Rooms / Handle Overbookings / Set Country Code for tomorrow",
     info: `• Go to Opera Cloud: Front Desk → Arrivals → Search.
 • Find unassigned reservations and assign available rooms to each guest.
 • In case of overbookings or full house, make smart decisions (e.g., prioritize loyal members, VIPs, or guests already checked in).
@@ -32,12 +32,14 @@ const night = [
   },
   {
     id: 5,
-    text: "Scan & Archive Registration Cards",
+    text: "Scan & Archive Registration Cards + Print Registration cards for tomorrow",
     info: `• Collect all signed registration cards from the shift.
 • At the printer/scanner, place the papers in the top scanner tray.
 • On the screen, select "Scanner."
 • Choose Destination: Reception and set DPI to 100.
-• After scanning, place the scanned cards in the archive folder in the cabinet behind the reception desk.`
+• After scanning, place the scanned cards in the archive folder in the cabinet behind the reception desk.
+• To print new reg cards, Go to opera cloud - Front desk - Front desk work space - Regristration cards - Click on "Exclude blocks" then search - Tick all of the reservation & Process Regristration cards
+`
   },
   {
     id: 6,
@@ -50,7 +52,7 @@ Optional Manual Process:
 • Go to Opera Cloud → Reports → Manage Reports.
 • Search: "Event List Details"
   - Set date to tomorrow.
-  - Set filters: ACT, DEF, OPT, TEN.
+  - Set status: ACT, DEF, OPT, TEN.
   - Print and post it in the staff kitchen.
 • Search: "Package Forecast"
   - Set date range: Today +14 days.
@@ -62,12 +64,12 @@ Optional Manual Process:
     info: `- You can find the Excel for dagens tal on our OneDrive. Use the total adults and children from today's and tomorrow's shift and enter them in dagens tal.
 - Go to Opera Cloud and check the Property Availability page. Enter the availability numbers and occupancy rate for tomorrow, as well as the number of arrivals, departures, and out of service/out of order rooms.
 - For the event field, use the printed Event Details List paper to fill out the field.
-- Both the Package Forecast and the Event List will be in the mail by 00:01, so look out for them.`
+- Both the Package Forecast and the Event List will be in the mail by 23:00, so look out for them.`
   },
   {
     id: 8,
     text: "Add Stayover Cleaning Requests",
-    info: `• Go to: www.easyguest.dk → Statistics → Services → Cleaning Requests.
+    info: `• Go to: https://manager.easyguest.dk/ScandicFalkoner/statistics/services → Statistics → Services → Cleaning Requests.
 • Identify which rooms need cleaning.
 • In Opera Cloud: Front Desk → In House → Find Room.
 • Click on the arrow → Housekeeping → New → Type "Stayover."
@@ -108,7 +110,7 @@ Optional Manual Process:
   },
   {
     id: 12,
-    text: "Clean Coffee Machine + Restock Shop",
+    text: "Clean Coffee Machine around 02:00 + Restock Shop",
     info: `Coffee Machine:
 • Tap bottom-left of coffee machine screen.
 • Click settings icon → Schedule Cleaning.
