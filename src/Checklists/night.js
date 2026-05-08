@@ -50,7 +50,7 @@ Optional Manual Process:
 • Go to Opera Cloud → Reports → Manage Reports.
 • Search: "Event List Details"
   - Set date to tomorrow.
-  - Set filters: ACT, DEF, OPT, TEN.
+  - Set status: ACT, DEF, OPT, TEN.
   - Print and post it in the staff kitchen.
 • Search: "Package Forecast"
   - Set date range: Today +14 days.
@@ -67,7 +67,7 @@ Optional Manual Process:
   {
     id: 8,
     text: "Add Stayover Cleaning Requests",
-    info: `• Go to: www.easyguest.dk → Statistics → Services → Cleaning Requests.
+    info: `• Go to: https://manager.easyguest.dk/ScandicFalkoner/statistics/services → Statistics → Services → Cleaning Requests.
 • Identify which rooms need cleaning.
 • In Opera Cloud: Front Desk → In House → Find Room.
 • Click on the arrow → Housekeeping → New → Type "Stayover."
@@ -108,7 +108,7 @@ Optional Manual Process:
   },
   {
     id: 12,
-    text: "Clean Coffee Machine + Restock Shop",
+    text: "Clean Coffee Machine 02:00 + Restock Shop",
     info: `Coffee Machine:
 • Tap bottom-left of coffee machine screen.
 • Click settings icon → Schedule Cleaning.
