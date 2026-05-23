@@ -1068,7 +1068,7 @@ function App() {
               </thead>
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.id}>
+                  <tr key={task.id} className={`${task.completed ? "task-completed" : ""} ${task.text.includes("Cash Count + Drop + Night Audit") ? "task-critical" : ""}`}>
                     <td className={task.completed ? "task-completed" : "task-incomplete"}>
                       {task.text}
                     </td>
@@ -1135,16 +1135,22 @@ function App() {
           {/* Downtime Reports Mini-Checklist */}
           <div className="downtime-checklist">
             <div className="downtime-header">
-              <h3 className="downtime-title">
-                Print Downtime Every 3 Hours 
+              <div className="downtime-header-top">
+                <h3 className="downtime-title">
+                  Print Downtime Every 3 Hours
+                </h3>
                 <button
-                  className="info-btn"
+                  className="downtime-info-icon-btn"
                   onClick={() => setShowDowntimeInfo(!showDowntimeInfo)}
                   aria-label="Show downtime report instructions"
+                  data-tooltip="Downtime Instructions"
                 >
                   i
                 </button>
-              </h3>
+              </div>
+              <p className="downtime-callout">
+                Important: Print and file the new downtime report every 3 hours during your shift.
+              </p>
             </div>
             <div className="downtime-items">
               {downtimeChecklist.map((item) => (
@@ -1293,10 +1299,8 @@ function App() {
                 </div>
                 <ol className="downtime-info-steps">
                   <li>Open <strong>Cloud Opera</strong> system</li>
-                  <li>Navigate to <strong>Reports</strong> → <strong>Manage reports</strong></li>
-                  <li>Search for <strong>"Downtime"</strong> in the search bar</li>
-                  <li>Click the <strong>three dots (⋯)</strong> on shift reports</li>
-                  <li>Select <strong>Print it</strong> option</li>
+                  <li>Navigate to <strong>Reports</strong> → <strong>Shift reports</strong></li>
+                  <li>Print the <strong>downtime</strong> from there</li>
                 </ol>
               </div>
 

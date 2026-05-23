@@ -10,6 +10,24 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor_react';
+            }
+            if (id.includes('firebase')) {
+              return 'vendor_firebase';
+            }
+            if (id.includes('leaflet') || id.includes('react-leaflet')) {
+              return 'vendor_map';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 })

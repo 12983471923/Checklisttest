@@ -52,32 +52,20 @@ export const useRealtimeChecklist = (shift, initials) => {
       const newSessionId = generateSessionId(currentShift);
       setSessionId(newSessionId);
 
-      // Get existing session or create new one
-      const session = await getOrCreateChecklistSession(currentShift);
+      // Always use local checklist data for fresh initialization
+      const initialTasks = checklists[currentShift].map((task) => ({ 
+        ...task, 
+        completed: false, 
+        note: "", 
+        doneBy: "",
+        inProgressBy: ""
+      }));
+      const initialDowntime = getDowntimeChecklist(currentShift);
       
-      if (session.tasks && session.tasks.length > 0) {
-        // Session exists with data - ensure all tasks have inProgressBy field
-        const tasksWithInProgress = session.tasks.map(task => ({
-          ...task,
-          inProgressBy: task.inProgressBy || ""
-        }));
-        setTasks(tasksWithInProgress);
-        setDowntimeChecklist(session.downtimeChecklist || getDowntimeChecklist(currentShift));
-      } else {
-        // New session or empty session - initialize with default data
-        const initialTasks = checklists[currentShift].map((task) => ({ 
-          ...task, 
-          completed: false, 
-          note: "", 
-          doneBy: "",
-          inProgressBy: ""
-        }));
-        const initialDowntime = getDowntimeChecklist(currentShift);
-        
-        await initializeSession(newSessionId, currentShift, initialTasks, initialDowntime);
-        setTasks(initialTasks);
-        setDowntimeChecklist(initialDowntime);
-      }
+      // Initialize/update session with fresh local data
+      await initializeSession(newSessionId, currentShift, initialTasks, initialDowntime);
+      setTasks(initialTasks);
+      setDowntimeChecklist(initialDowntime);
     } catch (err) {
       console.error('Error initializing session:', err);
       setError(err.message);

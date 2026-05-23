@@ -1224,6 +1224,37 @@ body {
   background-color: #f3f4f6;
 }
 
+/* Critical Task Highlight */
+.checklist-table tbody tr.task-critical {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  border-left: 4px solid #d32f2f;
+}
+
+.checklist-table tbody tr.task-critical:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #e53935 100%) !important;
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+  transform: translateY(-1px);
+}
+
+.checklist-table tbody tr.task-critical td {
+  color: white;
+}
+
+.checklist-table tbody tr.task-critical .task-text {
+  color: white;
+}
+
+.checklist-table tbody tr.task-critical .task-text-completed {
+  color: #ffcccc;
+}
+
+.checklist-table tbody tr.task-critical input[type="checkbox"] {
+  accent-color: #ff6b6b;
+}
+
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
@@ -2167,10 +2198,10 @@ input[type="checkbox"]:hover {
 
 /* Downtime Mini-Checklist */
 .downtime-checklist {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 16px 20px;
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 18px 22px;
   margin: 24px 0 16px 0;
   text-align: center;
 }
@@ -2178,9 +2209,87 @@ input[type="checkbox"]:hover {
 .downtime-header {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.downtime-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.downtime-callout {
+  margin: 0;
+  padding: 12px 14px;
+  background: #fff7cd;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  color: #92400e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.downtime-info-icon-btn {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #4b5563;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.downtime-info-icon-btn:hover {
+  background: #374151;
+  transform: translateY(-1px);
+}
+
+.downtime-info-icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  white-space: nowrap;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(31, 41, 55, 0.95);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  padding: 4px 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 10;
+}
+
+.downtime-info-icon-btn:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.downtime-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 

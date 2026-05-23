@@ -17,18 +17,17 @@ const night = [
   },
   {
     id: 3,
-    text: "Assign Remaining Rooms / Handle Overbookings / Set Country Code for tomorrow",
+    text: "Assign Remaining Rooms / Handle Overbookings",
     info: `• Go to Opera Cloud: Front Desk → Arrivals → Search.
 • Find unassigned reservations and assign available rooms to each guest.
-• In case of overbookings or full house, make smart decisions (e.g., prioritize loyal members, VIPs, or guests already checked in).
-• Ensure every reservation has a country code entered. If it's missing, ask the guest during check-in.`
+• In case of overbookings or full house, make smart decisions (e.g., prioritize loyal members, VIPs, or guests already checked in).`
   },
   {
     id: 4,
     text: "Extend Paymaster (PM) Reservations",
-    info: `• In Opera Cloud: Front Desk → Departures → Search for Paymaster (PM) reservations.
-• Click on the reservation number, then click "Edit."
-• Scroll to the stay duration section and add +5 nights to extend.`
+    info: `• In Opera Cloud: Front Desk → Departures → Type "PM" on Room type → Search.
+• Click on the reservation number.
+• Scroll to the stay duration section → Edit → Add +5 nights to extend → Save.`
   },
   {
     id: 5,
@@ -37,8 +36,8 @@ const night = [
 • At the printer/scanner, place the papers in the top scanner tray.
 • On the screen, select "Scanner."
 • Choose Destination: Reception and set DPI to 100.
-• After scanning, place the scanned cards in the archive folder in the cabinet behind the reception desk.
-• To print new reg cards, Go to opera cloud - Front desk - Front desk work space - Regristration cards - Click on "Exclude blocks" then search - Tick all of the reservation & Process Regristration cards
+• After scanning, go to our Reception email then download all of the files from the printer → Save it on the Onedrive → Reception → Registration cards → Save it on the proper date .
+• To print new reg cards, Go to opera cloud - Front desk - Front desk work space - Regristration cards - Click on "Exclude blocks" then search → Tick all of the reservation & Process Regristration cards
 `
   },
   {
@@ -69,7 +68,7 @@ Optional Manual Process:
   {
     id: 8,
     text: "Add Stayover Cleaning Requests",
-    info: `• Go to: https://manager.easyguest.dk/ScandicFalkoner/statistics/services → Statistics → Services → Cleaning Requests.
+    info: `• Go to Easyguest site → Statistics → Services → Cleaning Requests.
 • Identify which rooms need cleaning.
 • In Opera Cloud: Front Desk → In House → Find Room.
 • Click on the arrow → Housekeeping → New → Type "Stayover."
@@ -78,10 +77,10 @@ Optional Manual Process:
   {
     id: 9,
     text: "Check Netcompany Guests Have Been Charged",
-    info: `• Open Opera Cloud → Bookings → Traces.
+    info: `• Open Opera Cloud → Bookings → Manage reservation → Type "Netcompany" in Company box.
 • Search for Netcompany guests.
 • If charges are missing, verify them via emails or booking notes.
-• If something seems off, notify the MOD or write it in the handover email.`
+• If something seems off, notify the MOD or write it in the handover notes.`
   },
   {
     id: 10,
@@ -90,7 +89,7 @@ Optional Manual Process:
 • Go to: Finance → Virtual Card Management.
 • For each virtual card:
   - Copy the Booking Number.
-  - In Opera Cloud: Go to Bookings → Manage Reservation → Confirmation No.
+  - In Opera Cloud: Go to Bookings → Manage Reservation → Type the Booking.com reservation number on "Costume reference".
   - Paste the Booking Number, but add a % symbol in front (e.g., %123456789).
   - Click arrow → Deposit and Cancellation → New → Type amount to be charged (usually 100%).
   - Save.
@@ -99,14 +98,13 @@ Optional Manual Process:
   },
   {
     id: 11,
-    text: "Enter Lufthansa Wake-Up Calls",
+    text: "Enter Lufthansa Wake-Up Calls and Print the wakeup call report",
     info: `• Open Opera Cloud: Front Desk → Wake-Up Calls → New.
 • Input each Lufthansa room number, correct date, and requested time.
 • Double-check dates—some guests stay multiple nights.
 • Print wake-up list:
-  - Reports → Manage Reports → Search "Wake-Up."
-  - Set date: Next day → Print.
-• If already emailed, print from email instead.`
+  - Reports → Manage Reports → Search "Wake Up."
+  - Set date: Next day → Print.`
   },
   {
     id: 12,
@@ -133,12 +131,12 @@ Shop Restocking:
   {
     id: 14,
     text: "Check Mailbox",
-    info: `• All pending emails must be replied to by 03:00.
+    info: `• All pending emails must be replied to by 03:00 if possible.
 • Prioritize guest inquiries, Booking.com, Lufthansa, and internal communication.`
   },
   {
     id: 15,
-    text: "After 03:15 - Cash Count + Drop + Night Audit",
+    text: "Cash Count + Drop + Night Audit (03:00-04:00)",
     info: `Cash Drop:
 • Count all money again.
 • If there's extra (e.g., 175 DKK), go to: Finance → Cashier Closure.
@@ -151,64 +149,63 @@ Night Audit:
 • Final checks: delete 6PM bookings, reply to all emails, confirm pre-check-ins.
 • Go to: Finance → End of Day → Proceed to Next Day.
 • After processing:
-  - Print: Financial Transactions, Reservations, No-Shows.`
+  - Print: No-Shows.`
   },
   {
     id: 16,
-    text: "03:40 - Wake Lufthansa Crew + Prepare Breakfast",
-    info: `Wake-Up:
-• Use reception phone.
-• Dial "3" before the room number (e.g., Room 345 → Dial 3345).
-• Gently wake them up using a soft, polite voice.
+    text: "Wake Lufthansa Crew + Prepare Breakfast+ Clean up after",
+    info: `Wake-Up call instruction:
+• Open a programme called Telavox.
+• Log in to the front desk phone, you can find the log in Username and Password on the login docs.
+• The on the programme to call the crew, type "Room" then their room number, for example "Room 345".
 
 Breakfast:
 • Staff canteen → Find Freezer #4 (last in the row).
 • Take Lufthansa breakfast trolley.
-• Preheat oven: 160°C / 35% humidity / 10 mins.
+• Preheat oven: 160°C / 35% humidity / 7 mins.
 • Heat bread → Place on marble table near shop/coffee machine.`
   },
   {
     id: 17,
-    text: "Financial Transactions + Reservations + No-Shows",
-    info: `• Print each document:
-  - Financial Transactions → Archive behind Camilla's desk.
-  - Reservations → Same archive folder.
+    text: "When the end of the day is done print no show",
+    info: `• Print the document:
+  - Opera cloud → Reports → Manage Reports → Type "No show" → Edit and set the dates you want and print.
   - No-Shows → Place on Mie's desk.`
   },
   {
     id: 18,
-    text: "Restart Interface PC",
-    info: `• Use 4th front desk PC (named Frontdesk719_04).
-• Login:
-  - Username: Frontdesk719_04
-  - Password: Scandichotels2025
+    text: "Restart Interface PC in the Basement Server Room",
+    info: `• When you reach the room, look for key at the top of the cabinet on the servers.
+• Login to the Interface computer:
+  - Username: interface719@scandichotels.com
+  - Password: Funct1on
 • Open "Interface" program:
   - Password: Funct1on
   - Close all open windows.
   - Log out → Log back in.
   - Reopen Interface → Launch all 5 necessary programs.
-  - Close interface → Log out.`
+  - Then just leave the computer as it is.`
   },
   {
     id: 19,
     text: "Check In Today's PMs",
-    info: `• Opera Cloud → Arrivals → Filter: Room Type = "PM" → Search.
+    info: `• Opera Cloud → Arrivals → Room Type = Type "PM" → Search.
 • Assign rooms → Check them in.`
   },
   {
     id: 20,
     text: "Check Traces (Fruit Baskets, RB to CC, Stayover Notes)",
-    info: `• Opera Cloud → Bookings → Traces.
+    info: `• Opera Cloud → Bookings → Traces → Type "FRO" on the department.
 • Review and confirm all action items have been handled.
 • If any pending tasks remain, add to the handover notes.`
   },
   {
     id: 21,
-    text: "Shred Old Downtime Reports + Reg Cards (GDPR)",
+    text: "GDPR in the Garbage room",
     info: `• Collect outdated papers from back office.
 • Take to garbage room (in front of Freezer #4).
 • Put into GDPR bin.
-• If full:
+• If bin is full, make a request with the Teknik by:
   - Opera Cloud → Inventory → Room Maintenance → New.
   - Room: 9007 → Reason: OTHER.
   - Comment: "GDPR bin is full. Please replace."`
