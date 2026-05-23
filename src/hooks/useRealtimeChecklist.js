@@ -52,7 +52,6 @@ export const useRealtimeChecklist = (shift, initials) => {
       const newSessionId = generateSessionId(currentShift);
       setSessionId(newSessionId);
 
-      // Always use local checklist data for fresh initialization
       const initialTasks = checklists[currentShift].map((task) => ({ 
         ...task, 
         completed: false, 
@@ -61,15 +60,23 @@ export const useRealtimeChecklist = (shift, initials) => {
         inProgressBy: ""
       }));
       const initialDowntime = getDowntimeChecklist(currentShift);
-      
-      // Initialize/update session with fresh local data
-      await initializeSession(newSessionId, currentShift, initialTasks, initialDowntime);
-      setTasks(initialTasks);
-      setDowntimeChecklist(initialDowntime);
+
+      const session = await getOrCreateChecklistSession(currentShift);
+      const sessionTasks = Array.isArray(session.tasks) && session.tasks.length ? session.tasks.map(task => ({
+        ...task,
+        inProgressBy: task.inProgressBy || ""
+      })) : initialTasks;
+      const sessionDowntime = Array.isArray(session.downtimeChecklist) && session.downtimeChecklist.length ? session.downtimeChecklist : initialDowntime;
+
+      if (!session.tasks || !session.tasks.length || !session.downtimeChecklist || !session.downtimeChecklist.length) {
+        await initializeSession(newSessionId, currentShift, initialTasks, initialDowntime);
+      }
+
+      setTasks(sessionTasks);
+      setDowntimeChecklist(sessionDowntime);
     } catch (err) {
       console.error('Error initializing session:', err);
       setError(err.message);
-      // Fallback to local state
       const fallbackTasks = checklists[currentShift].map((task) => ({ 
         ...task, 
         completed: false, 
