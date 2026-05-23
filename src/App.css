@@ -1226,33 +1226,34 @@ body {
 
 /* Critical Task Highlight */
 .checklist-table tbody tr.task-critical {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
-  color: white;
+  background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%) !important;
+  color: #1e293b;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  border-left: 4px solid #d32f2f;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.22);
+  border-left: 4px solid #4f46e5;
 }
 
 .checklist-table tbody tr.task-critical:hover {
-  background: linear-gradient(135deg, #ff5252 0%, #e53935 100%) !important;
-  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%) !important;
+  color: white;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.28);
   transform: translateY(-1px);
 }
 
 .checklist-table tbody tr.task-critical td {
-  color: white;
+  color: inherit;
 }
 
 .checklist-table tbody tr.task-critical .task-text {
-  color: white;
+  color: inherit;
 }
 
 .checklist-table tbody tr.task-critical .task-text-completed {
-  color: #ffcccc;
+  color: #e0e7ff;
 }
 
 .checklist-table tbody tr.task-critical input[type="checkbox"] {
-  accent-color: #ff6b6b;
+  accent-color: #4f46e5;
 }
 
 input[type="checkbox"] {
