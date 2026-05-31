@@ -572,3 +572,294 @@
     padding: 20px;
   }
 }
+
+/* ============================================
+   Modern admin panel refresh
+   ============================================ */
+
+.admin-overlay {
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 34rem),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 28rem),
+    var(--app-bg, #fafafa);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.admin-panel {
+  background: transparent;
+}
+
+.admin-topbar {
+  padding: 18px 28px;
+  background: color-mix(in srgb, var(--app-card, #fff) 82%, transparent);
+  border-bottom: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  backdrop-filter: blur(18px);
+}
+
+.admin-topbar-title h1 {
+  color: var(--app-text, #111827);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.admin-topbar-title p {
+  color: var(--app-text-muted, #6b7280);
+}
+
+.admin-close-btn {
+  min-height: 44px;
+  background: #111827;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.16);
+}
+
+.admin-close-btn:hover {
+  background: #0f172a;
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.22);
+}
+
+.admin-body {
+  gap: 26px;
+}
+
+.admin-nav,
+.admin-section,
+.admin-access-denied {
+  background: var(--app-card, #fff);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 22px;
+  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(15, 23, 42, 0.06));
+}
+
+.admin-nav {
+  padding: 10px;
+}
+
+.admin-nav-item {
+  min-height: 44px;
+  color: var(--app-text-muted, #6b7280);
+  border-radius: 14px;
+  font-weight: 700;
+  transition: background 180ms ease, color 180ms ease, transform 140ms ease;
+}
+
+.admin-nav-item:hover {
+  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
+  color: var(--app-primary, #4f46e5);
+}
+
+.admin-nav-item.active {
+  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+}
+
+.admin-section {
+  padding: 30px;
+}
+
+.admin-section-head h2 {
+  color: var(--app-text, #111827);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.admin-section-head p,
+.admin-time-item label,
+.admin-table th,
+.admin-empty,
+.admin-loading {
+  color: var(--app-text-muted, #6b7280);
+}
+
+.admin-shift-picker {
+  padding: 6px;
+  gap: 6px;
+  background: rgba(17, 24, 39, 0.04);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 999px;
+}
+
+.admin-shift-btn {
+  min-height: 42px;
+  border-radius: 999px;
+  color: var(--app-text-muted, #6b7280);
+  font-weight: 800;
+}
+
+.admin-shift-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+}
+
+.admin-btn {
+  min-height: 44px;
+  color: var(--app-text, #111827);
+  background: var(--app-card, #fff);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: var(--app-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.05));
+}
+
+.admin-btn:hover {
+  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
+  color: var(--app-primary, #4f46e5);
+  border-color: rgba(79, 70, 229, 0.22);
+}
+
+.admin-btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
+  border: none;
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
+}
+
+.admin-btn-primary:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #4338ca, #2563eb);
+  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.28);
+}
+
+.admin-btn-danger {
+  color: var(--app-danger, #ef4444);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.admin-btn-danger:hover {
+  color: #dc2626;
+  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
+}
+
+.admin-input,
+.admin-textarea {
+  min-height: 44px;
+  color: var(--app-text, #111827);
+  background: var(--app-card, #fff);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 14px;
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  border-color: rgba(79, 70, 229, 0.48);
+  box-shadow: var(--app-ring, 0 0 0 4px rgba(79, 70, 229, 0.14));
+}
+
+.admin-task-card,
+.admin-time-item,
+.admin-table-wrap,
+.admin-message {
+  background: var(--app-card-muted, #f9fafb);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 18px;
+}
+
+.admin-task-card {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.admin-task-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--app-border-strong, rgba(17, 24, 39, 0.14));
+  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(15, 23, 42, 0.06));
+}
+
+.admin-icon-btn {
+  min-height: 32px;
+  color: var(--app-text-muted, #6b7280);
+  background: var(--app-card, #fff);
+  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  border-radius: 11px;
+}
+
+.admin-icon-btn:hover:not(:disabled) {
+  color: var(--app-primary, #4f46e5);
+  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
+}
+
+.admin-delete-btn {
+  color: var(--app-danger, #ef4444);
+  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
+  border-color: rgba(239, 68, 68, 0.16);
+}
+
+.admin-table {
+  background: transparent;
+}
+
+.admin-table th {
+  background: var(--app-card-muted, #f9fafb);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.admin-table td {
+  color: var(--app-text, #111827);
+  border-bottom-color: var(--app-border, rgba(17, 24, 39, 0.09));
+}
+
+.admin-role-badge,
+.admin-status-badge,
+.admin-save-status {
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.admin-save-status.saving {
+  background: var(--app-card-muted, #f9fafb);
+  color: var(--app-text-muted, #6b7280);
+}
+
+.admin-save-status.saved {
+  background: var(--app-success-soft, rgba(34, 197, 94, 0.12));
+  color: #15803d;
+}
+
+.admin-save-status.error {
+  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
+  color: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  .admin-overlay {
+    background:
+      radial-gradient(circle at top left, rgba(79, 70, 229, 0.17), transparent 34rem),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.13), transparent 28rem),
+      var(--app-bg, #0f0f0f);
+  }
+
+  .admin-topbar,
+  .admin-nav,
+  .admin-section,
+  .admin-access-denied {
+    background: rgba(24, 24, 27, 0.88);
+  }
+
+  .admin-shift-picker {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .admin-task-card,
+  .admin-time-item,
+  .admin-table-wrap,
+  .admin-message,
+  .admin-input,
+  .admin-textarea,
+  .admin-icon-btn,
+  .admin-btn {
+    background: #111113;
+  }
+
+  .admin-table th {
+    background: #111113;
+  }
+}

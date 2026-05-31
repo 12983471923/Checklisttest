@@ -3,11 +3,10 @@ import { signInUser, resetPassword } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
 
 /* ─── Inline styles ─────────────────────────────────────────────────────────
-   Kept here so the component is self-contained. All values follow
-   Apple's Human Interface Guidelines: system font stack, #1d1d1f text,
-   #f5f5f7 background, and a near-black CTA button.
+   Kept here so the component is self-contained. Values mirror the global
+   Inter-based dashboard design tokens used by the rest of the app.
    ─────────────────────────────────────────────────────────────────────────── */
-const FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
+const FONT = "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
 
 const s = {
   page: {
@@ -15,15 +14,16 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#f5f5f7',
+    background: 'radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 34rem), radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 28rem), #FAFAFA',
     padding: '24px 16px',
     fontFamily: FONT,
   },
   card: {
     background: '#ffffff',
-    borderRadius: '20px',
-    boxShadow: '0 2px 24px rgba(0,0,0,0.09)',
-    padding: '48px 44px 40px',
+    border: '1px solid rgba(17, 24, 39, 0.09)',
+    borderRadius: '24px',
+    boxShadow: '0 24px 60px rgba(15, 23, 42, 0.10)',
+    padding: '46px 42px 38px',
     width: '100%',
     maxWidth: '400px',
     boxSizing: 'border-box',
@@ -41,16 +41,16 @@ const s = {
     objectFit: 'contain',
   },
   hotelName: {
-    fontSize: '22px',
-    fontWeight: '600',
-    color: '#1d1d1f',
-    letterSpacing: '-0.3px',
+    fontSize: '24px',
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: '-0.6px',
     margin: 0,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: '14px',
-    color: '#6e6e73',
+    color: '#6B7280',
     marginTop: '4px',
     textAlign: 'center',
     letterSpacing: '0px',
@@ -67,46 +67,50 @@ const s = {
   },
   label: {
     fontSize: '13px',
-    fontWeight: '500',
-    color: '#3a3a3c',
-    letterSpacing: '0px',
+    fontWeight: '700',
+    color: '#374151',
+    letterSpacing: '-0.01em',
   },
   input: {
     width: '100%',
+    minHeight: '46px',
     padding: '13px 15px',
     fontSize: '15px',
-    color: '#1d1d1f',
-    background: '#fafafa',
-    border: '1.5px solid #d1d1d6',
-    borderRadius: '10px',
+    color: '#111827',
+    background: '#FFFFFF',
+    border: '1px solid rgba(17, 24, 39, 0.13)',
+    borderRadius: '12px',
     outline: 'none',
     boxSizing: 'border-box',
-    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+    transition: 'border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease',
     fontFamily: FONT,
     WebkitAppearance: 'none',
   },
   inputFocus: {
-    borderColor: '#1d1d1f',
-    boxShadow: '0 0 0 3px rgba(29,29,31,0.08)',
+    borderColor: 'rgba(79, 70, 229, 0.55)',
+    boxShadow: '0 0 0 4px rgba(79, 70, 229, 0.14)',
     background: '#ffffff',
   },
   button: {
     marginTop: '8px',
     width: '100%',
+    minHeight: '46px',
     padding: '14px',
     fontSize: '15px',
-    fontWeight: '500',
+    fontWeight: '800',
     color: '#ffffff',
-    background: '#1d1d1f',
+    background: '#111827',
     border: 'none',
-    borderRadius: '10px',
+    borderRadius: '12px',
     cursor: 'pointer',
-    transition: 'background 0.15s ease, opacity 0.15s ease',
+    transition: 'background 0.18s ease, opacity 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease',
     fontFamily: FONT,
     letterSpacing: '-0.1px',
+    boxShadow: '0 12px 24px rgba(17, 24, 39, 0.16)',
   },
   buttonHover: {
-    background: '#3a3a3c',
+    background: '#0F172A',
+    boxShadow: '0 16px 32px rgba(17, 24, 39, 0.22)',
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -120,7 +124,7 @@ const s = {
     background: 'none',
     border: 'none',
     fontSize: '13px',
-    color: '#6e6e73',
+    color: '#4F46E5',
     cursor: 'pointer',
     padding: '0',
     fontFamily: FONT,
@@ -131,34 +135,34 @@ const s = {
     alignItems: 'flex-start',
     gap: '8px',
     padding: '12px 14px',
-    background: '#fff2f2',
-    border: '1px solid #ffd6d6',
-    borderRadius: '10px',
+    background: 'rgba(239, 68, 68, 0.08)',
+    border: '1px solid rgba(239, 68, 68, 0.18)',
+    borderRadius: '12px',
     fontSize: '13px',
-    color: '#c0392b',
+    color: '#B91C1C',
     lineHeight: '1.45',
   },
   success: {
     padding: '12px 14px',
-    background: '#f0fff4',
-    border: '1px solid #b2dfdb',
-    borderRadius: '10px',
+    background: 'rgba(34, 197, 94, 0.10)',
+    border: '1px solid rgba(34, 197, 94, 0.2)',
+    borderRadius: '12px',
     fontSize: '13px',
-    color: '#1a7f4b',
+    color: '#15803D',
     lineHeight: '1.45',
   },
   divider: {
     height: '1px',
-    background: '#f0f0f0',
+    background: 'rgba(17, 24, 39, 0.09)',
     margin: '24px 0',
   },
   backBtn: {
     background: 'none',
-    border: '1.5px solid #d1d1d6',
-    borderRadius: '10px',
+    border: '1px solid rgba(79, 70, 229, 0.28)',
+    borderRadius: '12px',
     padding: '12px',
     fontSize: '14px',
-    color: '#3a3a3c',
+    color: '#4F46E5',
     cursor: 'pointer',
     width: '100%',
     fontFamily: FONT,
@@ -169,7 +173,7 @@ const s = {
     marginTop: '28px',
     textAlign: 'center',
     fontSize: '12px',
-    color: '#aeaeb2',
+    color: '#9CA3AF',
     lineHeight: '1.5',
     maxWidth: '400px',
     width: '100%',
@@ -318,10 +322,10 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
           <div style={s.card}>
             <Header />
             <div style={s.divider} />
-            <p style={{ fontSize: '20px', fontWeight: '600', color: '#1d1d1f', marginTop: 0, marginBottom: '6px' }}>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: '#111827', marginTop: 0, marginBottom: '6px', letterSpacing: '-0.03em' }}>
               Reset Password
             </p>
-            <p style={{ fontSize: '14px', color: '#6e6e73', marginTop: 0, marginBottom: '20px' }}>
+            <p style={{ fontSize: '14px', color: '#6B7280', marginTop: 0, marginBottom: '20px' }}>
               Enter your email and we'll send a reset link.
             </p>
 
@@ -405,8 +409,8 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
               type="button"
               style={s.forgotBtn}
               onClick={() => { setShowReset(true); setInlineError(''); }}
-              onMouseEnter={e => e.target.style.color = '#1d1d1f'}
-              onMouseLeave={e => e.target.style.color = '#6e6e73'}
+              onMouseEnter={e => e.target.style.color = '#4338CA'}
+              onMouseLeave={e => e.target.style.color = '#4F46E5'}
             >
               Forgot Password?
             </button>

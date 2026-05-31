@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5730,5 +5732,716 @@ textarea {
 
   .info-btn {
     flex: 0 0 34px;
+  }
+}
+
+/* ============================================
+   Modern dashboard redesign (Notion / Linear / Vercel inspired)
+   Visual-only layer: preserves all existing markup and behavior.
+   ============================================ */
+
+:root {
+  --app-bg: #fafafa;
+  --app-bg-soft: #f4f4f5;
+  --app-card: #ffffff;
+  --app-card-muted: #f9fafb;
+  --app-text: #111827;
+  --app-text-muted: #6b7280;
+  --app-text-soft: #9ca3af;
+  --app-border: rgba(17, 24, 39, 0.09);
+  --app-border-strong: rgba(17, 24, 39, 0.14);
+  --app-primary: #4f46e5;
+  --app-primary-hover: #4338ca;
+  --app-primary-soft: rgba(79, 70, 229, 0.1);
+  --app-success: #22c55e;
+  --app-success-soft: rgba(34, 197, 94, 0.12);
+  --app-warning: #f59e0b;
+  --app-warning-soft: rgba(245, 158, 11, 0.13);
+  --app-danger: #ef4444;
+  --app-danger-soft: rgba(239, 68, 68, 0.1);
+  --app-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --app-shadow-sm: 0 8px 22px rgba(15, 23, 42, 0.06);
+  --app-shadow-md: 0 18px 46px rgba(15, 23, 42, 0.1);
+  --app-ring: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  --app-radius-lg: 20px;
+  --app-radius-md: 16px;
+  --app-radius-sm: 12px;
+
+  /* Map the prior design tokens onto the new system so older rules inherit. */
+  --ios-bg: var(--app-bg);
+  --ios-card: var(--app-card);
+  --ios-label: var(--app-text);
+  --ios-secondary-label: var(--app-text-muted);
+  --ios-tertiary-label: var(--app-text-soft);
+  --ios-separator: var(--app-border);
+  --ios-fill: var(--app-card-muted);
+  --ios-green: var(--app-success);
+  --ios-orange: var(--app-warning);
+  --ios-red: var(--app-danger);
+  --ios-blue: var(--app-primary);
+  --ios-shadow: var(--app-shadow-sm);
+  --ios-soft-shadow: var(--app-shadow-xs);
+  --ios-radius: var(--app-radius-md);
+  --ios-radius-sm: var(--app-radius-sm);
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.09), transparent 32rem),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 28rem),
+    var(--app-bg);
+  color: var(--app-text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  min-height: 44px;
+}
+
+.checklist-container {
+  max-width: 1520px;
+  padding: 32px;
+  background: transparent;
+}
+
+.main-layout {
+  gap: 28px;
+}
+
+.left-sidebar {
+  flex-basis: 320px;
+}
+
+.header-card,
+.task-card,
+.downtime-checklist,
+.meta-bar,
+.shift-instructions-card,
+.note-modal-box,
+.info-modal-box,
+.initials-modal-box,
+.breakfast-modal-box,
+.wakeup-modal-box,
+.handover-modal-container,
+.handover-fullscreen-container,
+.wakeup-fullscreen-container,
+.welcome-modal-box {
+  background: color-mix(in srgb, var(--app-card) 96%, transparent);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.header-card {
+  padding: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(18px);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.header-card:hover,
+.task-card:hover,
+.downtime-item:hover,
+.wakeup-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--app-border-strong);
+  box-shadow: var(--app-shadow-md);
+}
+
+.header-card strong,
+.night-title,
+.task-title,
+.downtime-title {
+  color: var(--app-text);
+}
+
+.header-card strong {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.info-label,
+.checklist-section-label,
+.handover-stat,
+.wakeup-stat,
+.progress-summary {
+  color: var(--app-text-muted);
+}
+
+.top-header {
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.night-title {
+  font-size: clamp(1.85rem, 3vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+
+/* Shift selector: horizontal pill tabs with filled accent active state. */
+.shift-selector {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+  min-width: min(100%, 360px);
+  gap: 6px;
+  padding: 6px;
+  background: rgba(17, 24, 39, 0.04);
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.shift-selector::before {
+  display: none;
+}
+
+.shift-btn {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--app-text-muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background 180ms ease, color 180ms ease, transform 140ms ease, box-shadow 180ms ease;
+}
+
+.shift-btn.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--app-primary), #3b82f6);
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.24);
+}
+
+.shift-btn:hover:not(.active) {
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--app-primary);
+}
+
+.shift-btn:active,
+.add-note-btn:active,
+.edit-note-btn:active,
+.reset-btn:active,
+.working-btn:active,
+.info-btn:active,
+.handover-btn:active,
+.wakeup-add-btn:active {
+  transform: scale(0.97);
+}
+
+.meta-bar {
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+}
+
+.progress-bar {
+  height: 9px;
+  background: rgba(79, 70, 229, 0.09);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  background: linear-gradient(90deg, var(--app-success), #14b8a6);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
+  transition: width 260ms ease;
+}
+
+.progress-summary {
+  font-weight: 700;
+}
+
+.checklist-section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 2px 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.checklist-section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--app-border);
+}
+
+.task-list {
+  gap: 12px;
+}
+
+.task-card {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.task-card.is-in-progress {
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: inset 4px 0 0 var(--app-warning), var(--app-shadow-sm);
+}
+
+.task-card.task-critical {
+  background: linear-gradient(135deg, #fffaf0, #ffffff);
+  border-color: rgba(245, 158, 11, 0.26);
+  box-shadow: inset 4px 0 0 var(--app-warning), var(--app-shadow-sm);
+}
+
+.task-card.is-completed {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), var(--app-card));
+}
+
+.task-checkbox-control {
+  width: 36px;
+  height: 36px;
+}
+
+.ios-checkbox {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(107, 114, 128, 0.42);
+  background: var(--app-card);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.ios-checkbox-input:checked + .ios-checkbox {
+  background: var(--app-success);
+  border-color: var(--app-success);
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.25);
+  transform: scale(1.08);
+}
+
+.ios-checkbox-input:focus-visible + .ios-checkbox {
+  box-shadow: var(--app-ring);
+}
+
+.task-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.task-card.is-completed .task-title {
+  color: var(--app-text-soft);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.task-note-preview {
+  margin-top: 6px;
+  color: var(--app-text-muted);
+  font-size: 0.88rem;
+}
+
+.in-progress-indicator,
+.working-btn.working-active,
+.working-btn.working-other {
+  color: #92400e;
+  background: var(--app-warning-soft);
+}
+
+.in-progress-dot {
+  background: var(--app-warning);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.16);
+}
+
+.initials-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 5px 10px;
+  color: #3730a3;
+  background: rgba(79, 70, 229, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.16);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.working-btn,
+.edit-note-btn,
+.handover-view-all-btn,
+.wakeup-fullscreen-btn,
+.handover-nav-btn,
+.wakeup-bulk-btn,
+.breakfast-modal-cancel-btn,
+.handover-cancel-btn,
+.wakeup-filter-tab {
+  min-height: 40px;
+  color: var(--app-text);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  font-weight: 700;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.working-btn:hover:not(:disabled),
+.edit-note-btn:hover,
+.handover-view-all-btn:hover,
+.wakeup-fullscreen-btn:hover,
+.handover-nav-btn:hover,
+.wakeup-bulk-btn:hover,
+.breakfast-modal-cancel-btn:hover,
+.handover-cancel-btn:hover,
+.wakeup-filter-tab:hover {
+  background: var(--app-primary-soft);
+  border-color: rgba(79, 70, 229, 0.22);
+  color: var(--app-primary);
+  box-shadow: var(--app-shadow-xs);
+}
+
+.info-btn {
+  width: 40px;
+  height: 40px;
+  color: var(--app-primary);
+  background: var(--app-primary-soft);
+  border: 1px solid rgba(79, 70, 229, 0.14);
+}
+
+.info-btn:hover {
+  color: #fff;
+  background: var(--app-primary);
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+}
+
+.add-note-btn,
+.handover-btn,
+.wakeup-add-btn,
+.handover-add-btn,
+.handover-save-btn,
+.breakfast-modal-save-btn,
+.celebration-continue-btn {
+  min-height: 42px;
+  background: linear-gradient(135deg, var(--app-primary), #3b82f6);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.18);
+}
+
+.add-note-btn:hover,
+.handover-btn:hover,
+.wakeup-add-btn:hover,
+.handover-add-btn:hover,
+.handover-save-btn:hover,
+.breakfast-modal-save-btn:hover,
+.celebration-continue-btn:hover {
+  background: linear-gradient(135deg, var(--app-primary-hover), #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.25);
+}
+
+.admin-panel-btn {
+  background: linear-gradient(135deg, #111827, #374151) !important;
+  color: #fff !important;
+}
+
+.reset-btn,
+.wakeup-clear-btn,
+.handover-delete-btn,
+.handover-bulk-delete-btn,
+.handover-bulk-delete-old-btn,
+.handover-delete-small-btn,
+.wakeup-delete,
+.wakeup-delete-btn,
+.handover-history-delete {
+  min-height: 40px;
+  color: var(--app-danger);
+  background: transparent;
+  border: none;
+  font-weight: 800;
+}
+
+.reset-btn:hover,
+.wakeup-clear-btn:hover,
+.handover-delete-btn:hover,
+.handover-bulk-delete-btn:hover,
+.handover-bulk-delete-old-btn:hover,
+.handover-delete-small-btn:hover,
+.wakeup-delete:hover,
+.wakeup-delete-btn:hover,
+.handover-history-delete:hover {
+  color: #dc2626;
+  background: var(--app-danger-soft);
+}
+
+.downtime-checklist {
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.035), rgba(59, 130, 246, 0.045)), var(--app-card);
+}
+
+.downtime-callout {
+  color: #92400e;
+  background: var(--app-warning-soft);
+  border: 1px solid rgba(245, 158, 11, 0.14);
+  border-radius: var(--app-radius-sm);
+}
+
+.downtime-item,
+.wakeup-item,
+.handover-preview,
+.time-value,
+.time-value-clickable,
+.price-value,
+.handover-date-input,
+.handover-date-display,
+.handover-fullscreen-stat,
+.wakeup-fullscreen-stat,
+.handover-stats-detailed,
+.handover-history-item,
+.handover-notes-preview {
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+  box-shadow: var(--app-shadow-xs);
+}
+
+.wakeup-item.completed {
+  background: var(--app-success-soft);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.form-input,
+.initials-input,
+.handover-date-input,
+.handover-main-date-input,
+.breakfast-modal-input,
+.wakeup-input,
+.note-textarea,
+.handover-textarea,
+.handover-main-textarea,
+.wakeup-textarea {
+  min-height: 44px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+  color: var(--app-text);
+}
+
+.form-input:focus,
+.initials-input:focus,
+.handover-date-input:focus,
+.handover-main-date-input:focus,
+.breakfast-modal-input:focus,
+.wakeup-input:focus,
+.note-textarea:focus,
+.handover-textarea:focus,
+.handover-main-textarea:focus,
+.wakeup-textarea:focus {
+  border-color: rgba(79, 70, 229, 0.48);
+  box-shadow: var(--app-ring);
+}
+
+.info-modal-overlay,
+.handover-modal-overlay,
+.handover-fullscreen-overlay,
+.wakeup-fullscreen-overlay,
+.celebration-modal-overlay {
+  background: rgba(15, 23, 42, 0.44);
+  backdrop-filter: blur(14px);
+}
+
+.handover-modal-header,
+.handover-fullscreen-header,
+.wakeup-fullscreen-header,
+.handover-fullscreen-footer,
+.wakeup-fullscreen-footer,
+.handover-sidebar,
+.handover-fullscreen-stats,
+.wakeup-fullscreen-stats,
+.wakeup-fullscreen-filters {
+  background: var(--app-card-muted);
+  border-color: var(--app-border);
+}
+
+.handover-modal-close,
+.handover-fullscreen-close,
+.wakeup-fullscreen-close,
+.info-modal-close {
+  background: var(--app-card);
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-border);
+}
+
+.handover-modal-close:hover,
+.handover-fullscreen-close:hover,
+.wakeup-fullscreen-close:hover,
+.info-modal-close:hover {
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+.shift-instructions-card {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.075), rgba(59, 130, 246, 0.045)), var(--app-card);
+  border-color: rgba(79, 70, 229, 0.14);
+}
+
+.shift-instructions-card .shift-instructions-title {
+  color: var(--app-primary);
+}
+
+.footer-text {
+  color: var(--app-text-muted);
+}
+
+/* Dark mode-friendly palette, automatically following OS preference. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #0f0f0f;
+    --app-bg-soft: #171717;
+    --app-card: #18181b;
+    --app-card-muted: #111113;
+    --app-text: #f9fafb;
+    --app-text-muted: #a1a1aa;
+    --app-text-soft: #71717a;
+    --app-border: rgba(255, 255, 255, 0.09);
+    --app-border-strong: rgba(255, 255, 255, 0.16);
+    --app-primary-soft: rgba(129, 140, 248, 0.16);
+    --app-success-soft: rgba(34, 197, 94, 0.16);
+    --app-warning-soft: rgba(245, 158, 11, 0.18);
+    --app-danger-soft: rgba(239, 68, 68, 0.15);
+    --app-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --app-shadow-sm: 0 12px 34px rgba(0, 0, 0, 0.32);
+    --app-shadow-md: 0 24px 56px rgba(0, 0, 0, 0.45);
+  }
+
+  html,
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(79, 70, 229, 0.17), transparent 34rem),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.13), transparent 28rem),
+      var(--app-bg);
+  }
+
+  .meta-bar,
+  .header-card,
+  .task-card,
+  .downtime-checklist,
+  .shift-instructions-card {
+    background: rgba(24, 24, 27, 0.88);
+  }
+
+  .task-card.task-critical {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(24, 24, 27, 0.94));
+  }
+
+  .task-card.is-completed {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(24, 24, 27, 0.94));
+  }
+
+  .ios-checkbox {
+    background: #111113;
+    border-color: rgba(255, 255, 255, 0.26);
+  }
+
+  .initials-chip {
+    color: #c7d2fe;
+    background: rgba(129, 140, 248, 0.16);
+    border-color: rgba(129, 140, 248, 0.24);
+  }
+
+  .time-value,
+  .time-value-clickable,
+  .price-value,
+  .handover-preview,
+  .downtime-item,
+  .wakeup-item,
+  .form-input,
+  .initials-input,
+  .handover-date-input,
+  .handover-main-date-input,
+  .breakfast-modal-input,
+  .wakeup-input,
+  .note-textarea,
+  .handover-textarea,
+  .handover-main-textarea,
+  .wakeup-textarea {
+    background: #111113;
+    color: var(--app-text);
+  }
+}
+
+@media (max-width: 768px) {
+  body,
+  .checklist-container,
+  .left-sidebar,
+  .main-content {
+    background: transparent;
+  }
+
+  .checklist-container {
+    padding: 0;
+  }
+
+  .top-header {
+    background: rgba(250, 250, 250, 0.88);
+    border-bottom: 1px solid var(--app-border);
+    backdrop-filter: blur(18px);
+  }
+
+  .shift-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .shift-btn {
+    padding-inline: 10px;
+  }
+
+  .task-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .task-card-actions {
+    grid-column: 1 / -1;
+    padding-left: 44px;
+  }
+
+  .add-note-btn,
+  .edit-note-btn,
+  .working-btn,
+  .reset-btn,
+  .wakeup-add-btn,
+  .wakeup-fullscreen-btn,
+  .wakeup-clear-btn,
+  .info-btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .left-sidebar,
+  .main-content {
+    padding: 12px;
+  }
+
+  .task-card-actions {
+    padding-left: 0;
   }
 }
