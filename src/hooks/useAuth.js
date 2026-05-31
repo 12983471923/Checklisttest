@@ -58,9 +58,5 @@ export const AuthProvider = ({ children }) => {
     canWorkShift: (shift) => userProfile?.shifts?.includes(shift) || userProfile?.role === 'admin'
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return React.createElement(AuthContext.Provider, { value }, children);
 };
