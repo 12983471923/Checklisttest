@@ -1,13 +1,8 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAnalytics, isSupported as analyticsIsSupported } from "firebase/analytics";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyD_mOV2hawstyrJPsYCQ5HvmSXpa37K9qU",
   authDomain: "realbase-e7569.firebaseapp.com",
@@ -19,15 +14,23 @@ const firebaseConfig = {
   measurementId: "G-X2GWBR1VE8"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Analytics (optional)
-const analytics = getAnalytics(app);
-
-// Initialize Firebase Auth and get a reference to the service
+// Auth and Firestore are required — initialize these first so they are always
+// exported even if the optional Analytics initialization below fails.
 export const auth = getAuth(app);
-
-// Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
+
+// Analytics is optional. We guard it with isSupported() (which returns a
+// Promise) to avoid blocking the module in environments where Analytics is
+// unavailable (e.g. ad-blockers, SSR, Vite HMR edge cases).
+// A synchronous failure here was previously preventing auth from exporting.
+analyticsIsSupported().then((supported) => {
+  if (supported) {
+    getAnalytics(app);
+  }
+}).catch(() => {
+  // Analytics unavailable — safe to ignore, app works without it
+});
+
 export default app;
