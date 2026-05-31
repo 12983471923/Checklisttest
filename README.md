@@ -37,10 +37,10 @@ A React-based checklist application with Firebase real-time database integration
 
 4. Open [http://localhost:5175](http://localhost:5175) in your browser
 
-## 🔑 Login Credentials
+## 🔑 Login Access
 
-- **Username**: 719
-- **Password**: falkoner
+Access is handled through Firebase Authentication. Create and manage staff
+accounts in Firebase Console or through a trusted Admin SDK backend.
 
 ## 🌐 Real-time Database Features
 

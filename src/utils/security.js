@@ -7,6 +7,15 @@ export const validateUserInput = (input, type = 'text') => {
   const sanitized = input.trim();
   
   switch (type) {
+    case 'email':
+      if (sanitized.length > 254) {
+        return { valid: false, error: 'Email address is too long' };
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized)) {
+        return { valid: false, error: 'Enter a valid email address' };
+      }
+      return { valid: true, value: sanitized.toLowerCase() };
+
     case 'initials':
       if (sanitized.length < 2 || sanitized.length > 4) {
         return { valid: false, error: 'Initials must be 2-4 characters' };
@@ -117,17 +126,9 @@ export const logSecurityEvent = (event, details = {}) => {
     url: window.location.href
   };
   
-  // In production, send to logging service
-  console.log('Security Event:', logEntry);
-  
-  // Store locally for debugging
-  try {
-    const logs = JSON.parse(localStorage.getItem('securityLogs') || '[]');
-    logs.push(logEntry);
-    // Keep only last 100 logs
-    if (logs.length > 100) logs.splice(0, logs.length - 100);
-    localStorage.setItem('securityLogs', JSON.stringify(logs));
-  } catch (error) {
-    console.error('Failed to store security log:', error);
+  // In production, send to a trusted logging service instead of persisting
+  // potentially sensitive auth events in browser storage.
+  if (import.meta.env.DEV) {
+    console.log('Security Event:', logEntry);
   }
 };

@@ -1,9 +1,7 @@
 import { 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateProfile,
   sendPasswordResetEmail,
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -65,42 +63,32 @@ const createUserProfile = async (user, additionalData = {}) => {
   return userRef;
 };
 
-// Sign up new user (for managers to create staff accounts)
-export const signUpUser = async (email, password, userData = {}) => {
-  try {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
-    
-    // Update display name
-    if (userData.displayName) {
-      await updateProfile(user, { displayName: userData.displayName });
-    }
-    
-    // Create user profile in Firestore
-    await createUserProfile(user, userData);
-    
-    logSecurityEvent('user_created', { 
-      userId: user.uid, 
-      email,
-      role: userData.role || USER_ROLES.STAFF 
-    });
-    
-    return { user, error: null };
-  } catch (error) {
-    logSecurityEvent('signup_failed', { email, error: error.message });
-    return { user: null, error: error.message };
-  }
-};
+// Browser-side user creation is intentionally disabled. Creating accounts from
+// client code can sign out the manager and lets attackers tamper with profile
+// fields before rules run. Use Firebase Console or a trusted Admin SDK backend.
+export const signUpUser = async () => ({
+  user: null,
+  error: 'User creation from the browser is disabled. Use Firebase Console or a trusted admin backend.'
+});
 
 // Sign in user
 export const signInUser = async (email, password) => {
   try {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
-    
-    // Update last login time
-    const userRef = doc(db, 'users', user.uid);
-    await updateDoc(userRef, {
+
+    // Ensure Firebase Auth users have a locked-down default profile.
+    const userRef = await createUserProfile(user);
+    const userSnap = await getDoc(userRef);
+    const profile = userSnap.data();
+
+    if (profile?.isActive === false) {
+      await signOut(auth);
+      return { user: null, error: 'This account is inactive. Contact your manager.' };
+    }
+
+    await setDoc(userRef, {
       lastLogin: serverTimestamp()
-    });
+    }, { merge: true });
     
     logSecurityEvent('login_success', { 
       userId: user.uid, 

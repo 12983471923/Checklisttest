@@ -38,8 +38,8 @@ const Sidebar = ({
           <div className="info-item">
             <span className="info-icon">🌐</span>
             <div className="info-content">
-              <span className="info-label">WiFi Password:</span>
-              <span className="info-value">scandic2024</span>
+              <span className="info-label">WiFi Access:</span>
+              <span className="info-value">Ask the front desk for the current password.</span>
             </div>
           </div>
         </div>

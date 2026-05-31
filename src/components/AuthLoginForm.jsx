@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { signInUser, resetPassword } from '../firebase/auth';
-import { validateUserInput } from '../utils/security';
+import { rateLimitLogin, validateUserInput } from '../utils/security';
 
 const AuthLoginForm = ({ onLogin, onError }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -14,7 +14,6 @@ const AuthLoginForm = ({ onLogin, onError }) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validate email
     const emailValidation = validateUserInput(formData.email, 'email');
     if (!emailValidation.valid) {
       onError(emailValidation.error);
@@ -22,8 +21,15 @@ const AuthLoginForm = ({ onLogin, onError }) => {
       return;
     }
 
+    const rateLimit = rateLimitLogin(emailValidation.value);
+    if (!rateLimit.allowed) {
+      onError(rateLimit.error);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { user, error } = await signInUser(formData.email, formData.password);
+      const { user, error } = await signInUser(emailValidation.value, formData.password);
       
       if (error) {
         onError(error);
@@ -44,7 +50,13 @@ const AuthLoginForm = ({ onLogin, onError }) => {
     setResetMessage('');
 
     try {
-      const { error } = await resetPassword(resetEmail);
+      const emailValidation = validateUserInput(resetEmail, 'email');
+      if (!emailValidation.valid) {
+        setResetMessage(`Error: ${emailValidation.error}`);
+        return;
+      }
+
+      const { error } = await resetPassword(emailValidation.value);
       
       if (error) {
         setResetMessage(`Error: ${error}`);

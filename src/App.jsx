@@ -1,7 +1,7 @@
-﻿import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
-import { users } from "./users";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
+import { useAuth } from "./hooks/useAuth";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
   getHandoverNotes,
@@ -13,19 +13,64 @@ import {
   getBreakfastTimes,
   subscribeToBreakfastTimes
 } from "./firebase/database";
+import { signOutUser } from "./firebase/auth";
+import AuthLoginForm from "./components/AuthLoginForm";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
 import 'leaflet/dist/leaflet.css';
 import "./App.css";
-
-// Login session constants
-const LOGIN_STORAGE_KEY = 'checklistapp_login_session';
-const SESSION_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+import "./components/auth.css";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  const { currentUser, userProfile, loading, error } = useAuth();
   const [loginError, setLoginError] = useState("");
+  
+  if (loading) {
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <h1 className="login-title">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+        <AuthLoginForm
+          onLogin={() => setLoginError("")}
+          onError={setLoginError}
+        />
+        {(loginError || error) && (
+          <div className="form-error" style={{ maxWidth: "360px", marginTop: "12px" }}>
+            {loginError || error}
+          </div>
+        )}
+        <div style={{
+          marginTop: "40px",
+          padding: "16px 20px",
+          backgroundColor: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: "8px",
+          fontSize: "0.85rem",
+          color: "#64748b",
+          textAlign: "center",
+          maxWidth: "400px",
+          width: "100%"
+        }}>
+          This tool is for internal use at Scandic Falkoner. No guest data or sensitive personal data is stored. Task records are limited to staff initials and completion logs.
+        </div>
+      </div>
+    );
+  }
+
+  return <ChecklistApp userProfile={userProfile} currentUser={currentUser} />;
+}
+
+function ChecklistApp({ userProfile, currentUser }) {
+  const profileInitials = userProfile?.initials?.trim().toUpperCase() || "";
+  const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
   const [showChangeInitials, setShowChangeInitials] = useState(false);
@@ -158,122 +203,13 @@ function App() {
     };
   }, []);
 
-  // Session management functions
-  const saveLoginSession = useCallback((userData, userInitials = "", initialsSubmitted = false) => {
-    const sessionData = {
-      user: userData,
-      initials: userInitials,
-      initialsSubmitted: initialsSubmitted,
-      timestamp: Date.now(),
-      expiry: Date.now() + SESSION_DURATION
-    };
-    localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(sessionData));
-  }, []);
-
-  const loadLoginSession = useCallback(() => {
-    try {
-      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
-      if (!sessionData) return null;
-
-      const parsed = JSON.parse(sessionData);
-      const now = Date.now();
-
-      // Check if session has expired
-      if (now > parsed.expiry) {
-        localStorage.removeItem(LOGIN_STORAGE_KEY);
-        return null;
-      }
-
-      return {
-        user: parsed.user,
-        initials: parsed.initials || "",
-        initialsSubmitted: parsed.initialsSubmitted || false
-      };
-    } catch (error) {
-      console.error('Error loading login session:', error);
-      localStorage.removeItem(LOGIN_STORAGE_KEY);
-      return null;
-    }
-  }, []);
-
-  const updateSessionInitials = useCallback((userInitials, initialsSubmitted) => {
-    try {
-      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
-      if (sessionData) {
-        const parsed = JSON.parse(sessionData);
-        parsed.initials = userInitials;
-        parsed.initialsSubmitted = initialsSubmitted;
-        localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(parsed));
-      }
-    } catch (error) {
-      console.error('Error updating session initials:', error);
-    }
-  }, []);
-
-  const clearLoginSession = useCallback(() => {
-    localStorage.removeItem(LOGIN_STORAGE_KEY);
-  }, []);
-
-  // Check for existing login session on app load
+  // Prefer verified profile initials when they are available from Firebase.
   useEffect(() => {
-    const sessionData = loadLoginSession();
-    if (sessionData) {
-      setUser(sessionData.user);
-      setInitials(sessionData.initials);
-      setInitialsSubmitted(sessionData.initialsSubmitted);
+    if (profileInitials) {
+      setInitials(profileInitials);
+      setInitialsSubmitted(true);
     }
-  }, [loadLoginSession]);
-
-  // Auto-logout when session expires
-  useEffect(() => {
-    if (!user) return;
-
-    const checkSessionExpiry = () => {
-      const sessionData = localStorage.getItem(LOGIN_STORAGE_KEY);
-      if (!sessionData) {
-        setUser(null);
-        setInitials("");
-        setInitialsSubmitted(false);
-        return;
-      }
-
-      try {
-        const parsed = JSON.parse(sessionData);
-        if (Date.now() > parsed.expiry) {
-          clearLoginSession();
-          setUser(null);
-          setInitials("");
-          setInitialsSubmitted(false);
-        }
-      } catch (error) {
-        console.error('Error checking session expiry:', error);
-        clearLoginSession();
-        setUser(null);
-        setInitials("");
-        setInitialsSubmitted(false);
-      }
-    };
-
-    // Check session expiry every 30 seconds
-    const interval = setInterval(checkSessionExpiry, 30000);
-    return () => clearInterval(interval);
-  }, [user, clearLoginSession]);
-
-  // Handle login submit
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const match = users.find(
-      (u) => u.username === loginForm.username && u.password === loginForm.password
-    );
-    if (match) {
-      setUser(match);
-      saveLoginSession(match); // Save session to localStorage
-      setLoginForm({ username: "", password: "" });
-      setLoginError("");
-    } else {
-      setLoginError("Incorrect username or password.");
-    }
-  };
+  }, [profileInitials]);
 
   // Handle initials submit
   const handleInitialsSubmit = (e) => {
@@ -285,7 +221,6 @@ function App() {
     }
     setInitials(trimmedInitials);
     setInitialsSubmitted(true);
-    updateSessionInitials(trimmedInitials, true); // Update session with initials
     
     // Show welcome modal after initials are submitted
     setShowWelcomeModal(true);
@@ -293,7 +228,7 @@ function App() {
 
   // Progress calculation - memoized for performance
   const percent = useMemo(() => 
-    Math.round((tasks.filter((t) => t.completed).length / tasks.length) * 100),
+    tasks.length ? Math.round((tasks.filter((t) => t.completed).length / tasks.length) * 100) : 0,
     [tasks]
   );
 
@@ -328,9 +263,8 @@ function App() {
     }
   }, [resetAll]);
 
-  const handleLogout = () => {
-    clearLoginSession(); // Clear stored session
-    setUser(null);
+  const handleLogout = async () => {
+    await signOutUser();
     setInitials("");
     setInitialsSubmitted(false);
     setShowChangeInitials(false);
@@ -563,91 +497,6 @@ function App() {
       }
     }
   }, [wakeUpCalls]);
-
-  // Show login form if not logged in
-  if (!user) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <form
-          className="login-form"
-          onSubmit={handleLogin}
-          style={{ maxWidth: "320px", padding: "24px", minWidth: "280px" }}
-        >
-          {/* Hotel Logo */}
-          <div style={{ 
-            textAlign: "center", 
-            marginBottom: "24px",
-            paddingBottom: "16px",
-            borderBottom: "1px solid #e2e8f0"
-          }}>
-            <img 
-              src="/logo.png" 
-              alt="Scandic Falkoner Logo" 
-              style={{ 
-                maxWidth: "180px", 
-                height: "auto"
-              }}
-            />
-          </div>
-          
-          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Staff Login</h2>
-          <div style={{ marginBottom: 16 }}>
-            <input
-              className="form-input"
-              type="text"
-              placeholder="User ID"
-              value={loginForm.username}
-              onChange={e => setLoginForm(f => ({ ...f, username: e.target.value.trim() }))}
-              autoFocus
-              required
-              autoComplete="username"
-              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
-            />
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <input
-              className="form-input"
-              type="password"
-              placeholder="Password"
-              value={loginForm.password}
-              onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
-              required
-              autoComplete="current-password"
-              style={{ padding: "10px 14px", fontSize: "0.95rem" }}
-            />
-          </div>
-          {loginError && (
-            <div className="form-error" style={{ padding: "10px 12px", fontSize: "0.9rem", marginBottom: "12px" }}>
-              {loginError}
-            </div>
-          )}
-          <button
-            type="submit"
-            className="add-note-btn"
-            style={{ width: "100%", fontSize: "1rem", padding: "12px 16px" }}
-          >
-            Log In
-          </button>
-        </form>
-        
-        {/* Privacy Disclaimer - Minimalistic */}
-        <div style={{ 
-          marginTop: "40px", 
-          padding: "16px 20px", 
-          backgroundColor: "#f8fafc", 
-          border: "1px solid #e2e8f0", 
-          borderRadius: "8px",
-          fontSize: "0.85rem",
-          color: "#64748b",
-          textAlign: "center",
-          maxWidth: "400px",
-          width: "100%"
-        }}>
-          This tool is for internal use at Scandic Falkoner. No guest data or sensitive personal data is stored. Task records are limited to staff initials and completion logs.
-        </div>
-      </div>
-    );
-  }
 
   // Show initials input after login if not set yet
   if (!initialsSubmitted) {
@@ -962,7 +811,7 @@ function App() {
           <div className="meta-bar">
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <span style={{ color: "#718096", fontSize: "0.85rem", fontWeight: "500" }}>
-            Logged in as <strong style={{ color: "#4a5568" }}>{user.username}</strong>
+            Logged in as <strong style={{ color: "#4a5568" }}>{displayName}</strong>
           </span>
           <span>
             <span role="img" aria-label="calendar">📅</span>

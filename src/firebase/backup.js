@@ -22,9 +22,9 @@ const BACKUP_CONFIG = {
   collections: [
     'checklists',
     'downtime', 
-    'handoverNotes',
-    'wakeUpCalls',
-    'breakfastTimes',
+    'handover-notes',
+    'wake-up-calls',
+    'breakfast-times',
     'users',
     'auditTrail'
   ]
@@ -232,12 +232,20 @@ export const restoreFromBackup = async (backupId, options = {}) => {
       throw new Error(`Cannot restore from incomplete backup (status: ${backup.status})`);
     }
 
-    const batch = writeBatch(db);
+    let batch = writeBatch(db);
+    let batchOperations = 0;
     let restoredDocs = 0;
     const restoreLog = {
       collections: {},
       totalRestored: 0,
       errors: []
+    };
+
+    const commitBatch = async () => {
+      if (batchOperations === 0) return;
+      await batch.commit();
+      batch = writeBatch(db);
+      batchOperations = 0;
     };
 
     // Restore each selected collection
@@ -282,8 +290,13 @@ export const restoreFromBackup = async (backupId, options = {}) => {
           });
 
           batch.set(docRef, cleanData, { merge: restoreMode === 'merge' });
+          batchOperations++;
           collectionRestored++;
           restoredDocs++;
+
+          if (batchOperations >= 450) {
+            await commitBatch();
+          }
 
         } catch (docError) {
           console.error(`Error restoring document ${docId}:`, docError);
@@ -300,8 +313,8 @@ export const restoreFromBackup = async (backupId, options = {}) => {
       console.log(`✅ ${collectionName}: ${collectionRestored} documents restored`);
     }
 
-    // Commit all changes
-    await batch.commit();
+    // Commit any remaining changes. Firestore limits each batch to 500 writes.
+    await commitBatch();
     
     restoreLog.totalRestored = restoredDocs;
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { signUpUser, USER_ROLES, SHIFT_TYPES } from '../firebase/auth';
 import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -20,22 +20,7 @@ const UserManagement = ({ onClose }) => {
   const [createLoading, setCreateLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Only managers and admins can access this
-  if (!isManager && !isAdmin) {
-    return (
-      <div className="access-denied">
-        <h3>Access Denied</h3>
-        <p>You don't have permission to manage users.</p>
-        <button onClick={onClose} className="add-note-btn">Close</button>
-      </div>
-    );
-  }
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       const usersSnapshot = await getDocs(collection(db, 'users'));
       const usersData = usersSnapshot.docs.map(doc => ({
@@ -49,7 +34,27 @@ const UserManagement = ({ onClose }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isManager && !isAdmin) {
+      setLoading(false);
+      return;
+    }
+
+    loadUsers();
+  }, [isManager, isAdmin, loadUsers]);
+
+  // Only managers and admins can access this
+  if (!isManager && !isAdmin) {
+    return (
+      <div className="access-denied">
+        <h3>Access Denied</h3>
+        <p>You don't have permission to manage users.</p>
+        <button onClick={onClose} className="add-note-btn">Close</button>
+      </div>
+    );
+  }
 
   const handleCreateUser = async (e) => {
     e.preventDefault();

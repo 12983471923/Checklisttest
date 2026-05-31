@@ -176,11 +176,8 @@ Breakfast:
     id: 18,
     text: "Restart Interface PC in the Basement Server Room",
     info: `• When you reach the room, look for key at the top of the cabinet on the servers.
-• Login to the Interface computer:
-  - Username: interface719@scandichotels.com
-  - Password: Funct1on
-• Open "Interface" program:
-  - Password: Funct1on
+• Login to the Interface computer using the approved credential document.
+• Open "Interface" program using the approved credential document.
   - Close all open windows.
   - Log out → Log back in.
   - Reopen Interface → Launch all 5 necessary programs.

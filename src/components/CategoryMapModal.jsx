@@ -24,10 +24,10 @@ const SimpleMapModal = ({ isOpen, onClose }) => {
   { name: "Café Vivaldi", description: "Cozy café/bar offering coffee, wine, simple bites, and a calm environment great for informal meets.", distance: "1 min walk", website: "https://cafevivaldi.dk", icon: "☕" },
   { name: "Lagkagehuset", description: "Popular Danish bakery chain serving top-quality pastries, coffee, and snacks ideal for casual or non-alcoholic options.", distance: "1 min walk", website: "https://lagkagehuset.dk", icon: "🥐" },
   { name: "McDonald's", description: "International fast-food chain good for convenient, quick bites or for younger guests.", distance: "1 min walk", icon: "🍔" },
-  { name: "Restaurant Frederiks Have", description: "Refined gourmet restaurant in an elegant 19th-century setting. Known for seasonal Nordic menus, thoughtful ambiance, and Bib Gourmand recognition.", distance: "5 min walk", website: "http://frederikshave.dk", icon: "🍷" },
+  { name: "Restaurant Frederiks Have", description: "Refined gourmet restaurant in an elegant 19th-century setting. Known for seasonal Nordic menus, thoughtful ambiance, and Bib Gourmand recognition.", distance: "5 min walk", website: "https://frederikshave.dk", icon: "🍷" },
   { name: "Mielcke & Hurtigkarl", description: "Artistic fine-dining nestled in the Frederiksberg Gardens. Features creative tasting menus inspired by global influences.", distance: "8 min walk", website: "https://www.mhcph.com", icon: "🍷" },
-  { name: "Sokkelund Brasserie", description: "Classic Danish brasserie offering all-day dining from brunch to dinner in a comfortable, welcoming setting.", distance: "5 min walk", website: "http://sokkelund.dk", icon: "🍽️" },
-  { name: "Josty (Café in Frederiksberg Gardens)", description: "Historic café venue set within Frederiksberg Gardens. Known for its charming veranda and brunch great for scenic, leisurely meals.", distance: "10 min walk", website: "http://josty.dk", icon: "☕" }
+  { name: "Sokkelund Brasserie", description: "Classic Danish brasserie offering all-day dining from brunch to dinner in a comfortable, welcoming setting.", distance: "5 min walk", website: "https://sokkelund.dk", icon: "🍽️" },
+  { name: "Josty (Café in Frederiksberg Gardens)", description: "Historic café venue set within Frederiksberg Gardens. Known for its charming veranda and brunch great for scenic, leisurely meals.", distance: "10 min walk", website: "https://josty.dk", icon: "☕" }
     ],
     bars: [
   { name: "Green Room", description: "Elegant cocktail bar located inside Scandic Falkoner. Theatre-inspired décor, creative cocktails, and live jazz or DJs on select nights. Perfect if you don't want to leave the hotel.", distance: "On-site", website: "https://greenroom-restaurant.dk", icon: "🍸" },

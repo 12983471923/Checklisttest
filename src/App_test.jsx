@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
-import { users } from "./users";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
