@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAuditTrail, useAuditStats, useAuditMonitor } from '../hooks/useAuditTrail';
 import { AUDIT_EVENTS, AUDIT_SEVERITY } from '../firebase/audit';
-import './audit.css';
 
 const AuditTrailDashboard = () => {
   const [activeTab, setActiveTab] = useState('recent');

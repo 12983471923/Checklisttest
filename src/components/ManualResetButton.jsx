@@ -3,7 +3,6 @@ import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/fire
 import { db } from '../firebase/config';
 import { useAuth } from '../hooks/useAuth';
 import { logSecurityEvent } from '../utils/security';
-import './ManualResetButton.css';
 
 const ManualResetButton = ({ onResetComplete }) => {
   const { user } = useAuth();

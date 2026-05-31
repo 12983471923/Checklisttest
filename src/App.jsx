@@ -565,7 +565,7 @@ function App() {
           onSubmit={handleLogin}
           style={{ maxWidth: "320px", padding: "24px", minWidth: "280px" }}
         >
-          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Staff Login</h2>
+          <h2 className="form-title" style={{ fontSize: "1.3rem", marginBottom: "20px" }}>Scandic Falkoner</h2>
           <div style={{ marginBottom: 16 }}>
             <input
               className="form-input"
@@ -601,7 +601,7 @@ function App() {
             className="add-note-btn"
             style={{ width: "100%", fontSize: "1rem", padding: "12px 16px" }}
           >
-            Log In
+            Sign In
           </button>
         </form>
       </div>
@@ -942,14 +942,6 @@ function App() {
             <ManualResetButton onResetComplete={() => window.location.reload()} />
             <span
               className="initials-chip"
-              style={{
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                background: showInitialsModal ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)",
-                color: showInitialsModal ? "white" : "#4a5568",
-                border: showInitialsModal ? "2px solid #667eea" : "2px solid #e2e8f0",
-                transform: showInitialsModal ? "translateY(-1px)" : "none"
-              }}
               title="Click to change initials"
               onClick={() => {
                 setNewInitials(initials);
@@ -960,12 +952,6 @@ function App() {
             </span>
             <button
               className="add-note-btn"
-              style={{
-                background: "linear-gradient(135deg, #4a5568 0%, #2d3748 100%)",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                padding: "8px 16px"
-              }}
               onClick={handleLogout}
             >
               Log Out
@@ -977,7 +963,7 @@ function App() {
           <div className="progress-bar">
             <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
           </div>
-          <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
+          <div className="progress-summary">
             {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
           </div>
 
@@ -1038,7 +1024,10 @@ function App() {
                 {tasks.map((task) => (
                   <tr key={task.id}>
                     <td className={task.completed ? "task-completed" : "task-incomplete"}>
-                      {task.text}
+                      <div className="task-cell-content">
+                        <span>{task.text}</span>
+                        {task.note && <span className="task-note-preview">{task.note}</span>}
+                      </div>
                     </td>
                     <td>
                       <button

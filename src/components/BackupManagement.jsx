@@ -8,7 +8,6 @@ import {
   deleteBackup 
 } from '../firebase/backup';
 import { useAuth } from '../hooks/useAuth';
-import './backup.css';
 
 const BackupManagement = ({ onClose }) => {
   const { isManager, isAdmin, currentUser } = useAuth();

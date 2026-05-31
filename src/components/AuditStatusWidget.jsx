@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuditMonitor } from '../hooks/useAuditTrail';
 import { useAuth } from '../hooks/useAuth';
-import './audit.css';
 
 const AuditStatusWidget = ({ onViewDetails }) => {
   const { user } = useAuth();
