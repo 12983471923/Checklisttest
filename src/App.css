@@ -6458,6 +6458,11 @@ button {
             muted #B0B0B0 / accent #888888 / border #444444
             success #4CAF50 / warning #FFA726 / danger #EF5350
    ===================================================================== */
+html {
+  /* Render native controls (date/time pickers, scrollbars) in dark mode */
+  color-scheme: dark;
+}
+
 html,
 body {
   background-color: #121212;
