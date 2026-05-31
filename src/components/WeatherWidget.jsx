@@ -73,7 +73,7 @@ const WeatherWidget = () => {
   if (loading) {
     return (
       <div className="weather-widget weather-minimal">
-        <span className="weather-spinner">�️</span>
+        <span className="weather-spinner">🌡️</span>
         <span className="weather-temp-minimal">--°</span>
       </div>
     );

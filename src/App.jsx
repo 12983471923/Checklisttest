@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import { useAuth } from "./hooks/useAuth";
+import { validateUserInput } from "./utils/security";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
   getHandoverNotes,
@@ -214,15 +215,13 @@ function ChecklistApp({ userProfile, currentUser }) {
   // Handle initials submit
   const handleInitialsSubmit = (e) => {
     e.preventDefault();
-    const trimmedInitials = initials.trim().toUpperCase();
-    if (trimmedInitials.length < 2) {
-      alert("Please enter at least 2 letters for initials.");
+    const validation = validateUserInput(initials, 'initials');
+    if (!validation.valid) {
+      alert(validation.error);
       return;
     }
-    setInitials(trimmedInitials);
+    setInitials(validation.value);
     setInitialsSubmitted(true);
-    
-    // Show welcome modal after initials are submitted
     setShowWelcomeModal(true);
   };
 
@@ -245,7 +244,12 @@ function ChecklistApp({ userProfile, currentUser }) {
 
   const saveNote = useCallback(() => {
     if (showNoteModal) {
-      updateTaskNote(showNoteModal, noteText);
+      const validation = validateUserInput(noteText, 'notes');
+      if (!validation.valid) {
+        alert(validation.error);
+        return;
+      }
+      updateTaskNote(showNoteModal, validation.value);
       setShowNoteModal(null);
       setNoteText("");
     }
@@ -279,7 +283,9 @@ function ChecklistApp({ userProfile, currentUser }) {
 
   const saveHandoverNotes = useCallback(async () => {
     try {
-      await saveHandoverNotesToDB(handoverDate, handoverNotes);
+      const validation = validateUserInput(handoverNotes, 'longText');
+      const safeNotes = validation.valid ? validation.value : handoverNotes.substring(0, 10000);
+      await saveHandoverNotesToDB(handoverDate, safeNotes);
       setShowHandoverModal(false);
     } catch (error) {
       console.error('Error saving handover notes:', error);
@@ -408,23 +414,43 @@ function ChecklistApp({ userProfile, currentUser }) {
       return;
     }
 
-    // Parse room numbers - split by comma, space, or semicolon and clean up
-    const roomNumbers = newWakeUpCall.roomNumber
+    const timeValidation = validateUserInput(newWakeUpCall.time, 'time');
+    if (!timeValidation.valid) {
+      alert(timeValidation.error);
+      return;
+    }
+
+    // Parse and validate each room number
+    const rawRooms = newWakeUpCall.roomNumber
       .split(/[,;\s]+/)
       .map(room => room.trim())
-      .filter(room => room.length > 0)
-      .map(room => room.padStart(3, '0'));
+      .filter(room => room.length > 0);
+
+    const roomNumbers = [];
+    for (const room of rawRooms) {
+      const roomValidation = validateUserInput(room, 'roomNumber');
+      if (!roomValidation.valid) {
+        alert(`Invalid room number "${room}": ${roomValidation.error}`);
+        return;
+      }
+      roomNumbers.push(roomValidation.value);
+    }
 
     if (roomNumbers.length === 0) {
       alert('Please enter valid room number(s).');
       return;
     }
 
+    const notesValidation = validateUserInput(newWakeUpCall.notes || '', 'notes');
+    const safeNotes = notesValidation.valid ? notesValidation.value : '';
+
     // Create separate wake-up call for each room
     const newCalls = roomNumbers.map(roomNumber => ({
       ...newWakeUpCall,
-      id: Date.now() + Math.random(), // Ensure unique IDs
+      id: Date.now() + Math.random(),
       roomNumber,
+      time: timeValidation.value,
+      notes: safeNotes,
       createdBy: initials,
       completed: false
     }));
