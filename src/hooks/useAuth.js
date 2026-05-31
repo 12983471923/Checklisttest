@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChange, getCurrentUserWithProfile } from '../firebase/auth';
+import { isAdminEmail } from '../config/admin';
 
 const AuthContext = createContext();
 
@@ -42,6 +43,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Admin requires BOTH the hardcoded admin email AND the Firestore role.
+  // This double-check prevents a stray "admin" role on another account, or a
+  // tampered token, from unlocking the admin panel.
+  const hasAdminEmail = isAdminEmail(currentUser?.email);
+  const isAdmin = hasAdminEmail && userProfile?.role === 'admin';
+
   const value = {
     currentUser,
     userProfile,
@@ -50,8 +57,9 @@ export const AuthProvider = ({ children }) => {
     refreshProfile,
     // Helper computed properties
     isAuthenticated: !!currentUser,
-    isManager: userProfile?.role === 'manager' || userProfile?.role === 'admin',
-    isAdmin: userProfile?.role === 'admin',
+    isManager: userProfile?.role === 'manager' || isAdmin,
+    isAdmin,
+    hasAdminEmail,
     userInitials: userProfile?.initials || '',
     userName: userProfile?.displayName || currentUser?.displayName || 'Unknown User',
     userShifts: userProfile?.shifts || [],

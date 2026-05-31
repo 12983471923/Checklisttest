@@ -23,12 +23,22 @@ service cloud.firestore {
       return hasProfile() && get(userPath()).data.isActive != false;
     }
 
+    // The single hardcoded admin email. Admin privileges require BOTH this
+    // verified auth email AND the Firestore role == 'admin' (double-check).
+    function adminEmail() {
+      return 'admin@falkoner.com';
+    }
+
+    function hasAdminEmail() {
+      return signedIn() && request.auth.token.email == adminEmail();
+    }
+
     function isManager() {
       return isActive() && currentRole() in ['manager', 'admin'];
     }
 
     function isAdmin() {
-      return isActive() && currentRole() == 'admin';
+      return isActive() && currentRole() == 'admin' && hasAdminEmail();
     }
 
     function isSelf(userId) {
@@ -104,6 +114,14 @@ service cloud.firestore {
     // Backups — admin only
     match /backups/{document} {
       allow read, write: if isAdmin();
+    }
+
+    // Shift configuration (task definitions, instructions, downtime times).
+    // Any active staff member may read it (the checklist is built from it),
+    // but only the admin may modify it.
+    match /shiftConfig/{document} {
+      allow read: if isActive();
+      allow write: if isAdmin() && withinSizeLimit();
     }
 
     // Deny all other collections by default

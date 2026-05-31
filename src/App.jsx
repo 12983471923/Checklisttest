@@ -15,7 +15,9 @@ import {
   subscribeToBreakfastTimes
 } from "./firebase/database";
 import { signOutUser } from "./firebase/auth";
+import { isAdminEmail } from "./config/admin";
 import AuthLoginForm from "./components/AuthLoginForm";
+import AdminPanel from "./components/AdminPanel";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
 import 'leaflet/dist/leaflet.css';
@@ -52,6 +54,9 @@ function App() {
 function ChecklistApp({ userProfile, currentUser }) {
   const profileInitials = userProfile?.initials?.trim().toUpperCase() || "";
   const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
+  // Admin requires BOTH the hardcoded admin email AND the Firestore role.
+  const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === "admin";
+  const [showAdmin, setShowAdmin] = useState(false);
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
   const [showChangeInitials, setShowChangeInitials] = useState(false);
@@ -86,6 +91,7 @@ function ChecklistApp({ userProfile, currentUser }) {
   const {
     tasks,
     downtimeChecklist,
+    instructions,
     loading,
     error,
     toggleTask,
@@ -826,6 +832,11 @@ function ChecklistApp({ userProfile, currentUser }) {
         </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
             <WeatherWidget />
+            {isAdmin && (
+              <button className="add-note-btn admin-panel-btn" onClick={() => setShowAdmin(true)}>
+                🛠️ Admin Panel
+              </button>
+            )}
             <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
             <span
               className={`initials-chip initials-chip-action ${showInitialsModal ? "active" : ""}`}
@@ -888,6 +899,16 @@ function ChecklistApp({ userProfile, currentUser }) {
               maxWidth: "250px"
             }}>
               ⚠️ Database sync error: {error}. Changes are saved locally and will sync when reconnected.
+            </div>
+          )}
+
+          {/* Shift instructions (read-only, set by admin) */}
+          {instructions && instructions.trim() && (
+            <div className="shift-instructions-card">
+              <div className="shift-instructions-title">
+                <span role="img" aria-label="clipboard">📋</span> {shift} Shift Notes
+              </div>
+              <p className="shift-instructions-text">{instructions}</p>
             </div>
           )}
 
@@ -2024,6 +2045,9 @@ function ChecklistApp({ userProfile, currentUser }) {
 
       {/* Floating Map Button */}
       <FloatingMapButton />
+
+      {/* Admin Panel (admin only) */}
+      {showAdmin && isAdmin && <AdminPanel onClose={() => setShowAdmin(false)} />}
     </div>
   );
 }

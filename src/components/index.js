@@ -13,6 +13,9 @@ export { default as SimpleMapModal } from './SimpleMapModal';
 export { default as AuthLoginForm } from './AuthLoginForm';
 export { default as UserManagement } from './UserManagement';
 
+// Admin
+export { default as AdminPanel } from './AdminPanel';
+
 // Backup components
 export { default as BackupManagement } from './BackupManagement';
 export { default as BackupStatusWidget } from './BackupStatusWidget';
