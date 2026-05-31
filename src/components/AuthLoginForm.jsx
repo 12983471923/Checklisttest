@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { signInUser, resetPassword } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
 
-// TODO: Remove this alias map once all staff have their own Firebase Auth
-// accounts. Lets legacy short IDs resolve to their full Firebase email.
+// TODO: Remove USERNAME_ALIASES when TEMP_USERS bypass is removed from App.jsx
 const USERNAME_ALIASES = {
   '719': '719@falkoner.com',
 };
@@ -13,7 +12,7 @@ const resolveEmail = (input) => {
   return USERNAME_ALIASES[trimmed] ?? trimmed;
 };
 
-const AuthLoginForm = ({ onLogin, onError }) => {
+const AuthLoginForm = ({ onLogin, onError, onTempLogin }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
@@ -25,9 +24,21 @@ const AuthLoginForm = ({ onLogin, onError }) => {
     e.preventDefault();
     setLoading(true);
 
-    const emailValidation = validateUserInput(formData.email, 'email');
+    const rawIdentifier = formData.email.trim();
+
+    // TODO: Remove this block when TEMP_USERS bypass is removed from App.jsx.
+    // Try client-side temp credentials before hitting Firebase Auth.
+    if (onTempLogin && onTempLogin(rawIdentifier, formData.password)) {
+      setFormData({ email: '', password: '' });
+      setLoading(false);
+      return;
+    }
+
+    const resolvedEmail = resolveEmail(rawIdentifier);
+
+    const emailValidation = validateUserInput(resolvedEmail, 'email');
     if (!emailValidation.valid) {
-      onError(emailValidation.error);
+      onError('Enter your email address or staff ID.');
       setLoading(false);
       return;
     }
@@ -41,7 +52,7 @@ const AuthLoginForm = ({ onLogin, onError }) => {
 
     try {
       const { user, error } = await signInUser(emailValidation.value, formData.password);
-      
+
       if (error) {
         onError(error);
       } else if (user) {
@@ -68,7 +79,7 @@ const AuthLoginForm = ({ onLogin, onError }) => {
       }
 
       const { error } = await resetPassword(emailValidation.value);
-      
+
       if (error) {
         setResetMessage(`Error: ${error}`);
       } else {
@@ -89,14 +100,14 @@ const AuthLoginForm = ({ onLogin, onError }) => {
         <div className="login-box">
           <h1 className="login-title">Reset Password</h1>
           <p className="login-subtitle">Enter your email to receive a password reset link</p>
-          
+
           <form onSubmit={handleResetPassword} className="login-form">
             {resetMessage && (
               <div className={`form-message ${resetMessage.includes('Error') ? 'form-error' : 'form-success'}`}>
                 {resetMessage}
               </div>
             )}
-            
+
             <div className="form-group">
               <label htmlFor="resetEmail">Email Address</label>
               <input
@@ -110,17 +121,17 @@ const AuthLoginForm = ({ onLogin, onError }) => {
                 disabled={resetLoading}
               />
             </div>
-            
+
             <div className="form-buttons">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="login-btn"
                 disabled={resetLoading}
               >
                 {resetLoading ? 'Sending...' : 'Send Reset Link'}
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="reset-btn"
                 onClick={() => setShowResetPassword(false)}
                 disabled={resetLoading}
@@ -142,7 +153,7 @@ const AuthLoginForm = ({ onLogin, onError }) => {
         <div className="login-version">
           <span className="version-badge">v2.0 - Enhanced Security</span>
         </div>
-        
+
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email or Staff ID</label>
@@ -158,7 +169,7 @@ const AuthLoginForm = ({ onLogin, onError }) => {
               disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -168,21 +179,22 @@ const AuthLoginForm = ({ onLogin, onError }) => {
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               placeholder="Enter your password"
               className="form-input"
+              autoComplete="current-password"
               required
               disabled={loading}
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="login-btn"
             disabled={loading}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
-          
+
           <div className="login-footer">
-            <button 
+            <button
               type="button"
               className="link-btn"
               onClick={() => setShowResetPassword(true)}
@@ -192,7 +204,7 @@ const AuthLoginForm = ({ onLogin, onError }) => {
             </button>
           </div>
         </form>
-        
+
         <div className="login-help">
           <p>Need access? Contact your manager to create an account.</p>
         </div>

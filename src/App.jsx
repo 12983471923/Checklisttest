@@ -22,10 +22,65 @@ import 'leaflet/dist/leaflet.css';
 import "./App.css";
 import "./components/auth.css";
 
+// TODO: Remove TEMP_USERS and all temp-session logic once Firebase Auth is
+// confirmed working. This bypass exists solely for local testing while the
+// Firebase project's Auth configuration is being set up.
+const TEMP_USERS = {
+  '719':          { password: 'falkoner',       displayName: 'Legacy User',    email: '719@falkoner.com',       role: 'staff'   },
+  'nightstaff':   { password: 'Scandic2025!Night',   displayName: 'Night Staff',   email: 'night@falkoner.com',    role: 'staff'   },
+  'morningstaff': { password: 'Scandic2025!Morning', displayName: 'Morning Staff', email: 'morning@falkoner.com',  role: 'staff'   },
+  'eveningstaff': { password: 'Scandic2025!Evening', displayName: 'Evening Staff', email: 'evening@falkoner.com',  role: 'staff'   },
+  'manager':      { password: 'Scandic2025!Manager', displayName: 'Hotel Manager', email: 'manager@falkoner.com',  role: 'manager' },
+};
+
+const TEMP_SESSION_KEY = '_temp_session';
+
+const loadTempSession = () => {
+  try {
+    const raw = sessionStorage.getItem(TEMP_SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+};
+
+const saveTempSession = (user) => {
+  try { sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(user)); } catch {}
+};
+
+const clearTempSession = () => {
+  try { sessionStorage.removeItem(TEMP_SESSION_KEY); } catch {}
+};
+
 function App() {
   const { currentUser, userProfile, loading, error } = useAuth();
   const [loginError, setLoginError] = useState("");
-  
+  // TODO: Remove tempUser state when TEMP_USERS is removed
+  const [tempUser, setTempUser] = useState(loadTempSession);
+
+  // TODO: Remove this handler when TEMP_USERS is removed
+  const handleTempLogin = (identifier, password) => {
+    const key = identifier.trim().toLowerCase();
+    const match = TEMP_USERS[key];
+    if (match && match.password === password) {
+      const session = { displayName: match.displayName, email: match.email, role: match.role, isTempUser: true };
+      saveTempSession(session);
+      setTempUser(session);
+      return true;
+    }
+    return false;
+  };
+
+  const handleTempLogout = () => {
+    clearTempSession();
+    setTempUser(null);
+  };
+
+  // Temp user is active — skip Firebase Auth entirely
+  // TODO: Remove this block when TEMP_USERS is removed
+  if (tempUser) {
+    const mockCurrentUser = { email: tempUser.email, displayName: tempUser.displayName };
+    return <ChecklistApp userProfile={tempUser} currentUser={mockCurrentUser} onTempLogout={handleTempLogout} />;
+  }
+
   if (loading) {
     return (
       <div className="login-container">
@@ -42,6 +97,7 @@ function App() {
         <AuthLoginForm
           onLogin={() => setLoginError("")}
           onError={setLoginError}
+          onTempLogin={handleTempLogin}
         />
         {(loginError || error) && (
           <div className="form-error" style={{ maxWidth: "360px", marginTop: "12px" }}>
@@ -69,7 +125,7 @@ function App() {
   return <ChecklistApp userProfile={userProfile} currentUser={currentUser} />;
 }
 
-function ChecklistApp({ userProfile, currentUser }) {
+function ChecklistApp({ userProfile, currentUser, onTempLogout }) {
   const profileInitials = userProfile?.initials?.trim().toUpperCase() || "";
   const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
   const [initials, setInitials] = useState("");
@@ -268,7 +324,12 @@ function ChecklistApp({ userProfile, currentUser }) {
   }, [resetAll]);
 
   const handleLogout = async () => {
-    await signOutUser();
+    if (onTempLogout) {
+      // TODO: Remove this branch when temp user bypass is removed
+      onTempLogout();
+    } else {
+      await signOutUser();
+    }
     setInitials("");
     setInitialsSubmitted(false);
     setShowChangeInitials(false);
