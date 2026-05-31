@@ -800,7 +800,7 @@ function ChecklistApp({ userProfile, currentUser }) {
           {/* Top right header with title and shift selector */}
           <div className="top-header">
             <h2 className="night-title">{shift} Checklist</h2>
-            <div className="shift-selector">
+          <div className={`shift-selector shift-selector-${shift.toLowerCase()}`}>
               {Object.keys(checklists).map((shiftName) => (
                 <button
                   key={shiftName}
@@ -828,15 +828,7 @@ function ChecklistApp({ userProfile, currentUser }) {
             <WeatherWidget />
             <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
             <span
-              className="initials-chip"
-              style={{
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                background: showInitialsModal ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)",
-                color: showInitialsModal ? "white" : "#4a5568",
-                border: showInitialsModal ? "2px solid #667eea" : "2px solid #e2e8f0",
-                transform: showInitialsModal ? "translateY(-1px)" : "none"
-              }}
+              className={`initials-chip initials-chip-action ${showInitialsModal ? "active" : ""}`}
               title="Click to change initials"
               onClick={() => {
                 setNewInitials(initials);
@@ -845,16 +837,7 @@ function ChecklistApp({ userProfile, currentUser }) {
             >
               {initials}
             </span>
-            <button
-              className="add-note-btn"
-              style={{
-                background: "linear-gradient(135deg, #4a5568 0%, #2d3748 100%)",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                padding: "8px 16px"
-              }}
-              onClick={handleLogout}
-            >
+            <button className="add-note-btn logout-btn" onClick={handleLogout}>
               Log Out
             </button>
           </div>
@@ -864,7 +847,7 @@ function ChecklistApp({ userProfile, currentUser }) {
           <div className="progress-bar">
             <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
           </div>
-          <div style={{ fontSize: "1.1rem", color: "#667eea", marginBottom: 8, fontWeight: "600" }}>
+          <div className="progress-summary">
             {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
           </div>
 
@@ -908,86 +891,93 @@ function ChecklistApp({ userProfile, currentUser }) {
             </div>
           )}
 
-          {/* Checklist table */}
-          <div className="table-wrap">
-            <table className="checklist-table">
-              <thead>
-                <tr>
-                  <th>Task</th>
-                  <th>Working</th>
-                  <th>Done</th>
-                  <th>By</th>
-                  <th>Info</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map((task) => (
-                  <tr key={task.id} className={`${task.completed ? "task-completed" : ""} ${task.text.includes("Cash Count + Drop + Night Audit") ? "task-critical" : ""}`}>
-                    <td className={task.completed ? "task-completed" : "task-incomplete"}>
-                      {task.text}
-                    </td>
-                    <td>
-                      <button
-                        className={`working-btn ${task.inProgressBy === initials ? "working-active" : (task.inProgressBy ? "working-other" : "")}`}
-                        onClick={() => toggleTaskInProgress(task.id)}
-                        disabled={task.completed || (task.inProgressBy && task.inProgressBy !== initials)}
-                        title={task.inProgressBy && task.inProgressBy !== initials ? `${task.inProgressBy} is working on this task` : task.inProgressBy === initials ? "Stop working on this task" : "Start working on this task"}
-                      >
-                        {task.inProgressBy === initials ? (
-                          <>
-                            <span>●</span>
-                            <span>Stop</span>
-                          </>
-                        ) : task.inProgressBy ? (
-                          <>
-                            <span>●</span>
-                            <span>{task.inProgressBy}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>○</span>
-                            <span>Work</span>
-                          </>
-                        )}
-                      </button>
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                        aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
-                      />
-                    </td>
-                    <td>
-                      {task.completed ? <span className="initials-chip">{task.doneBy}</span> : ""}
-                    </td>
-                    <td>
-                      <button
-                        className="info-btn"
-                        onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
-                        aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
-                      >
-                        i
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        className={task.note ? "edit-note-btn" : "add-note-btn"}
-                        onClick={() => handleNote(task.id)}
-                        title={task.note ? "View/Edit Note" : "Add Note"}
-                      >
-                        {task.note ? "Edit" : "Add Note"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Checklist tasks */}
+          <div className="checklist-section-label">Shift tasks</div>
+          <div className="task-list" role="list" aria-label={`${shift} checklist tasks`}>
+            {tasks.map((task) => {
+              const isInProgress = Boolean(task.inProgressBy);
+              const isMine = task.inProgressBy === initials;
+              const isCritical = task.text.includes("Cash Count + Drop + Night Audit");
+
+              return (
+                <article
+                  key={task.id}
+                  className={`task-card ${task.completed ? "is-completed" : ""} ${isInProgress ? "is-in-progress" : ""} ${isCritical ? "task-critical" : ""}`}
+                  role="listitem"
+                >
+                  <label className="task-checkbox-control">
+                    <input
+                      className="ios-checkbox-input"
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleTask(task.id)}
+                      aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
+                    />
+                    <span className="ios-checkbox" aria-hidden="true"></span>
+                  </label>
+
+                  <div className="task-card-body">
+                    <div className="task-title-row">
+                      <h3 className="task-title">{task.text}</h3>
+                      {isInProgress && (
+                        <span className="in-progress-indicator">
+                          <span className="in-progress-dot" aria-hidden="true"></span>
+                          {isMine ? "In progress" : `${task.inProgressBy} working`}
+                        </span>
+                      )}
+                    </div>
+                    {task.note && (
+                      <p className="task-note-preview">{task.note}</p>
+                    )}
+                  </div>
+
+                  <div className="task-card-actions">
+                    {task.completed && <span className="initials-chip">{task.doneBy}</span>}
+                    <button
+                      className={`working-btn ${isMine ? "working-active" : (isInProgress ? "working-other" : "")}`}
+                      onClick={() => toggleTaskInProgress(task.id)}
+                      disabled={task.completed || (isInProgress && !isMine)}
+                      title={isInProgress && !isMine ? `${task.inProgressBy} is working on this task` : isMine ? "Stop working on this task" : "Start working on this task"}
+                    >
+                      {isMine ? (
+                        <>
+                          <span>●</span>
+                          <span>Stop</span>
+                        </>
+                      ) : isInProgress ? (
+                        <>
+                          <span>●</span>
+                          <span>{task.inProgressBy}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>○</span>
+                          <span>Work</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      className="info-btn"
+                      onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
+                      aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
+                    >
+                      i
+                    </button>
+                    <button
+                      className={task.note ? "edit-note-btn" : "add-note-btn"}
+                      onClick={() => handleNote(task.id)}
+                      title={task.note ? "View/Edit Note" : "Add Note"}
+                    >
+                      {task.note ? "Edit note" : "Add note"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
           {/* Downtime Reports Mini-Checklist */}
+          <div className="checklist-section-label downtime-section-label">Downtime checklist</div>
           <div className="downtime-checklist">
             <div className="downtime-header">
               <div className="downtime-header-top">
@@ -1009,13 +999,17 @@ function ChecklistApp({ userProfile, currentUser }) {
             </div>
             <div className="downtime-items">
               {downtimeChecklist.map((item) => (
-                <div key={item.id} className="downtime-item">
-                  <input
-                    type="checkbox"
-                    checked={item.completed}
-                    onChange={() => toggleDowntimeTask(item.id)}
-                    aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
-                  />
+                <div key={item.id} className={`downtime-item ${item.completed ? "is-completed" : ""}`}>
+                  <label className="task-checkbox-control downtime-checkbox-control">
+                    <input
+                      className="ios-checkbox-input"
+                      type="checkbox"
+                      checked={item.completed}
+                      onChange={() => toggleDowntimeTask(item.id)}
+                      aria-label={`Mark ${item.text} as ${item.completed ? 'incomplete' : 'complete'}`}
+                    />
+                    <span className="ios-checkbox" aria-hidden="true"></span>
+                  </label>
                   <span className={item.completed ? "downtime-text-completed" : "downtime-text"}>
                     {item.text}
                   </span>

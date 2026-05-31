@@ -4,7 +4,7 @@ const SHIFTS = ['Night', 'Morning', 'Evening'];
 
 const ShiftSelector = ({ currentShift, onShiftChange }) => {
   return (
-    <div className="shift-selector">
+    <div className={`shift-selector shift-selector-${currentShift.toLowerCase()}`}>
       {SHIFTS.map((shiftName) => (
         <button
           key={shiftName}
