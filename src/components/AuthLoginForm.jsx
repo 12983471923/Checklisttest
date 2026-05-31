@@ -14,15 +14,15 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 34rem), radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 28rem), #FAFAFA',
+    background: 'radial-gradient(circle at top left, rgba(136, 136, 136, 0.06), transparent 34rem), radial-gradient(circle at top right, rgba(136, 136, 136, 0.05), transparent 28rem), #121212',
     padding: '24px 16px',
     fontFamily: FONT,
   },
   card: {
-    background: '#ffffff',
-    border: '1px solid rgba(17, 24, 39, 0.09)',
+    background: '#1E1E1E',
+    border: '1px solid #444444',
     borderRadius: '24px',
-    boxShadow: '0 24px 60px rgba(15, 23, 42, 0.10)',
+    boxShadow: 'none',
     padding: '46px 42px 38px',
     width: '100%',
     maxWidth: '400px',
@@ -43,14 +43,14 @@ const s = {
   hotelName: {
     fontSize: '24px',
     fontWeight: '800',
-    color: '#111827',
+    color: '#E0E0E0',
     letterSpacing: '-0.6px',
     margin: 0,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: '14px',
-    color: '#6B7280',
+    color: '#B0B0B0',
     marginTop: '4px',
     textAlign: 'center',
     letterSpacing: '0px',
@@ -68,7 +68,7 @@ const s = {
   label: {
     fontSize: '13px',
     fontWeight: '700',
-    color: '#374151',
+    color: '#B0B0B0',
     letterSpacing: '-0.01em',
   },
   input: {
@@ -76,9 +76,9 @@ const s = {
     minHeight: '46px',
     padding: '13px 15px',
     fontSize: '15px',
-    color: '#111827',
-    background: '#FFFFFF',
-    border: '1px solid rgba(17, 24, 39, 0.13)',
+    color: '#E0E0E0',
+    background: '#2A2A2A',
+    border: '1px solid #444444',
     borderRadius: '12px',
     outline: 'none',
     boxSizing: 'border-box',
@@ -87,9 +87,9 @@ const s = {
     WebkitAppearance: 'none',
   },
   inputFocus: {
-    borderColor: 'rgba(79, 70, 229, 0.55)',
-    boxShadow: '0 0 0 4px rgba(79, 70, 229, 0.14)',
-    background: '#ffffff',
+    borderColor: '#888888',
+    boxShadow: '0 0 0 3px rgba(136, 136, 136, 0.35)',
+    background: '#2A2A2A',
   },
   button: {
     marginTop: '8px',
@@ -98,19 +98,19 @@ const s = {
     padding: '14px',
     fontSize: '15px',
     fontWeight: '800',
-    color: '#ffffff',
-    background: '#111827',
-    border: 'none',
+    color: '#E0E0E0',
+    background: '#2A2A2A',
+    border: '1px solid #444444',
     borderRadius: '12px',
     cursor: 'pointer',
     transition: 'background 0.18s ease, opacity 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease',
     fontFamily: FONT,
     letterSpacing: '-0.1px',
-    boxShadow: '0 12px 24px rgba(17, 24, 39, 0.16)',
+    boxShadow: 'none',
   },
   buttonHover: {
-    background: '#0F172A',
-    boxShadow: '0 16px 32px rgba(17, 24, 39, 0.22)',
+    background: '#333333',
+    boxShadow: 'none',
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -124,7 +124,7 @@ const s = {
     background: 'none',
     border: 'none',
     fontSize: '13px',
-    color: '#4F46E5',
+    color: '#888888',
     cursor: 'pointer',
     padding: '0',
     fontFamily: FONT,
@@ -135,34 +135,34 @@ const s = {
     alignItems: 'flex-start',
     gap: '8px',
     padding: '12px 14px',
-    background: 'rgba(239, 68, 68, 0.08)',
-    border: '1px solid rgba(239, 68, 68, 0.18)',
+    background: 'rgba(239, 83, 80, 0.12)',
+    border: '1px solid rgba(239, 83, 80, 0.4)',
     borderRadius: '12px',
     fontSize: '13px',
-    color: '#B91C1C',
+    color: '#EF5350',
     lineHeight: '1.45',
   },
   success: {
     padding: '12px 14px',
-    background: 'rgba(34, 197, 94, 0.10)',
-    border: '1px solid rgba(34, 197, 94, 0.2)',
+    background: 'rgba(76, 175, 80, 0.12)',
+    border: '1px solid rgba(76, 175, 80, 0.4)',
     borderRadius: '12px',
     fontSize: '13px',
-    color: '#15803D',
+    color: '#4CAF50',
     lineHeight: '1.45',
   },
   divider: {
     height: '1px',
-    background: 'rgba(17, 24, 39, 0.09)',
+    background: '#444444',
     margin: '24px 0',
   },
   backBtn: {
     background: 'none',
-    border: '1px solid rgba(79, 70, 229, 0.28)',
+    border: '1px solid #444444',
     borderRadius: '12px',
     padding: '12px',
     fontSize: '14px',
-    color: '#4F46E5',
+    color: '#B0B0B0',
     cursor: 'pointer',
     width: '100%',
     fontFamily: FONT,
@@ -173,7 +173,7 @@ const s = {
     marginTop: '28px',
     textAlign: 'center',
     fontSize: '12px',
-    color: '#9CA3AF',
+    color: '#888888',
     lineHeight: '1.5',
     maxWidth: '400px',
     width: '100%',
@@ -322,10 +322,10 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
           <div style={s.card}>
             <Header />
             <div style={s.divider} />
-            <p style={{ fontSize: '20px', fontWeight: '800', color: '#111827', marginTop: 0, marginBottom: '6px', letterSpacing: '-0.03em' }}>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: '#E0E0E0', marginTop: 0, marginBottom: '6px', letterSpacing: '-0.03em' }}>
               Reset Password
             </p>
-            <p style={{ fontSize: '14px', color: '#6B7280', marginTop: 0, marginBottom: '20px' }}>
+            <p style={{ fontSize: '14px', color: '#B0B0B0', marginTop: 0, marginBottom: '20px' }}>
               Enter your email and we'll send a reset link.
             </p>
 
@@ -409,8 +409,8 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
               type="button"
               style={s.forgotBtn}
               onClick={() => { setShowReset(true); setInlineError(''); }}
-              onMouseEnter={e => e.target.style.color = '#4338CA'}
-              onMouseLeave={e => e.target.style.color = '#4F46E5'}
+              onMouseEnter={e => e.target.style.color = '#AAAAAA'}
+              onMouseLeave={e => e.target.style.color = '#888888'}
             >
               Forgot Password?
             </button>

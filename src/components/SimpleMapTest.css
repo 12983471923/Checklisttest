@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(30, 30, 30, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +13,7 @@
 }
 
 .simple-modal-content {
-  background: white;
+  background: #1E1E1E;
   border-radius: 16px;
   width: 90vw;
   height: 85vh;
@@ -30,9 +30,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e1e5e9;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  border-bottom: 1px solid #444444;
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
+  color: #E0E0E0;
 }
 
 .simple-modal-header h2 {
@@ -45,7 +45,7 @@
   background: none;
   border: none;
   font-size: 32px;
-  color: white;
+  color: #E0E0E0;
   cursor: pointer;
   padding: 0;
   width: 40px;
@@ -58,7 +58,7 @@
 }
 
 .simple-modal-close:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 30, 30, 0.2);
 }
 
 .simple-modal-body {
@@ -68,19 +68,19 @@
 }
 
 .simple-modal-body h3 {
-  color: #2d3748;
+  color: #888888;
   margin-top: 0;
   margin-bottom: 16px;
 }
 
 .simple-modal-body p {
-  color: #4a5568;
+  color: #B0B0B0;
   margin-bottom: 24px;
   line-height: 1.6;
 }
 
 .recommended-places-list h4 {
-  color: #2d3748;
+  color: #888888;
   margin-bottom: 16px;
 }
 
@@ -91,8 +91,8 @@
 
 .recommended-places-list li {
   padding: 12px 0;
-  border-bottom: 1px solid #e2e8f0;
-  color: #4a5568;
+  border-bottom: 1px solid #444444;
+  color: #B0B0B0;
   line-height: 1.5;
 }
 

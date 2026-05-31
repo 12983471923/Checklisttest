@@ -1,7 +1,7 @@
 /* Backup Management Styles */
 
 .backup-management-container {
-  background: white;
+  background: #1E1E1E;
   border-radius: 12px;
   max-width: 1400px;
   width: 95vw;
@@ -15,9 +15,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-  color: white;
+  border-bottom: 1px solid #444444;
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
+  color: #E0E0E0;
   border-radius: 12px 12px 0 0;
 }
 
@@ -38,15 +38,15 @@
 }
 
 .backup-message.success {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #4CAF50;
 }
 
 .backup-message.error {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #EF5350;
 }
 
 /* Stats Dashboard */
@@ -58,8 +58,8 @@
 }
 
 .backup-stat-card {
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #1E1E1E 0%, #1E1E1E 100%);
+  border: 1px solid #444444;
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
@@ -74,13 +74,13 @@
 .backup-stat-number {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #2d3748;
+  color: #888888;
   margin-bottom: 0.5rem;
 }
 
 .backup-stat-label {
   font-size: 0.875rem;
-  color: #718096;
+  color: #B0B0B0;
   font-weight: 500;
 }
 
@@ -91,14 +91,14 @@
   align-items: center;
   margin-bottom: 2rem;
   padding: 1rem;
-  background: #f7fafc;
+  background: #1E1E1E;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #444444;
 }
 
 .backup-create-btn {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
+  background: linear-gradient(135deg, #4CAF50 0%, #4CAF50 100%);
+  color: #E0E0E0;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -109,7 +109,7 @@
 }
 
 .backup-create-btn:hover {
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  background: linear-gradient(135deg, #4CAF50 0%, #4CAF50 100%);
   transform: translateY(-1px);
 }
 
@@ -121,14 +121,14 @@
 
 .backup-info {
   font-size: 0.875rem;
-  color: #718096;
+  color: #B0B0B0;
   margin-left: 1rem;
 }
 
 /* Backups List */
 .backups-list h3 {
-  color: #2d3748;
-  border-bottom: 2px solid #e2e8f0;
+  color: #888888;
+  border-bottom: 2px solid #444444;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -136,9 +136,9 @@
 .no-backups {
   text-align: center;
   padding: 3rem;
-  background: #f7fafc;
+  background: #1E1E1E;
   border-radius: 8px;
-  border: 2px dashed #e2e8f0;
+  border: 2px dashed #444444;
 }
 
 .no-backups-icon {
@@ -147,12 +147,12 @@
 }
 
 .no-backups h4 {
-  color: #4a5568;
+  color: #B0B0B0;
   margin-bottom: 0.5rem;
 }
 
 .no-backups p {
-  color: #718096;
+  color: #B0B0B0;
   margin-bottom: 1.5rem;
 }
 
@@ -165,35 +165,35 @@
 .backups-table table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: #1E1E1E;
 }
 
 .backups-table th,
 .backups-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #444444;
 }
 
 .backups-table th {
-  background: #f7fafc;
+  background: #1E1E1E;
   font-weight: 600;
-  color: #4a5568;
+  color: #B0B0B0;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .backups-table tr:hover {
-  background: #f7fafc;
+  background: #1E1E1E;
 }
 
 .backup-failed {
-  background: #fed7d7;
+  background: #1E1E1E;
 }
 
 .backup-failed:hover {
-  background: #feb2b2;
+  background: #2A2A2A;
 }
 
 /* Status and Type Badges */
@@ -207,28 +207,28 @@
 }
 
 .backup-type-badge.automatic {
-  background: #bee3f8;
-  color: #2b6cb0;
+  background: #1E1E1E;
+  color: #888888;
 }
 
 .backup-type-badge.manual {
-  background: #d6f5d6;
-  color: #2f855a;
+  background: #1E1E1E;
+  color: #4CAF50;
 }
 
 .backup-status-badge.completed {
-  background: #c6f6d5;
-  color: #22543d;
+  background: #1E1E1E;
+  color: #4CAF50;
 }
 
 .backup-status-badge.failed {
-  background: #fed7d7;
-  color: #c53030;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 .backup-status-badge.in_progress {
-  background: #feebc8;
-  color: #c05621;
+  background: #1E1E1E;
+  color: #FFA726;
 }
 
 /* Action Buttons */
@@ -252,30 +252,30 @@
 }
 
 .backup-action-btn.export {
-  background: #bee3f8;
-  color: #2b6cb0;
+  background: #1E1E1E;
+  color: #888888;
 }
 
 .backup-action-btn.export:hover {
-  background: #90cdf4;
+  background: #2A2A2A;
 }
 
 .backup-action-btn.restore {
-  background: #fbb6ce;
-  color: #b83280;
+  background: #1E1E1E;
+  color: #888888;
 }
 
 .backup-action-btn.restore:hover {
-  background: #f687b3;
+  background: #2A2A2A;
 }
 
 .backup-action-btn.delete {
-  background: #fed7d7;
-  color: #c53030;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 .backup-action-btn.delete:hover {
-  background: #feb2b2;
+  background: #2A2A2A;
 }
 
 /* Restore Modal */
@@ -285,7 +285,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(30, 30, 30, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +293,7 @@
 }
 
 .restore-modal {
-  background: white;
+  background: #1E1E1E;
   border-radius: 12px;
   padding: 2rem;
   max-width: 600px;
@@ -305,23 +305,23 @@
 
 .restore-modal h3 {
   margin-top: 0;
-  color: #2d3748;
-  border-bottom: 1px solid #e2e8f0;
+  color: #888888;
+  border-bottom: 1px solid #444444;
   padding-bottom: 0.5rem;
 }
 
 .restore-warning {
-  background: #fed7d7;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background: #1E1E1E;
+  border: 1px solid #444444;
+  color: #EF5350;
   padding: 1rem;
   border-radius: 8px;
   margin: 1rem 0;
 }
 
 .restore-info {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
+  background: #1E1E1E;
+  border: 1px solid #444444;
   padding: 1rem;
   border-radius: 8px;
   margin: 1rem 0;
@@ -337,7 +337,7 @@
 .restore-options h4,
 .restore-mode h4 {
   margin-bottom: 0.75rem;
-  color: #4a5568;
+  color: #B0B0B0;
 }
 
 .restore-collection,
@@ -354,7 +354,7 @@
 
 .restore-collection:hover,
 .restore-mode label:hover {
-  background: #f7fafc;
+  background: #1E1E1E;
 }
 
 .restore-collection input[type="checkbox"],
@@ -365,8 +365,8 @@
 .restore-confirm {
   margin: 1.5rem 0;
   padding: 1rem;
-  background: #fffbeb;
-  border: 1px solid #f6d55c;
+  background: #1E1E1E;
+  border: 1px solid #FFA726;
   border-radius: 8px;
 }
 
@@ -376,7 +376,7 @@
   gap: 0.5rem;
   cursor: pointer;
   font-weight: 500;
-  color: #744210;
+  color: #FFA726;
 }
 
 .restore-confirm input[type="checkbox"] {
@@ -390,12 +390,12 @@
   justify-content: flex-end;
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #444444;
 }
 
 .restore-btn {
-  background: linear-gradient(135deg, #f687b3 0%, #ed64a6 100%);
-  color: white;
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
+  color: #E0E0E0;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -405,7 +405,7 @@
 }
 
 .restore-btn:hover {
-  background: linear-gradient(135deg, #ed64a6 0%, #d53f8c 100%);
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
 }
 
 .restore-btn:disabled {
@@ -414,8 +414,8 @@
 }
 
 .cancel-btn {
-  background: #e2e8f0;
-  color: #4a5568;
+  background: #1E1E1E;
+  color: #B0B0B0;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -425,7 +425,7 @@
 }
 
 .cancel-btn:hover {
-  background: #cbd5e0;
+  background: #1E1E1E;
 }
 
 /* Loading States */
@@ -435,15 +435,15 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: white;
+  background: #1E1E1E;
   border-radius: 8px;
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #4299e1;
+  border: 4px solid #444444;
+  border-top: 4px solid #888888;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;

@@ -6,8 +6,8 @@
 }
 
 .version-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
+  color: #E0E0E0;
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -22,15 +22,15 @@
 }
 
 .form-success {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #4CAF50;
 }
 
 .form-error {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #EF5350;
 }
 
 .form-buttons {
@@ -42,7 +42,7 @@
 .link-btn {
   background: none;
   border: none;
-  color: #667eea;
+  color: #888888;
   text-decoration: underline;
   cursor: pointer;
   font-size: 0.9rem;
@@ -50,22 +50,22 @@
 }
 
 .link-btn:hover {
-  color: #764ba2;
+  color: #888888;
 }
 
 .login-help {
   text-align: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #444444;
   font-size: 0.85rem;
-  color: #718096;
+  color: #B0B0B0;
 }
 
 /* User Management Styles */
 
 .user-management-container {
-  background: white;
+  background: #1E1E1E;
   border-radius: 12px;
   max-width: 1200px;
   width: 95vw;
@@ -79,9 +79,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  border-bottom: 1px solid #444444;
+  background: linear-gradient(135deg, #2A2A2A 0%, #2A2A2A 100%);
+  color: #E0E0E0;
   border-radius: 12px 12px 0 0;
 }
 
@@ -102,15 +102,15 @@
 }
 
 .user-management-message.success {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #4CAF50;
 }
 
 .user-management-message.error {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background-color: #1E1E1E;
+  border: 1px solid #444444;
+  color: #EF5350;
 }
 
 .user-management-actions {
@@ -120,8 +120,8 @@
 }
 
 .add-user-form {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: #1E1E1E;
+  border: 1px solid #444444;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -129,7 +129,7 @@
 
 .add-user-form h3 {
   margin-top: 0;
-  color: #2d3748;
+  color: #888888;
 }
 
 .form-row {
@@ -153,13 +153,13 @@
 .form-group label {
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: #B0B0B0;
 }
 
 .form-group input,
 .form-group select {
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #444444;
   border-radius: 6px;
   font-size: 1rem;
 }
@@ -167,8 +167,8 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #888888;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .shift-checkboxes {
@@ -197,8 +197,8 @@
 }
 
 .users-list h3 {
-  color: #2d3748;
-  border-bottom: 2px solid #e2e8f0;
+  color: #888888;
+  border-bottom: 2px solid #444444;
   padding-bottom: 0.5rem;
 }
 
@@ -210,7 +210,7 @@
 .users-table table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: #1E1E1E;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -220,20 +220,20 @@
 .users-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #444444;
 }
 
 .users-table th {
-  background: #f7fafc;
+  background: #1E1E1E;
   font-weight: 600;
-  color: #4a5568;
+  color: #B0B0B0;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .users-table tr:hover {
-  background: #f7fafc;
+  background: #1E1E1E;
 }
 
 .user-inactive {
@@ -249,18 +249,18 @@
 }
 
 .role-staff {
-  background: #e2e8f0;
-  color: #4a5568;
+  background: #1E1E1E;
+  color: #B0B0B0;
 }
 
 .role-manager {
-  background: #fed7af;
-  color: #c05621;
+  background: rgba(255, 167, 38, 0.15);
+  color: #FFA726;
 }
 
 .role-admin {
-  background: #fed7d7;
-  color: #c53030;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 .status-badge {
@@ -272,13 +272,13 @@
 }
 
 .status-badge.active {
-  background: #c6f6d5;
-  color: #22543d;
+  background: #1E1E1E;
+  color: #4CAF50;
 }
 
 .status-badge.inactive {
-  background: #fed7d7;
-  color: #c53030;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 .user-action-btn {
@@ -292,33 +292,33 @@
 }
 
 .user-action-btn.activate {
-  background: #68d391;
-  color: white;
+  background: rgba(76, 175, 80, 0.15);
+  color: #E0E0E0;
 }
 
 .user-action-btn.activate:hover {
-  background: #48bb78;
+  background: #4CAF50;
 }
 
 .user-action-btn.deactivate {
-  background: #fc8181;
-  color: white;
+  background: rgba(239, 83, 80, 0.15);
+  color: #E0E0E0;
 }
 
 .user-action-btn.deactivate:hover {
-  background: #f56565;
+  background: #EF5350;
 }
 
 .access-denied {
   text-align: center;
   padding: 2rem;
-  background: white;
+  background: #1E1E1E;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #444444;
 }
 
 .access-denied h3 {
-  color: #c53030;
+  color: #EF5350;
   margin-bottom: 1rem;
 }
 
@@ -328,6 +328,6 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: white;
+  background: #1E1E1E;
   border-radius: 8px;
 }

@@ -81,49 +81,49 @@ const BackupStatusWidget = ({ onClick }) => {
       case 'none':
         return {
           icon: '❌',
-          color: '#e53e3e',
+          color: '#EF5350',
           text: 'No backups found',
           detail: 'Create your first backup'
         };
       case 'critical':
         return {
           icon: '🚨',
-          color: '#e53e3e',
+          color: '#EF5350',
           text: `${backupStatus.daysAgo} days ago`,
           detail: 'Backup overdue!'
         };
       case 'warning':
         return {
           icon: '⚠️',
-          color: '#dd6b20',
+          color: '#FFA726',
           text: `${backupStatus.daysAgo} days ago`,
           detail: 'Backup needed soon'
         };
       case 'failed':
         return {
           icon: '❌',
-          color: '#e53e3e',
+          color: '#EF5350',
           text: 'Last backup failed',
           detail: 'Check backup logs'
         };
       case 'good':
         return {
           icon: '✅',
-          color: '#38a169',
+          color: '#4CAF50',
           text: backupStatus.daysAgo === 0 ? 'Today' : `${backupStatus.daysAgo} day${backupStatus.daysAgo > 1 ? 's' : ''} ago`,
           detail: 'Backup up to date'
         };
       case 'error':
         return {
           icon: '⚠️',
-          color: '#dd6b20',
+          color: '#FFA726',
           text: 'Check failed',
           detail: 'Unable to verify'
         };
       default:
         return {
           icon: '❓',
-          color: '#718096',
+          color: '#B0B0B0',
           text: 'Unknown',
           detail: 'Status unclear'
         };

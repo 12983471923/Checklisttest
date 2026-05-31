@@ -30,8 +30,8 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f5f7" }}>
-        <div style={{ color: "#6e6e73", fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif", fontSize: "15px" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#121212" }}>
+        <div style={{ color: "#B0B0B0", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif", fontSize: "15px" }}>
           Loading…
         </div>
       </div>
@@ -822,8 +822,8 @@ function ChecklistApp({ userProfile, currentUser }) {
           {/* Meta bar */}
           <div className="meta-bar">
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <span style={{ color: "#718096", fontSize: "0.85rem", fontWeight: "500" }}>
-            Logged in as <strong style={{ color: "#4a5568" }}>{displayName}</strong>
+          <span style={{ color: "#B0B0B0", fontSize: "0.85rem", fontWeight: "500" }}>
+            Logged in as <strong style={{ color: "#E0E0E0" }}>{displayName}</strong>
           </span>
           <span>
             <span role="img" aria-label="calendar">📅</span>
@@ -869,14 +869,14 @@ function ChecklistApp({ userProfile, currentUser }) {
               position: "fixed",
               top: "20px",
               left: "20px",
-              background: "#f7fafc", 
-              border: "1px solid #e2e8f0", 
+              background: "#1E1E1E", 
+              border: "1px solid #444444", 
               borderRadius: "6px", 
               padding: "12px", 
-              color: "#4a5568",
+              color: "#B0B0B0",
               fontSize: "0.95rem",
               zIndex: 1000,
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+              boxShadow: "0 0 0 1px #444444",
               maxWidth: "250px"
             }}>
               🔄 Syncing with database...
@@ -888,14 +888,14 @@ function ChecklistApp({ userProfile, currentUser }) {
               position: "fixed",
               top: "20px",
               left: "20px",
-              background: "#fed7d7", 
-              border: "1px solid #feb2b2", 
+              background: "rgba(239, 83, 80, 0.12)", 
+              border: "1px solid rgba(239, 83, 80, 0.4)", 
               borderRadius: "6px", 
               padding: "12px", 
-              color: "#c53030",
+              color: "#EF5350",
               fontSize: "0.95rem",
               zIndex: 1000,
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+              boxShadow: "0 0 0 1px rgba(239, 83, 80, 0.3)",
               maxWidth: "250px"
             }}>
               ⚠️ Database sync error: {error}. Changes are saved locally and will sync when reconnected.
@@ -2005,7 +2005,7 @@ function ChecklistApp({ userProfile, currentUser }) {
       {showWelcomeModal && (
         <div className="info-modal-overlay" onClick={() => setShowWelcomeModal(false)}>
           <div className="welcome-modal-box" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#2c3e50' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#E0E0E0' }}>
               🎉 Welcome to the Digital Checklist System!
             </h3>
             <div className="welcome-modal-content">
@@ -2018,7 +2018,7 @@ function ChecklistApp({ userProfile, currentUser }) {
               <p style={{ textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' }}>
                 If you find any bugs, errors, or have suggestions for improvement, please contact <strong>Ayush</strong>.
               </p>
-              <p style={{ textAlign: 'center', lineHeight: '1.6', fontSize: '0.9rem', color: '#7f8c8d' }}>
+              <p style={{ textAlign: 'center', lineHeight: '1.6', fontSize: '0.9rem', color: '#B0B0B0' }}>
                 Your feedback will help make this system even better! 🚀
               </p>
             </div>

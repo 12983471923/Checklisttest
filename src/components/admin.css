@@ -3,12 +3,12 @@
 .admin-overlay {
   position: fixed;
   inset: 0;
-  background: #f5f5f7;
+  background: #1E1E1E;
   z-index: 2000;
   display: flex;
   align-items: stretch;
   justify-content: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
   overflow: auto;
 }
 
@@ -18,7 +18,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  background: #f5f5f7;
+  background: #1E1E1E;
 }
 
 /* Top bar */
@@ -30,10 +30,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px 28px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(30, 30, 30, 0.8);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(68, 68, 68, 0.08);
 }
 
 .admin-topbar-title {
@@ -50,20 +50,20 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: #E0E0E0;
   letter-spacing: -0.02em;
 }
 
 .admin-topbar-title p {
   margin: 2px 0 0;
   font-size: 0.8rem;
-  color: #6e6e73;
+  color: #B0B0B0;
 }
 
 .admin-close-btn {
   border: none;
-  background: #1d1d1f;
-  color: #fff;
+  background: #2A2A2A;
+  color: #E0E0E0;
   padding: 9px 18px;
   border-radius: 980px;
   font-size: 0.9rem;
@@ -73,7 +73,7 @@
 }
 
 .admin-close-btn:hover {
-  background: #333336;
+  background: #2A2A2A;
 }
 
 .admin-close-btn:active {
@@ -96,7 +96,7 @@
   flex-direction: column;
   gap: 4px;
   min-width: 210px;
-  background: #ffffff;
+  background: #1E1E1E;
   border-radius: 18px;
   padding: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -113,18 +113,18 @@
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #E0E0E0;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .admin-nav-item:hover {
-  background: #f0f0f2;
+  background: #1E1E1E;
 }
 
 .admin-nav-item.active {
-  background: #0071e3;
-  color: #fff;
+  background: #2A2A2A;
+  color: #E0E0E0;
 }
 
 .admin-nav-icon {
@@ -138,7 +138,7 @@
 
 /* Section card */
 .admin-section {
-  background: #ffffff;
+  background: #1E1E1E;
   border-radius: 20px;
   padding: 28px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -156,14 +156,14 @@
   margin: 0;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: #E0E0E0;
   letter-spacing: -0.02em;
 }
 
 .admin-section-head p {
   margin: 6px 0 0;
   font-size: 0.88rem;
-  color: #6e6e73;
+  color: #B0B0B0;
   max-width: 640px;
   line-height: 1.45;
 }
@@ -171,7 +171,7 @@
 /* Shift picker */
 .admin-shift-picker {
   display: inline-flex;
-  background: #f0f0f2;
+  background: #1E1E1E;
   border-radius: 12px;
   padding: 4px;
   margin-bottom: 22px;
@@ -185,21 +185,21 @@
   border-radius: 9px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1d1d1f;
+  color: #E0E0E0;
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .admin-shift-btn.active {
-  background: #ffffff;
+  background: #1E1E1E;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 /* Buttons */
 .admin-btn {
   border: none;
-  background: #e8e8ed;
-  color: #1d1d1f;
+  background: #1E1E1E;
+  color: #E0E0E0;
   padding: 10px 20px;
   border-radius: 980px;
   font-size: 0.92rem;
@@ -209,7 +209,7 @@
 }
 
 .admin-btn:hover {
-  background: #dcdce1;
+  background: #1E1E1E;
 }
 
 .admin-btn:active {
@@ -217,21 +217,21 @@
 }
 
 .admin-btn-primary {
-  background: #0071e3;
-  color: #fff;
+  background: #2A2A2A;
+  color: #E0E0E0;
 }
 
 .admin-btn-primary:hover {
-  background: #0077ed;
+  background: #2A2A2A;
 }
 
 .admin-btn-danger {
-  background: #ff3b30;
-  color: #fff;
+  background: #EF5350;
+  color: #E0E0E0;
 }
 
 .admin-btn-danger:hover {
-  background: #ff5247;
+  background: #EF5350;
 }
 
 .admin-button-row {
@@ -244,13 +244,13 @@
 .admin-input,
 .admin-textarea {
   width: 100%;
-  border: 1px solid #d2d2d7;
+  border: 1px solid #444444;
   border-radius: 12px;
   padding: 10px 14px;
   font-size: 0.95rem;
   font-family: inherit;
-  color: #1d1d1f;
-  background: #fff;
+  color: #E0E0E0;
+  background: #1E1E1E;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
 }
@@ -258,8 +258,8 @@
 .admin-input:focus,
 .admin-textarea:focus {
   outline: none;
-  border-color: #0071e3;
-  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+  border-color: #888888;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.15);
 }
 
 .admin-textarea {
@@ -284,8 +284,8 @@
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  background: #fafafd;
-  border: 1px solid #ececf1;
+  background: #1E1E1E;
+  border: 1px solid #444444;
   border-radius: 16px;
   padding: 14px;
 }
@@ -301,7 +301,7 @@
 .admin-task-number {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #86868b;
+  color: #888888;
 }
 
 .admin-task-fields {
@@ -314,8 +314,8 @@
 
 .admin-icon-btn {
   border: none;
-  background: #ececf1;
-  color: #1d1d1f;
+  background: #1E1E1E;
+  color: #E0E0E0;
   width: 30px;
   height: 30px;
   border-radius: 9px;
@@ -328,7 +328,7 @@
 }
 
 .admin-icon-btn:hover:not(:disabled) {
-  background: #dcdce1;
+  background: #1E1E1E;
 }
 
 .admin-icon-btn:disabled {
@@ -337,11 +337,11 @@
 }
 
 .admin-delete-btn {
-  background: #ffe5e3;
+  background: #1E1E1E;
 }
 
 .admin-delete-btn:hover:not(:disabled) {
-  background: #ffd0cc;
+  background: #1E1E1E;
 }
 
 /* Times */
@@ -361,7 +361,7 @@
 .admin-time-item label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #6e6e73;
+  color: #B0B0B0;
 }
 
 .admin-time-row {
@@ -378,7 +378,7 @@
 .admin-table-wrap {
   overflow-x: auto;
   border-radius: 14px;
-  border: 1px solid #ececf1;
+  border: 1px solid #444444;
 }
 
 .admin-table {
@@ -390,17 +390,17 @@
 .admin-table th {
   text-align: left;
   padding: 13px 16px;
-  background: #fafafd;
-  color: #6e6e73;
+  background: #1E1E1E;
+  color: #B0B0B0;
   font-weight: 600;
-  border-bottom: 1px solid #ececf1;
+  border-bottom: 1px solid #444444;
   white-space: nowrap;
 }
 
 .admin-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #f2f2f5;
-  color: #1d1d1f;
+  border-bottom: 1px solid #444444;
+  color: #E0E0E0;
   vertical-align: middle;
 }
 
@@ -423,28 +423,28 @@
 }
 
 .admin-role-badge.role-admin {
-  background: #ffe8c2;
-  color: #8a5a00;
+  background: #1E1E1E;
+  color: #FFA726;
 }
 
 .admin-role-badge.role-manager {
-  background: #dbe9ff;
-  color: #0a4aa0;
+  background: #1E1E1E;
+  color: #888888;
 }
 
 .admin-role-badge.role-staff {
-  background: #ececf1;
-  color: #515154;
+  background: #1E1E1E;
+  color: #B0B0B0;
 }
 
 .admin-status-badge.active {
-  background: #d7f5dd;
-  color: #1d7a37;
+  background: #1E1E1E;
+  color: #4CAF50;
 }
 
 .admin-status-badge.inactive {
-  background: #ffe5e3;
-  color: #b3261e;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 /* Misc states */
@@ -452,14 +452,14 @@
 .admin-empty {
   padding: 28px;
   text-align: center;
-  color: #86868b;
+  color: #888888;
   font-size: 0.95rem;
 }
 
 .admin-message {
-  background: #eef4ff;
-  border: 1px solid #d4e3ff;
-  color: #0a4aa0;
+  background: #1E1E1E;
+  border: 1px solid #444444;
+  color: #888888;
   padding: 11px 16px;
   border-radius: 12px;
   margin-bottom: 18px;
@@ -475,23 +475,23 @@
 }
 
 .admin-save-status.saving {
-  background: #f0f0f2;
-  color: #6e6e73;
+  background: #1E1E1E;
+  color: #B0B0B0;
 }
 
 .admin-save-status.saved {
-  background: #d7f5dd;
-  color: #1d7a37;
+  background: #1E1E1E;
+  color: #4CAF50;
 }
 
 .admin-save-status.error {
-  background: #ffe5e3;
-  color: #b3261e;
+  background: #1E1E1E;
+  color: #EF5350;
 }
 
 /* Access denied */
 .admin-access-denied {
-  background: #fff;
+  background: #1E1E1E;
   border-radius: 20px;
   padding: 40px;
   margin: auto;
@@ -502,28 +502,28 @@
 
 .admin-access-denied h2 {
   margin: 0 0 10px;
-  color: #1d1d1f;
+  color: #E0E0E0;
 }
 
 .admin-access-denied p {
-  color: #6e6e73;
+  color: #B0B0B0;
   margin-bottom: 22px;
 }
 
 /* Admin entry button shown in the checklist meta bar */
 .admin-panel-btn {
-  background: #1d1d1f !important;
-  color: #fff !important;
+  background: #2A2A2A !important;
+  color: #E0E0E0 !important;
 }
 
 .admin-panel-btn:hover {
-  background: #333336 !important;
+  background: #2A2A2A !important;
 }
 
 /* Staff-facing read-only instructions banner */
 .shift-instructions-card {
-  background: linear-gradient(135deg, #eef4ff 0%, #f7f9ff 100%);
-  border: 1px solid #d4e3ff;
+  background: linear-gradient(135deg, #1E1E1E 0%, #1E1E1E 100%);
+  border: 1px solid #444444;
   border-radius: 16px;
   padding: 16px 20px;
   margin-bottom: 18px;
@@ -537,14 +537,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #0a4aa0;
+  color: #888888;
   margin-bottom: 8px;
 }
 
 .shift-instructions-card .shift-instructions-text {
   font-size: 0.95rem;
   line-height: 1.55;
-  color: #1d1d1f;
+  color: #E0E0E0;
   white-space: pre-wrap;
   margin: 0;
 }
@@ -578,10 +578,9 @@
    ============================================ */
 
 .admin-overlay {
-  background:
-    radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 34rem),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 28rem),
-    var(--app-bg, #fafafa);
+  background: radial-gradient(circle at top left, rgba(136, 136, 136, 0.10), transparent 34rem),
+    radial-gradient(circle at top right, rgba(136, 136, 136, 0.08), transparent 28rem),
+    var(--app-bg, #1E1E1E);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -591,33 +590,33 @@
 
 .admin-topbar {
   padding: 18px 28px;
-  background: color-mix(in srgb, var(--app-card, #fff) 82%, transparent);
-  border-bottom: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  background: color-mix(in srgb, var(--app-card, #1E1E1E) 82%, transparent);
+  border-bottom: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   backdrop-filter: blur(18px);
 }
 
 .admin-topbar-title h1 {
-  color: var(--app-text, #111827);
+  color: var(--app-text, #888888);
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: -0.045em;
 }
 
 .admin-topbar-title p {
-  color: var(--app-text-muted, #6b7280);
+  color: var(--app-text-muted, #B0B0B0);
 }
 
 .admin-close-btn {
   min-height: 44px;
-  background: #111827;
+  background: #2A2A2A;
   border-radius: 999px;
   font-weight: 800;
-  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.16);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
 }
 
 .admin-close-btn:hover {
-  background: #0f172a;
-  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.22);
+  background: #2A2A2A;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
 }
 
 .admin-body {
@@ -627,10 +626,10 @@
 .admin-nav,
 .admin-section,
 .admin-access-denied {
-  background: var(--app-card, #fff);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  background: var(--app-card, #1E1E1E);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 22px;
-  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(15, 23, 42, 0.06));
+  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(0, 0, 0, 0.06));
 }
 
 .admin-nav {
@@ -639,21 +638,21 @@
 
 .admin-nav-item {
   min-height: 44px;
-  color: var(--app-text-muted, #6b7280);
+  color: var(--app-text-muted, #B0B0B0);
   border-radius: 14px;
   font-weight: 700;
   transition: background 180ms ease, color 180ms ease, transform 140ms ease;
 }
 
 .admin-nav-item:hover {
-  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
-  color: var(--app-primary, #4f46e5);
+  background: var(--app-primary-soft, rgba(136, 136, 136, 0.1));
+  color: var(--app-primary, #888888);
 }
 
 .admin-nav-item.active {
-  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
-  color: #fff;
-  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+  background: linear-gradient(135deg, var(--app-primary, #2A2A2A), #2A2A2A);
+  color: #E0E0E0;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 
 .admin-section {
@@ -661,7 +660,7 @@
 }
 
 .admin-section-head h2 {
-  color: var(--app-text, #111827);
+  color: var(--app-text, #888888);
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: -0.045em;
@@ -672,92 +671,92 @@
 .admin-table th,
 .admin-empty,
 .admin-loading {
-  color: var(--app-text-muted, #6b7280);
+  color: var(--app-text-muted, #B0B0B0);
 }
 
 .admin-shift-picker {
   padding: 6px;
   gap: 6px;
-  background: rgba(17, 24, 39, 0.04);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  background: rgba(136, 136, 136, 0.04);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 999px;
 }
 
 .admin-shift-btn {
   min-height: 42px;
   border-radius: 999px;
-  color: var(--app-text-muted, #6b7280);
+  color: var(--app-text-muted, #B0B0B0);
   font-weight: 800;
 }
 
 .admin-shift-btn.active {
-  color: #fff;
-  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
-  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+  color: #E0E0E0;
+  background: linear-gradient(135deg, var(--app-primary, #2A2A2A), #2A2A2A);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 
 .admin-btn {
   min-height: 44px;
-  color: var(--app-text, #111827);
-  background: var(--app-card, #fff);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  color: var(--app-text, #888888);
+  background: var(--app-card, #1E1E1E);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 999px;
   font-weight: 800;
-  box-shadow: var(--app-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.05));
+  box-shadow: var(--app-shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.05));
 }
 
 .admin-btn:hover {
-  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
-  color: var(--app-primary, #4f46e5);
-  border-color: rgba(79, 70, 229, 0.22);
+  background: var(--app-primary-soft, rgba(136, 136, 136, 0.1));
+  color: var(--app-primary, #888888);
+  border-color: rgba(136, 136, 136, 0.22);
 }
 
 .admin-btn-primary {
-  color: #fff;
-  background: linear-gradient(135deg, var(--app-primary, #4f46e5), #3b82f6);
+  color: #E0E0E0;
+  background: linear-gradient(135deg, var(--app-primary, #2A2A2A), #2A2A2A);
   border: none;
-  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 .admin-btn-primary:hover {
-  color: #fff;
-  background: linear-gradient(135deg, #4338ca, #2563eb);
-  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.28);
+  color: #E0E0E0;
+  background: linear-gradient(135deg, #2A2A2A, #2A2A2A);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
 }
 
 .admin-btn-danger {
-  color: var(--app-danger, #ef4444);
+  color: var(--app-danger, #EF5350);
   background: transparent;
   border: none;
   box-shadow: none;
 }
 
 .admin-btn-danger:hover {
-  color: #dc2626;
-  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
+  color: #EF5350;
+  background: var(--app-danger-soft, rgba(239, 83, 80, 0.1));
 }
 
 .admin-input,
 .admin-textarea {
   min-height: 44px;
-  color: var(--app-text, #111827);
-  background: var(--app-card, #fff);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  color: var(--app-text, #888888);
+  background: var(--app-card, #1E1E1E);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 14px;
 }
 
 .admin-input:focus,
 .admin-textarea:focus {
-  border-color: rgba(79, 70, 229, 0.48);
-  box-shadow: var(--app-ring, 0 0 0 4px rgba(79, 70, 229, 0.14));
+  border-color: rgba(136, 136, 136, 0.48);
+  box-shadow: var(--app-ring, 0 0 0 4px rgba(0, 0, 0, 0.14));
 }
 
 .admin-task-card,
 .admin-time-item,
 .admin-table-wrap,
 .admin-message {
-  background: var(--app-card-muted, #f9fafb);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  background: var(--app-card-muted, #1E1E1E);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 18px;
 }
 
@@ -767,27 +766,27 @@
 
 .admin-task-card:hover {
   transform: translateY(-1px);
-  border-color: var(--app-border-strong, rgba(17, 24, 39, 0.14));
-  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(15, 23, 42, 0.06));
+  border-color: var(--app-border-strong, rgba(136, 136, 136, 0.14));
+  box-shadow: var(--app-shadow-sm, 0 8px 22px rgba(0, 0, 0, 0.06));
 }
 
 .admin-icon-btn {
   min-height: 32px;
-  color: var(--app-text-muted, #6b7280);
-  background: var(--app-card, #fff);
-  border: 1px solid var(--app-border, rgba(17, 24, 39, 0.09));
+  color: var(--app-text-muted, #B0B0B0);
+  background: var(--app-card, #1E1E1E);
+  border: 1px solid var(--app-border, rgba(136, 136, 136, 0.09));
   border-radius: 11px;
 }
 
 .admin-icon-btn:hover:not(:disabled) {
-  color: var(--app-primary, #4f46e5);
-  background: var(--app-primary-soft, rgba(79, 70, 229, 0.1));
+  color: var(--app-primary, #888888);
+  background: var(--app-primary-soft, rgba(136, 136, 136, 0.1));
 }
 
 .admin-delete-btn {
-  color: var(--app-danger, #ef4444);
-  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
-  border-color: rgba(239, 68, 68, 0.16);
+  color: var(--app-danger, #EF5350);
+  background: var(--app-danger-soft, rgba(239, 83, 80, 0.1));
+  border-color: rgba(239, 83, 80, 0.16);
 }
 
 .admin-table {
@@ -795,7 +794,7 @@
 }
 
 .admin-table th {
-  background: var(--app-card-muted, #f9fafb);
+  background: var(--app-card-muted, #1E1E1E);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -803,8 +802,8 @@
 }
 
 .admin-table td {
-  color: var(--app-text, #111827);
-  border-bottom-color: var(--app-border, rgba(17, 24, 39, 0.09));
+  color: var(--app-text, #888888);
+  border-bottom-color: var(--app-border, rgba(136, 136, 136, 0.09));
 }
 
 .admin-role-badge,
@@ -815,37 +814,36 @@
 }
 
 .admin-save-status.saving {
-  background: var(--app-card-muted, #f9fafb);
-  color: var(--app-text-muted, #6b7280);
+  background: var(--app-card-muted, #1E1E1E);
+  color: var(--app-text-muted, #B0B0B0);
 }
 
 .admin-save-status.saved {
-  background: var(--app-success-soft, rgba(34, 197, 94, 0.12));
-  color: #15803d;
+  background: var(--app-success-soft, rgba(76, 175, 80, 0.12));
+  color: #4CAF50;
 }
 
 .admin-save-status.error {
-  background: var(--app-danger-soft, rgba(239, 68, 68, 0.1));
-  color: #dc2626;
+  background: var(--app-danger-soft, rgba(239, 83, 80, 0.1));
+  color: #EF5350;
 }
 
 @media (prefers-color-scheme: dark) {
   .admin-overlay {
-    background:
-      radial-gradient(circle at top left, rgba(79, 70, 229, 0.17), transparent 34rem),
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.13), transparent 28rem),
-      var(--app-bg, #0f0f0f);
+    background: radial-gradient(circle at top left, rgba(136, 136, 136, 0.17), transparent 34rem),
+      radial-gradient(circle at top right, rgba(136, 136, 136, 0.13), transparent 28rem),
+      var(--app-bg, #121212);
   }
 
   .admin-topbar,
   .admin-nav,
   .admin-section,
   .admin-access-denied {
-    background: rgba(24, 24, 27, 0.88);
+    background: rgba(30, 30, 30, 0.88);
   }
 
   .admin-shift-picker {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 30, 30, 0.05);
   }
 
   .admin-task-card,
@@ -856,10 +854,10 @@
   .admin-textarea,
   .admin-icon-btn,
   .admin-btn {
-    background: #111113;
+    background: #121212;
   }
 
   .admin-table th {
-    background: #111113;
+    background: #121212;
   }
 }
