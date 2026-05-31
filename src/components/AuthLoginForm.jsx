@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { signInUser, resetPassword } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
 
+// TODO: Remove this alias map once all staff have their own Firebase Auth
+// accounts. Lets legacy short IDs resolve to their full Firebase email.
+const USERNAME_ALIASES = {
+  '719': '719@falkoner.com',
+};
+
+const resolveEmail = (input) => {
+  const trimmed = input.trim().toLowerCase();
+  return USERNAME_ALIASES[trimmed] ?? trimmed;
+};
+
 const AuthLoginForm = ({ onLogin, onError }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -134,14 +145,15 @@ const AuthLoginForm = ({ onLogin, onError }) => {
         
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email or Staff ID</label>
             <input
               id="email"
-              type="email"
+              type="text"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              placeholder="Enter your email"
+              placeholder="Email or staff ID (e.g. 719)"
               className="form-input"
+              autoComplete="username"
               required
               disabled={loading}
             />
