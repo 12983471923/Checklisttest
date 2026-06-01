@@ -6576,3 +6576,422 @@ input[type="radio"] {
 ::-webkit-scrollbar-corner {
   background: #2A2A2A;
 }
+
+/* =====================================================================
+   GLASSMORPHISM — frosted-glass layer on top of the dark night palette.
+   Keeps the #121212 base, adds a subtle gradient for the glass to reflect,
+   and turns cards/panels/inputs/buttons into translucent frosted surfaces.
+   Text stays within the dark palette (#E0E0E0 / #B0B0B0).
+   ===================================================================== */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-row: rgba(255, 255, 255, 0.03);
+  --glass-row-hover: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-row: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(12px);
+  --glass-blur-sm: blur(8px);
+  --glass-blur-lg: blur(20px);
+  --glass-btn: rgba(255, 255, 255, 0.1);
+  --glass-btn-hover: rgba(255, 255, 255, 0.18);
+  --glass-btn-border: rgba(255, 255, 255, 0.2);
+  --glass-danger: rgba(239, 68, 68, 0.15);
+  --glass-danger-hover: rgba(239, 68, 68, 0.25);
+  --glass-input: rgba(255, 255, 255, 0.05);
+  --glass-input-border: rgba(255, 255, 255, 0.1);
+  --glass-focus-border: rgba(255, 255, 255, 0.25);
+  --glass-focus-ring: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  --glass-completed: rgba(34, 197, 94, 0.08);
+  --glass-progress: rgba(34, 197, 94, 0.08);
+  --glass-amber: rgba(245, 158, 11, 0.08);
+}
+
+/* Subtle radial gradient behind everything to give the glass something
+   to reflect, while keeping the dark base. */
+html,
+body {
+  background: radial-gradient(ellipse at top left, #1a1a2e 0%, #121212 50%, #0f0f1a 100%) fixed;
+  background-color: #121212;
+}
+
+#root {
+  background: transparent;
+}
+
+/* The outer container becomes transparent so cards float as glass. */
+.checklist-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ---- Generic frosted-glass cards & panels ---- */
+.left-sidebar,
+.meta-bar,
+.downtime-checklist,
+.shift-instructions-card,
+.handover-editor,
+.handover-sidebar,
+.handover-history,
+.handover-stats-detailed,
+.info-modal-box,
+.wakeup-modal-box,
+.handover-modal-container,
+.breakfast-modal-box,
+.welcome-modal-box,
+.celebration-modal-box,
+.note-modal-box,
+.initials-modal-box,
+.wakeup-fullscreen-content,
+.handover-fullscreen-content {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Inner section cards get slightly more opacity. */
+.header-card,
+.downtime-info-section,
+.handover-stat-item,
+.celebration-stat-item,
+.celebration-badge,
+.celebration-achievement,
+.breakfast-display,
+.handover-current-date,
+.info-detail,
+.downtime-callout {
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px;
+}
+
+/* Subtle dividers inside the sidebar between sections. */
+.header-card + .header-card {
+  position: relative;
+}
+
+/* ---- Top bar ---- */
+.top-header {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+/* ---- Shift selector (Night / Morning / Evening) ---- */
+.shift-selector {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 5px;
+  box-shadow: none;
+}
+
+.shift-selector::before {
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.shift-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #B0B0B0;
+  border-radius: 999px;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.shift-btn.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #E0E0E0 !important;
+  border: none !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+}
+
+.shift-btn:hover:not(.active) {
+  background: transparent !important;
+  color: #E0E0E0 !important;
+}
+
+/* ---- Task rows as individual glass cards ---- */
+.task-card {
+  background: var(--glass-row) !important;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-row) !important;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.task-card:hover {
+  background: var(--glass-row-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+  transform: translateY(-2px);
+}
+
+.task-card.is-completed {
+  background: var(--glass-completed) !important;
+  border-left: 3px solid rgba(34, 197, 94, 0.8) !important;
+}
+
+.task-card.is-in-progress {
+  background: var(--glass-amber) !important;
+  border-left: 3px solid rgba(245, 158, 11, 0.8) !important;
+  box-shadow: none;
+}
+
+.task-card.task-critical {
+  background: var(--glass-row) !important;
+}
+
+/* ---- Card hover lift for sidebar/info cards ---- */
+.header-card:hover,
+.downtime-info-section:hover,
+.handover-stat-item:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: var(--glass-border-hover) !important;
+}
+
+/* ---- Checkboxes ---- */
+.ios-checkbox {
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ios-checkbox-input:checked + .ios-checkbox {
+  background: rgba(34, 197, 94, 0.8) !important;
+  border-color: rgba(34, 197, 94, 0.8) !important;
+  transform: scale(1.04);
+}
+
+.ios-checkbox-input:checked + .ios-checkbox::after {
+  border-color: #FFFFFF;
+}
+
+.ios-checkbox-input:focus-visible + .ios-checkbox {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+
+input[type="checkbox"] {
+  accent-color: rgba(34, 197, 94, 0.8);
+}
+
+/* ---- Primary glass buttons ---- */
+.add-note-btn,
+.admin-panel-btn,
+.logout-btn,
+.edit-note-btn,
+.working-btn,
+.info-btn,
+.handover-btn,
+.handover-add-btn,
+.handover-save-btn,
+.handover-edit-btn,
+.handover-view-all-btn,
+.handover-export-btn,
+.handover-nav-btn,
+.handover-history-btn,
+.handover-cancel-btn,
+.wakeup-add-btn,
+.wakeup-bulk-btn,
+.wakeup-fullscreen-btn,
+.breakfast-modal-save-btn,
+.breakfast-modal-cancel-btn,
+.celebration-continue-btn,
+.downtime-info-icon-btn,
+.info-modal-close,
+.celebration-modal-close {
+  background: var(--glass-btn) !important;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: #E0E0E0 !important;
+  border: 1px solid var(--glass-btn-border) !important;
+  box-shadow: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.14s ease;
+}
+
+.add-note-btn:hover,
+.admin-panel-btn:hover,
+.logout-btn:hover,
+.edit-note-btn:hover,
+.working-btn:hover:not(:disabled),
+.info-btn:hover,
+.handover-btn:hover,
+.handover-add-btn:hover,
+.handover-save-btn:hover,
+.handover-edit-btn:hover,
+.handover-view-all-btn:hover,
+.handover-export-btn:hover,
+.handover-nav-btn:hover,
+.handover-history-btn:hover,
+.handover-cancel-btn:hover,
+.wakeup-add-btn:hover,
+.wakeup-bulk-btn:hover,
+.wakeup-fullscreen-btn:hover,
+.breakfast-modal-save-btn:hover,
+.breakfast-modal-cancel-btn:hover,
+.celebration-continue-btn:hover,
+.downtime-info-icon-btn:hover,
+.info-modal-close:hover {
+  background: var(--glass-btn-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+}
+
+/* Button press feedback */
+.add-note-btn:active,
+.admin-panel-btn:active,
+.logout-btn:active,
+.reset-btn:active,
+.working-btn:active,
+.info-btn:active,
+.handover-btn:active,
+.handover-save-btn:active,
+.wakeup-add-btn:active,
+.shift-btn:active,
+.celebration-continue-btn:active {
+  transform: scale(0.98);
+}
+
+/* ---- Danger glass buttons ---- */
+.reset-btn,
+.handover-delete-btn,
+.handover-delete-small-btn,
+.handover-bulk-delete-btn,
+.handover-bulk-delete-old-btn,
+.wakeup-delete-btn,
+.wakeup-clear-btn {
+  background: var(--glass-danger) !important;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: #ff6b6b !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  box-shadow: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.14s ease;
+}
+
+.reset-btn:hover,
+.handover-delete-btn:hover,
+.handover-delete-small-btn:hover,
+.handover-bulk-delete-btn:hover,
+.handover-bulk-delete-old-btn:hover,
+.wakeup-delete-btn:hover,
+.wakeup-clear-btn:hover {
+  background: var(--glass-danger-hover) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+}
+
+/* ---- Glass input fields ---- */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+  background: var(--glass-input) !important;
+  border: 1px solid var(--glass-input-border) !important;
+  border-radius: 10px !important;
+  color: #E0E0E0 !important;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"])::placeholder,
+textarea::placeholder {
+  color: #B0B0B0;
+  opacity: 1;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+  border-color: var(--glass-focus-border) !important;
+  box-shadow: var(--glass-focus-ring) !important;
+}
+
+/* ---- Progress bar ---- */
+.progress-bar {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  background: rgba(34, 197, 94, 0.6) !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.45);
+}
+
+/* ---- Modal overlays — dark frosted backdrop ---- */
+.info-modal-overlay,
+.handover-modal-overlay,
+.celebration-modal-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ---- Initials chip as a glass pill ---- */
+.initials-chip {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: #B0B0B0 !important;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+/* ---- Glass scrollbars ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    background: radial-gradient(ellipse at top left, #1a1a2e 0%, #121212 50%, #0f0f1a 100%) fixed;
+    background-color: #121212;
+  }
+}
