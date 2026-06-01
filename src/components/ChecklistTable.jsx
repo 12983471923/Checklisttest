@@ -72,8 +72,14 @@ const ChecklistTable = ({
                 <button 
                   onClick={() => onShowInfo(task)}
                   className="info-btn"
+                  title="Task info"
+                  aria-label={`Show information for ${task.text}`}
                 >
-                  ℹ️
+                  <svg className="info-btn-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
+                    <path d="M12 10.5V16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                    <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
+                  </svg>
                 </button>
               </td>
             </tr>

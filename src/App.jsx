@@ -1188,11 +1188,17 @@ function ChecklistApp({ userProfile, currentUser }) {
                       )}
                     </button>
                     <button
-                      className="info-btn"
+                      className={`info-btn${showInfo === task.id ? " is-active" : ""}`}
                       onClick={() => setShowInfo(showInfo === task.id ? null : task.id)}
                       aria-label={`${showInfo === task.id ? 'Hide' : 'Show'} information for ${task.text}`}
+                      aria-expanded={showInfo === task.id}
+                      title="Task info"
                     >
-                      i
+                      <svg className="info-btn-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
+                        <path d="M12 10.5V16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                        <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
+                      </svg>
                     </button>
                     <button
                       className={task.note ? "edit-note-btn" : "add-note-btn"}
@@ -1216,12 +1222,18 @@ function ChecklistApp({ userProfile, currentUser }) {
                   Print Downtime Every 3 Hours
                 </h3>
                 <button
-                  className="downtime-info-icon-btn"
+                  className={`downtime-info-icon-btn${showDowntimeInfo ? " is-active" : ""}`}
                   onClick={() => setShowDowntimeInfo(!showDowntimeInfo)}
                   aria-label="Show downtime report instructions"
+                  aria-expanded={showDowntimeInfo}
                   data-tooltip="Downtime Instructions"
+                  title="Downtime instructions"
                 >
-                  i
+                  <svg className="info-btn-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
+                    <path d="M12 10.5V16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                    <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
+                  </svg>
                 </button>
               </div>
               <p className="downtime-callout">
