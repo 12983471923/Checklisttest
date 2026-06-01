@@ -102,6 +102,13 @@ service cloud.firestore {
       allow write: if isActive() && withinSizeLimit();
     }
 
+    // Hotel info (name, address, contact, times, pricing). Any active staff
+    // member may read it; only the admin may modify it.
+    match /hotel-info/{document} {
+      allow read: if isActive();
+      allow write: if isAdmin() && withinSizeLimit();
+    }
+
     // Audit trail — managers read; any active user can append; no edits/deletes
     match /auditTrail/{document} {
       allow read: if isManager();

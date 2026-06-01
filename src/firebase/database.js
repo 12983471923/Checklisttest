@@ -310,3 +310,86 @@ export const subscribeToBreakfastTimes = (callback) => {
     console.error('Error listening to breakfast times updates:', error);
   });
 };
+
+// ---------------------------------------------------------------------------
+// Hotel info (name / address / contact / times / pricing) — single config doc.
+// Readable by any active staff member, writable by admin only (firestore.rules).
+// ---------------------------------------------------------------------------
+const HOTEL_INFO_COLLECTION = 'hotel-info';
+const HOTEL_INFO_DOC = 'config';
+
+// Hardcoded defaults used as a fallback when no Firestore document exists yet.
+export const DEFAULT_HOTEL_INFO = {
+  name: 'Scandic Falkoner',
+  address: 'Falkoner Alle 9, 2000 Frederiksberg, Denmark',
+  phone: '+45 72 42 55 00',
+  email: 'falkoner@scandichotels.com',
+  times: {
+    breakfast: '06:30 - 10:00',
+    checkOut: '12:00',
+    checkIn: '16:00'
+  },
+  pricing: {
+    bikeRental: {
+      regular: '175 DKK per person',
+      lufthansa: '100 DKK per person'
+    },
+    breakfast: {
+      duringBooking: '140 DKK',
+      atCheckIn: '179 DKK',
+      onTheDay: '229 DKK'
+    }
+  }
+};
+
+// Deep-merge persisted data over the defaults so any missing field falls back.
+export const mergeHotelInfo = (data) => {
+  const d = DEFAULT_HOTEL_INFO;
+  const src = data || {};
+  return {
+    name: src.name ?? d.name,
+    address: src.address ?? d.address,
+    phone: src.phone ?? d.phone,
+    email: src.email ?? d.email,
+    times: { ...d.times, ...(src.times || {}) },
+    pricing: {
+      bikeRental: { ...d.pricing.bikeRental, ...((src.pricing && src.pricing.bikeRental) || {}) },
+      breakfast: { ...d.pricing.breakfast, ...((src.pricing && src.pricing.breakfast) || {}) }
+    }
+  };
+};
+
+export const getHotelInfo = async () => {
+  const docRef = doc(db, HOTEL_INFO_COLLECTION, HOTEL_INFO_DOC);
+  try {
+    const docSnap = await getDoc(docRef);
+    return mergeHotelInfo(docSnap.exists() ? docSnap.data() : null);
+  } catch (error) {
+    console.error('Error getting hotel info:', error);
+    return mergeHotelInfo(null);
+  }
+};
+
+export const saveHotelInfo = async (info) => {
+  const docRef = doc(db, HOTEL_INFO_COLLECTION, HOTEL_INFO_DOC);
+  try {
+    await setDoc(docRef, {
+      ...mergeHotelInfo(info),
+      lastUpdated: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error saving hotel info:', error);
+    throw error;
+  }
+};
+
+export const subscribeToHotelInfo = (callback) => {
+  const docRef = doc(db, HOTEL_INFO_COLLECTION, HOTEL_INFO_DOC);
+
+  return onSnapshot(docRef, (doc) => {
+    callback(mergeHotelInfo(doc.exists() ? doc.data() : null));
+  }, (error) => {
+    console.error('Error listening to hotel info updates:', error);
+    callback(mergeHotelInfo(null));
+  });
+};

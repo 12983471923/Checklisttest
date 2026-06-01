@@ -12,7 +12,10 @@ import {
   subscribeToWakeUpCalls,
   saveBreakfastTimes as saveBreakfastTimesToDB,
   getBreakfastTimes,
-  subscribeToBreakfastTimes
+  subscribeToBreakfastTimes,
+  subscribeToHotelInfo,
+  saveHotelInfo,
+  DEFAULT_HOTEL_INFO
 } from "./firebase/database";
 import { signOutUser } from "./firebase/auth";
 import { isAdminEmail } from "./config/admin";
@@ -51,6 +54,36 @@ function App() {
   return <ChecklistApp userProfile={userProfile} currentUser={currentUser} />;
 }
 
+// Header row for an editable sidebar section. Shows a pencil for admins and
+// Save / Cancel controls while that section is being edited inline.
+function SectionHeader({ title, isAdmin, isEditing, onEdit, onSave, onCancel, saving }) {
+  return (
+    <div className="section-head">
+      <strong>{title}</strong>
+      {isAdmin && !isEditing && (
+        <button
+          className="section-edit-btn"
+          onClick={onEdit}
+          title="Edit section"
+          aria-label={`Edit ${title}`}
+        >
+          ✏️
+        </button>
+      )}
+      {isAdmin && isEditing && (
+        <div className="section-edit-actions">
+          <button className="section-save-btn" onClick={onSave} disabled={saving}>
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+          <button className="section-cancel-btn" onClick={onCancel} disabled={saving}>
+            Cancel
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ChecklistApp({ userProfile, currentUser }) {
   const profileInitials = userProfile?.initials?.trim().toUpperCase() || "";
   const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
@@ -87,6 +120,49 @@ function ChecklistApp({ userProfile, currentUser }) {
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [lastCompletedShift, setLastCompletedShift] = useState('');
 
+  // Editable hotel info (admin only). Falls back to hardcoded defaults until
+  // the Firestore document loads, then stays in sync via onSnapshot.
+  const [hotelInfo, setHotelInfo] = useState(DEFAULT_HOTEL_INFO);
+  const [editingSection, setEditingSection] = useState(null); // 'info' | 'times' | 'pricing'
+  const [hotelDraft, setHotelDraft] = useState(DEFAULT_HOTEL_INFO);
+  const [savingHotelInfo, setSavingHotelInfo] = useState(false);
+
+  const updateDraft = (updater) => {
+    setHotelDraft((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      updater(next);
+      return next;
+    });
+  };
+
+  // Keep the working draft in sync with live data while not actively editing.
+  useEffect(() => {
+    if (!editingSection) setHotelDraft(hotelInfo);
+  }, [hotelInfo, editingSection]);
+
+  const startEditSection = (section) => {
+    setHotelDraft(JSON.parse(JSON.stringify(hotelInfo)));
+    setEditingSection(section);
+  };
+
+  const cancelEditSection = () => {
+    setEditingSection(null);
+    setHotelDraft(hotelInfo);
+  };
+
+  const saveEditSection = async () => {
+    setSavingHotelInfo(true);
+    try {
+      await saveHotelInfo(hotelDraft);
+      setEditingSection(null);
+    } catch (err) {
+      console.error('Failed to save hotel info:', err);
+      alert('Could not save changes. Please try again.');
+    } finally {
+      setSavingHotelInfo(false);
+    }
+  };
+
   // Use the real-time checklist hook
   const {
     tasks,
@@ -106,6 +182,7 @@ function ChecklistApp({ userProfile, currentUser }) {
     const unsubscribeHandovers = subscribeToHandoverNotes(setSavedHandovers);
     const unsubscribeWakeUpCalls = subscribeToWakeUpCalls(setWakeUpCalls);
     const unsubscribeBreakfastTimes = subscribeToBreakfastTimes(setBreakfastTimes);
+    const unsubscribeHotelInfo = subscribeToHotelInfo(setHotelInfo);
 
     // Load handover notes for current date
     getHandoverNotes(handoverDate).then(setHandoverNotes);
@@ -114,6 +191,7 @@ function ChecklistApp({ userProfile, currentUser }) {
       unsubscribeHandovers();
       unsubscribeWakeUpCalls();
       unsubscribeBreakfastTimes();
+      unsubscribeHotelInfo();
     };
   }, []);
 
@@ -565,40 +643,108 @@ function ChecklistApp({ userProfile, currentUser }) {
         {/* Left sidebar with hotel info */}
         <div className="left-sidebar">
           <div className="header-card">
-            <strong>🏨 Scandic Falkoner</strong>
-            
+            <SectionHeader
+              title={editingSection === 'info' ? '🏨 Hotel Info' : `🏨 ${hotelInfo.name}`}
+              isAdmin={isAdmin}
+              isEditing={editingSection === 'info'}
+              onEdit={() => startEditSection('info')}
+              onSave={saveEditSection}
+              onCancel={cancelEditSection}
+              saving={savingHotelInfo}
+            />
+
             <div className="hotel-info-section">
-              <div className="info-item">
-                <span className="info-icon">📍</span>
-                <div className="info-content">
-                  <span className="info-label">Address</span>
-                  <span className="info-value">Falkoner Alle 9, 2000 Frederiksberg, Denmark</span>
-                </div>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-icon">📞</span>
-                <div className="info-content">
-                  <span className="info-label">Phone</span>
-                  <span className="info-value">+45 72 42 55 00</span>
-                </div>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-icon">✉️</span>
-                <div className="info-content">
-                  <span className="info-label">Email</span>
-                  <span className="info-value">
-                    <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
-                  </span>
-                </div>
-              </div>
+              {editingSection === 'info' ? (
+                <>
+                  <div className="info-item">
+                    <span className="info-icon">🏨</span>
+                    <div className="info-content">
+                      <span className="info-label">Name</span>
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.name}
+                        onChange={(e) => updateDraft((d) => { d.name = e.target.value; })}
+                      />
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-icon">📍</span>
+                    <div className="info-content">
+                      <span className="info-label">Address</span>
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.address}
+                        onChange={(e) => updateDraft((d) => { d.address = e.target.value; })}
+                      />
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-icon">📞</span>
+                    <div className="info-content">
+                      <span className="info-label">Phone</span>
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.phone}
+                        onChange={(e) => updateDraft((d) => { d.phone = e.target.value; })}
+                      />
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-icon">✉️</span>
+                    <div className="info-content">
+                      <span className="info-label">Email</span>
+                      <input
+                        className="sidebar-edit-input"
+                        type="email"
+                        value={hotelDraft.email}
+                        onChange={(e) => updateDraft((d) => { d.email = e.target.value; })}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="info-item">
+                    <span className="info-icon">📍</span>
+                    <div className="info-content">
+                      <span className="info-label">Address</span>
+                      <span className="info-value">{hotelInfo.address}</span>
+                    </div>
+                  </div>
+
+                  <div className="info-item">
+                    <span className="info-icon">📞</span>
+                    <div className="info-content">
+                      <span className="info-label">Phone</span>
+                      <span className="info-value">{hotelInfo.phone}</span>
+                    </div>
+                  </div>
+
+                  <div className="info-item">
+                    <span className="info-icon">✉️</span>
+                    <div className="info-content">
+                      <span className="info-label">Email</span>
+                      <span className="info-value">
+                        <a href={`mailto:${hotelInfo.email}`}>{hotelInfo.email}</a>
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
           <div className="header-card">
-            <strong>⏰ Hotel Times</strong>
-            
+            <SectionHeader
+              title="⏰ Hotel Times"
+              isAdmin={isAdmin}
+              isEditing={editingSection === 'times'}
+              onEdit={() => startEditSection('times')}
+              onSave={saveEditSection}
+              onCancel={cancelEditSection}
+              saving={savingHotelInfo}
+            />
+
             <div className="hotel-times-section">
               <div className="time-item">
                 <span className="time-icon">🍳</span>
@@ -620,7 +766,15 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🚪</span>
                 <div className="time-content">
                   <span className="time-label">Check-Out</span>
-                  <span className="time-value">12:00</span>
+                  {editingSection === 'times' ? (
+                    <input
+                      className="sidebar-edit-input"
+                      value={hotelDraft.times.checkOut}
+                      onChange={(e) => updateDraft((d) => { d.times.checkOut = e.target.value; })}
+                    />
+                  ) : (
+                    <span className="time-value">{hotelInfo.times.checkOut}</span>
+                  )}
                 </div>
               </div>
               
@@ -628,26 +782,58 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🔑</span>
                 <div className="time-content">
                   <span className="time-label">Check-In</span>
-                  <span className="time-value">16:00</span>
+                  {editingSection === 'times' ? (
+                    <input
+                      className="sidebar-edit-input"
+                      value={hotelDraft.times.checkIn}
+                      onChange={(e) => updateDraft((d) => { d.times.checkIn = e.target.value; })}
+                    />
+                  ) : (
+                    <span className="time-value">{hotelInfo.times.checkIn}</span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
           
           <div className="header-card">
-            <strong>Pricing Information</strong>
-            
+            <SectionHeader
+              title="💲 Pricing Information"
+              isAdmin={isAdmin}
+              isEditing={editingSection === 'pricing'}
+              onEdit={() => startEditSection('pricing')}
+              onSave={saveEditSection}
+              onCancel={cancelEditSection}
+              saving={savingHotelInfo}
+            />
+
             <div className="pricing-section">
               <div className="pricing-category">
                 <strong>🚴 Bike Rental</strong>
                 <div className="price-list">
                   <div className="price-item">
                     <span className="price-label">Regular rate:</span>
-                    <span className="price-value">175 DKK per person</span>
+                    {editingSection === 'pricing' ? (
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.pricing.bikeRental.regular}
+                        onChange={(e) => updateDraft((d) => { d.pricing.bikeRental.regular = e.target.value; })}
+                      />
+                    ) : (
+                      <span className="price-value">{hotelInfo.pricing.bikeRental.regular}</span>
+                    )}
                   </div>
                   <div className="price-item">
                     <span className="price-label">Lufthansa rate:</span>
-                    <span className="price-value">100 DKK per person</span>
+                    {editingSection === 'pricing' ? (
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.pricing.bikeRental.lufthansa}
+                        onChange={(e) => updateDraft((d) => { d.pricing.bikeRental.lufthansa = e.target.value; })}
+                      />
+                    ) : (
+                      <span className="price-value">{hotelInfo.pricing.bikeRental.lufthansa}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -657,15 +843,39 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <div className="price-list">
                   <div className="price-item">
                     <span className="price-label">During booking:</span>
-                    <span className="price-value">140 DKK</span>
+                    {editingSection === 'pricing' ? (
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.pricing.breakfast.duringBooking}
+                        onChange={(e) => updateDraft((d) => { d.pricing.breakfast.duringBooking = e.target.value; })}
+                      />
+                    ) : (
+                      <span className="price-value">{hotelInfo.pricing.breakfast.duringBooking}</span>
+                    )}
                   </div>
                   <div className="price-item">
                     <span className="price-label">At check-in:</span>
-                    <span className="price-value">179 DKK</span>
+                    {editingSection === 'pricing' ? (
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.pricing.breakfast.atCheckIn}
+                        onChange={(e) => updateDraft((d) => { d.pricing.breakfast.atCheckIn = e.target.value; })}
+                      />
+                    ) : (
+                      <span className="price-value">{hotelInfo.pricing.breakfast.atCheckIn}</span>
+                    )}
                   </div>
                   <div className="price-item">
                     <span className="price-label">On the day:</span>
-                    <span className="price-value">229 DKK</span>
+                    {editingSection === 'pricing' ? (
+                      <input
+                        className="sidebar-edit-input"
+                        value={hotelDraft.pricing.breakfast.onTheDay}
+                        onChange={(e) => updateDraft((d) => { d.pricing.breakfast.onTheDay = e.target.value; })}
+                      />
+                    ) : (
+                      <span className="price-value">{hotelInfo.pricing.breakfast.onTheDay}</span>
+                    )}
                   </div>
                 </div>
               </div>
