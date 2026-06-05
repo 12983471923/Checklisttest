@@ -20,6 +20,7 @@ import AuthLoginForm from "./components/AuthLoginForm";
 import AdminPanel from "./components/AdminPanel";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
+import ThemeToggle from "./components/ThemeToggle";
 import 'leaflet/dist/leaflet.css';
 import "./App.css";
 import "./components/auth.css";
@@ -30,10 +31,8 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f5f7" }}>
-        <div style={{ color: "#6e6e73", fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif", fontSize: "15px" }}>
-          Loading…
-        </div>
+      <div className="app-loading-screen">
+        <div className="app-loading-text">Loading…</div>
       </div>
     );
   }
@@ -822,8 +821,8 @@ function ChecklistApp({ userProfile, currentUser }) {
           {/* Meta bar */}
           <div className="meta-bar">
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <span style={{ color: "#718096", fontSize: "0.85rem", fontWeight: "500" }}>
-            Logged in as <strong style={{ color: "#4a5568" }}>{displayName}</strong>
+          <span className="meta-bar-user">
+            Logged in as <strong>{displayName}</strong>
           </span>
           <span>
             <span role="img" aria-label="calendar">📅</span>
@@ -831,6 +830,7 @@ function ChecklistApp({ userProfile, currentUser }) {
           </span>
         </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <ThemeToggle />
             <WeatherWidget />
             {isAdmin && (
               <button className="add-note-btn admin-panel-btn" onClick={() => setShowAdmin(true)}>

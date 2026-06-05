@@ -4655,7 +4655,8 @@ input[type="checkbox"]:hover {
    Apple-inspired checklist refresh
    ============================================ */
 
-:root {
+:root,
+[data-theme="light"] {
   --ios-bg: #f2f2f7;
   --ios-card: #ffffff;
   --ios-label: #1c1c1e;
@@ -4671,7 +4672,133 @@ input[type="checkbox"]:hover {
   --ios-soft-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   --ios-radius: 16px;
   --ios-radius-sm: 12px;
+  --ios-chip-bg: #f0f0f3;
+  --ios-chip-bg-hover: #e5e5ea;
+  --ios-meta-bar-bg: rgba(255, 255, 255, 0.74);
+  --ios-progress-track: rgba(118, 118, 128, 0.14);
+  --ios-progress-start: #30d158;
+  --ios-checkbox-border: #c7c7cc;
+  --ios-primary-btn-bg: #111111;
+  --ios-primary-btn-bg-hover: #000000;
+  --ios-primary-btn-text: #ffffff;
+  --ios-task-critical-bg: #fff9ef;
+  --ios-task-completed-bg: rgba(255, 255, 255, 0.88);
+  --ios-in-progress-text: #a15c00;
+  --ios-in-progress-bg: rgba(255, 149, 0, 0.12);
+  --ios-wakeup-completed-bg: #f3fff6;
+  --ios-downtime-callout-text: #7a4400;
+  --ios-input-bg: rgba(255, 255, 255, 0.9);
+  --ios-input-bg-focus: #ffffff;
+  --ios-header-sticky-bg: rgba(242, 242, 247, 0.92);
+  --ios-overlay: rgba(0, 0, 0, 0.36);
+  --ios-blue-tint: rgba(0, 122, 255, 0.1);
+  --ios-blue-tint-hover: rgba(0, 122, 255, 0.16);
+  --ios-red-tint: rgba(255, 59, 48, 0.1);
+  --ios-red-hover: #d70015;
+  --ios-orange-tint: rgba(255, 149, 0, 0.1);
+  --ios-orange-tint-strong: rgba(255, 149, 0, 0.14);
+  --ios-fill-hover: rgba(118, 118, 128, 0.18);
+  --ios-fill-hover-strong: rgba(118, 118, 128, 0.2);
+  --ios-history-active: rgba(0, 122, 255, 0.08);
+  --ios-shift-inset: rgba(60, 60, 67, 0.06);
+  --ios-shift-thumb-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+  --ios-card-hover-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
+  --ios-downtime-hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  --ios-checkbox-glow: rgba(0, 122, 255, 0.16);
+  --ios-input-focus-border: rgba(0, 122, 255, 0.45);
+  --ios-input-focus-ring: rgba(0, 122, 255, 0.14);
+  --ios-working-hover-bg: rgba(255, 149, 0, 0.2);
+  --ios-working-hover-text: #8a4f00;
+  --ios-success-bg: #f0fff4;
+  --ios-success-border: #b2dfdb;
+  --ios-success-text: #1a7f4b;
+  --ios-error-bg: #fff2f2;
+  --ios-error-border: #ffd6d6;
+  --ios-error-text: #c0392b;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+[data-theme="dark"] {
+  --ios-bg: #000000;
+  --ios-card: #1c1c1e;
+  --ios-label: #f5f5f7;
+  --ios-secondary-label: #aeaeb2;
+  --ios-tertiary-label: #8e8e93;
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  --ios-fill: rgba(118, 118, 128, 0.24);
+  --ios-green: #30d158;
+  --ios-orange: #ff9f0a;
+  --ios-red: #ff453a;
+  --ios-blue: #0a84ff;
+  --ios-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --ios-soft-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --ios-chip-bg: #2c2c2e;
+  --ios-chip-bg-hover: #3a3a3c;
+  --ios-meta-bar-bg: rgba(28, 28, 30, 0.85);
+  --ios-progress-track: rgba(118, 118, 128, 0.3);
+  --ios-progress-start: #32d74b;
+  --ios-checkbox-border: #636366;
+  --ios-primary-btn-bg: #f5f5f7;
+  --ios-primary-btn-bg-hover: #ffffff;
+  --ios-primary-btn-text: #000000;
+  --ios-task-critical-bg: #2c2419;
+  --ios-task-completed-bg: rgba(28, 28, 30, 0.88);
+  --ios-in-progress-text: #ffb340;
+  --ios-in-progress-bg: rgba(255, 159, 10, 0.18);
+  --ios-wakeup-completed-bg: #1a2e1f;
+  --ios-downtime-callout-text: #ffb340;
+  --ios-input-bg: rgba(44, 44, 46, 0.9);
+  --ios-input-bg-focus: #2c2c2e;
+  --ios-header-sticky-bg: rgba(0, 0, 0, 0.85);
+  --ios-overlay: rgba(0, 0, 0, 0.6);
+  --ios-blue-tint: rgba(10, 132, 255, 0.15);
+  --ios-blue-tint-hover: rgba(10, 132, 255, 0.22);
+  --ios-red-tint: rgba(255, 69, 58, 0.15);
+  --ios-red-hover: #ff6961;
+  --ios-orange-tint: rgba(255, 159, 10, 0.15);
+  --ios-orange-tint-strong: rgba(255, 159, 10, 0.22);
+  --ios-fill-hover: rgba(118, 118, 128, 0.32);
+  --ios-fill-hover-strong: rgba(118, 118, 128, 0.38);
+  --ios-history-active: rgba(10, 132, 255, 0.15);
+  --ios-shift-inset: rgba(84, 84, 88, 0.4);
+  --ios-shift-thumb-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  --ios-card-hover-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  --ios-downtime-hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  --ios-checkbox-glow: rgba(10, 132, 255, 0.25);
+  --ios-input-focus-border: rgba(10, 132, 255, 0.55);
+  --ios-input-focus-ring: rgba(10, 132, 255, 0.22);
+  --ios-working-hover-bg: rgba(255, 159, 10, 0.28);
+  --ios-working-hover-text: #ffc46b;
+  --ios-success-bg: #1a2e22;
+  --ios-success-border: #2d5a3d;
+  --ios-success-text: #4ade80;
+  --ios-error-bg: #2e1a1a;
+  --ios-error-border: #5a2d2d;
+  --ios-error-text: #ff6961;
+}
+
+.app-loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ios-bg);
+}
+
+.app-loading-text {
+  color: var(--ios-secondary-label);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+}
+
+.meta-bar-user {
+  color: var(--ios-secondary-label);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.meta-bar-user strong {
+  color: var(--ios-label);
 }
 
 html {
@@ -4845,7 +4972,7 @@ textarea {
   background: var(--ios-fill);
   border-radius: 999px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(60, 60, 67, 0.06);
+  box-shadow: inset 0 0 0 1px var(--ios-shift-inset);
 }
 
 .shift-selector::before {
@@ -4857,7 +4984,7 @@ textarea {
   width: calc((100% - 8px) / 3);
   border-radius: 999px;
   background: var(--ios-card);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+  box-shadow: var(--ios-shift-thumb-shadow);
   transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -4908,14 +5035,14 @@ textarea {
   gap: 16px;
   margin-bottom: 18px;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--ios-meta-bar-bg);
   border-radius: var(--ios-radius);
   box-shadow: var(--ios-soft-shadow);
   color: var(--ios-secondary-label);
 }
 
 .initials-chip {
-  background: #f0f0f3;
+  background: var(--ios-chip-bg);
   color: var(--ios-secondary-label);
   border: none;
   border-radius: 999px;
@@ -4932,7 +5059,7 @@ textarea {
 
 .initials-chip-action.active,
 .initials-chip:hover {
-  background: #e5e5ea;
+  background: var(--ios-chip-bg-hover);
   color: var(--ios-label);
   border-color: transparent;
 }
@@ -4940,12 +5067,12 @@ textarea {
 .progress-bar {
   height: 8px;
   margin: 16px 0 10px;
-  background: rgba(118, 118, 128, 0.14);
+  background: var(--ios-progress-track);
   border-radius: 999px;
 }
 
 .progress-bar-inner {
-  background: linear-gradient(90deg, #30d158 0%, var(--ios-green) 100%);
+  background: linear-gradient(90deg, var(--ios-progress-start) 0%, var(--ios-green) 100%);
   border-radius: 999px;
 }
 
@@ -4987,7 +5114,7 @@ textarea {
 
 .task-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--ios-card-hover-shadow);
 }
 
 .task-card.is-in-progress {
@@ -4995,12 +5122,12 @@ textarea {
 }
 
 .task-card.task-critical {
-  background: #fff9ef;
+  background: var(--ios-task-critical-bg);
   box-shadow: inset 4px 0 0 rgba(255, 149, 0, 0.86), var(--ios-shadow);
 }
 
 .task-card.is-completed {
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--ios-task-completed-bg);
 }
 
 .task-checkbox-control {
@@ -5025,7 +5152,7 @@ textarea {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid #c7c7cc;
+  border: 2px solid var(--ios-checkbox-border);
   background: transparent;
   display: inline-flex;
   align-items: center;
@@ -5058,7 +5185,7 @@ textarea {
 }
 
 .ios-checkbox-input:focus-visible + .ios-checkbox {
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.16);
+  box-shadow: 0 0 0 4px var(--ios-checkbox-glow);
 }
 
 .task-card-body {
@@ -5100,8 +5227,8 @@ textarea {
   align-items: center;
   gap: 5px;
   flex: 0 0 auto;
-  color: #a15c00;
-  background: rgba(255, 149, 0, 0.12);
+  color: var(--ios-in-progress-text);
+  background: var(--ios-in-progress-bg);
   border-radius: 999px;
   padding: 4px 9px;
   font-size: 0.74rem;
@@ -5138,7 +5265,7 @@ textarea {
 }
 
 .working-btn:hover:not(:disabled) {
-  background: rgba(118, 118, 128, 0.18);
+  background: var(--ios-fill-hover);
   color: var(--ios-label);
   transform: translateY(-1px);
   box-shadow: none;
@@ -5146,16 +5273,16 @@ textarea {
 
 .working-btn.working-active,
 .working-btn.working-other {
-  color: #a15c00;
-  background: rgba(255, 149, 0, 0.14);
+  color: var(--ios-in-progress-text);
+  background: var(--ios-orange-tint-strong);
   border-color: transparent;
   box-shadow: none;
   animation: none;
 }
 
 .working-btn.working-active:hover {
-  background: rgba(255, 149, 0, 0.2);
-  color: #8a4f00;
+  background: var(--ios-working-hover-bg);
+  color: var(--ios-working-hover-text);
   transform: translateY(-1px);
   box-shadow: none;
 }
@@ -5169,7 +5296,7 @@ textarea {
   width: 32px;
   height: 32px;
   color: var(--ios-blue);
-  background: rgba(0, 122, 255, 0.1);
+  background: var(--ios-blue-tint);
   border: none;
   border-radius: 50%;
   margin: 0;
@@ -5179,7 +5306,7 @@ textarea {
 
 .info-btn:hover {
   color: var(--ios-blue);
-  background: rgba(0, 122, 255, 0.16);
+  background: var(--ios-blue-tint-hover);
   transform: translateY(-1px);
 }
 
@@ -5190,8 +5317,8 @@ textarea {
 .handover-save-btn,
 .breakfast-modal-save-btn,
 .celebration-continue-btn {
-  background: #111111;
-  color: #ffffff;
+  background: var(--ios-primary-btn-bg);
+  color: var(--ios-primary-btn-text);
   border: none;
   border-radius: 999px;
   padding: 9px 15px;
@@ -5208,7 +5335,7 @@ textarea {
 .handover-save-btn:hover,
 .breakfast-modal-save-btn:hover,
 .celebration-continue-btn:hover {
-  background: #000000;
+  background: var(--ios-primary-btn-bg-hover);
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
 }
@@ -5274,8 +5401,8 @@ textarea {
 .wakeup-delete:hover,
 .wakeup-delete-btn:hover,
 .handover-history-delete:hover {
-  background: rgba(255, 59, 48, 0.1);
-  color: #d70015;
+  background: var(--ios-red-tint);
+  color: var(--ios-red-hover);
   transform: translateY(-1px);
   box-shadow: none;
 }
@@ -5317,7 +5444,7 @@ textarea {
 }
 
 .wakeup-item.completed {
-  background: #f3fff6;
+  background: var(--ios-wakeup-completed-bg);
   border-color: transparent;
 }
 
@@ -5342,20 +5469,20 @@ textarea {
 }
 
 .downtime-callout {
-  background: rgba(255, 149, 0, 0.1);
+  background: var(--ios-orange-tint);
   border: none;
-  color: #7a4400;
+  color: var(--ios-downtime-callout-text);
 }
 
 .downtime-info-icon-btn {
-  background: rgba(0, 122, 255, 0.1);
+  background: var(--ios-blue-tint);
   color: var(--ios-blue);
   border: none;
   box-shadow: none;
 }
 
 .downtime-info-icon-btn:hover {
-  background: rgba(0, 122, 255, 0.16);
+  background: var(--ios-blue-tint-hover);
   color: var(--ios-blue);
 }
 
@@ -5374,7 +5501,7 @@ textarea {
 
 .downtime-item:hover {
   border-color: transparent;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--ios-downtime-hover-shadow);
   transform: translateY(-1px);
 }
 
@@ -5395,7 +5522,7 @@ textarea {
 }
 
 .downtime-item .initials-chip {
-  background: #f0f0f3;
+  background: var(--ios-chip-bg);
   color: var(--ios-secondary-label);
 }
 
@@ -5410,7 +5537,7 @@ textarea {
 .handover-textarea,
 .handover-main-textarea,
 .wakeup-textarea {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--ios-input-bg);
   border: 1px solid var(--ios-separator);
   border-radius: 12px;
   color: var(--ios-label);
@@ -5428,9 +5555,9 @@ textarea {
 .handover-textarea:focus,
 .handover-main-textarea:focus,
 .wakeup-textarea:focus {
-  border-color: rgba(0, 122, 255, 0.45);
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.14);
+  border-color: var(--ios-input-focus-border);
+  background: var(--ios-input-bg-focus);
+  box-shadow: 0 0 0 4px var(--ios-input-focus-ring);
   transform: none;
 }
 
@@ -5439,7 +5566,7 @@ textarea {
 .handover-fullscreen-overlay,
 .wakeup-fullscreen-overlay,
 .celebration-modal-overlay {
-  background: rgba(0, 0, 0, 0.36);
+  background: var(--ios-overlay);
   backdrop-filter: blur(12px);
 }
 
@@ -5497,7 +5624,7 @@ textarea {
 .handover-fullscreen-close:hover,
 .wakeup-fullscreen-close:hover,
 .info-modal-close:hover {
-  background: rgba(118, 118, 128, 0.2);
+  background: var(--ios-fill-hover-strong);
   color: var(--ios-label);
 }
 
@@ -5515,14 +5642,14 @@ textarea {
 }
 
 .handover-history-item.active {
-  background: rgba(0, 122, 255, 0.08);
+  background: var(--ios-history-active);
   border-color: transparent;
 }
 
 .wakeup-filter-tab.active {
-  background: #111111;
-  color: #ffffff;
-  border-color: #111111;
+  background: var(--ios-primary-btn-bg);
+  color: var(--ios-primary-btn-text);
+  border-color: var(--ios-primary-btn-bg);
 }
 
 .footer-text {
@@ -5593,7 +5720,7 @@ textarea {
     z-index: 100;
     padding: 14px 12px;
     margin: -12px -12px 12px;
-    background: rgba(242, 242, 247, 0.92);
+    background: var(--ios-header-sticky-bg);
     border-bottom: none;
     backdrop-filter: blur(18px);
   }
@@ -5731,4 +5858,121 @@ textarea {
   .info-btn {
     flex: 0 0 34px;
   }
+}
+
+/* Admin panel + auth dark mode */
+[data-theme="dark"] .admin-overlay,
+[data-theme="dark"] .admin-panel {
+  background: var(--ios-bg);
+}
+
+[data-theme="dark"] .admin-topbar {
+  background: rgba(28, 28, 30, 0.85);
+  border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .admin-topbar-title h1,
+[data-theme="dark"] .admin-section-head h2,
+[data-theme="dark"] .admin-nav-item,
+[data-theme="dark"] .admin-shift-btn,
+[data-theme="dark"] .admin-table td,
+[data-theme="dark"] .admin-btn,
+[data-theme="dark"] .admin-icon-btn,
+[data-theme="dark"] .admin-input,
+[data-theme="dark"] .admin-textarea,
+[data-theme="dark"] .admin-access-denied h2,
+[data-theme="dark"] .shift-instructions-card .shift-instructions-text {
+  color: var(--ios-label);
+}
+
+[data-theme="dark"] .admin-topbar-title p,
+[data-theme="dark"] .admin-section-head p,
+[data-theme="dark"] .admin-time-item label,
+[data-theme="dark"] .admin-loading,
+[data-theme="dark"] .admin-empty,
+[data-theme="dark"] .admin-access-denied p {
+  color: var(--ios-secondary-label);
+}
+
+[data-theme="dark"] .admin-nav,
+[data-theme="dark"] .admin-section,
+[data-theme="dark"] .admin-access-denied {
+  background: var(--ios-card);
+  box-shadow: var(--ios-soft-shadow);
+}
+
+[data-theme="dark"] .admin-nav-item:hover {
+  background: var(--ios-fill);
+}
+
+[data-theme="dark"] .admin-shift-picker {
+  background: var(--ios-fill);
+}
+
+[data-theme="dark"] .admin-shift-btn.active {
+  background: var(--ios-card);
+}
+
+[data-theme="dark"] .admin-btn {
+  background: var(--ios-fill);
+}
+
+[data-theme="dark"] .admin-btn:hover {
+  background: var(--ios-fill-hover);
+}
+
+[data-theme="dark"] .admin-close-btn,
+[data-theme="dark"] .admin-panel-btn {
+  background: var(--ios-primary-btn-bg) !important;
+  color: var(--ios-primary-btn-text) !important;
+}
+
+[data-theme="dark"] .admin-close-btn:hover,
+[data-theme="dark"] .admin-panel-btn:hover {
+  background: var(--ios-primary-btn-bg-hover) !important;
+}
+
+[data-theme="dark"] .admin-task-card,
+[data-theme="dark"] .admin-table th {
+  background: var(--ios-fill);
+  border-color: var(--ios-separator);
+  color: var(--ios-label);
+}
+
+[data-theme="dark"] .admin-table-wrap {
+  border-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .admin-table td {
+  border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .admin-icon-btn {
+  background: var(--ios-fill);
+}
+
+[data-theme="dark"] .admin-input,
+[data-theme="dark"] .admin-textarea {
+  background: var(--ios-input-bg);
+  border-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .shift-instructions-card {
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.12) 0%, rgba(10, 132, 255, 0.06) 100%);
+  border-color: rgba(10, 132, 255, 0.25);
+}
+
+[data-theme="dark"] .shift-instructions-card .shift-instructions-title {
+  color: var(--ios-blue);
+}
+
+[data-theme="dark"] .user-management-container,
+[data-theme="dark"] .login-container {
+  background: var(--ios-card);
+  color: var(--ios-label);
+}
+
+[data-theme="dark"] .login-help {
+  border-top-color: var(--ios-separator);
+  color: var(--ios-secondary-label);
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { signInUser, resetPassword } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
+import ThemeToggle from './ThemeToggle';
 
 /* ─── Inline styles ─────────────────────────────────────────────────────────
    Kept here so the component is self-contained. All values follow
@@ -15,14 +16,14 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#f5f5f7',
+    background: 'var(--ios-bg)',
     padding: '24px 16px',
     fontFamily: FONT,
   },
   card: {
-    background: '#ffffff',
+    background: 'var(--ios-card)',
     borderRadius: '20px',
-    boxShadow: '0 2px 24px rgba(0,0,0,0.09)',
+    boxShadow: 'var(--ios-shadow)',
     padding: '48px 44px 40px',
     width: '100%',
     maxWidth: '400px',
@@ -43,14 +44,14 @@ const s = {
   hotelName: {
     fontSize: '22px',
     fontWeight: '600',
-    color: '#1d1d1f',
+    color: 'var(--ios-label)',
     letterSpacing: '-0.3px',
     margin: 0,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: '14px',
-    color: '#6e6e73',
+    color: 'var(--ios-secondary-label)',
     marginTop: '4px',
     textAlign: 'center',
     letterSpacing: '0px',
@@ -68,16 +69,16 @@ const s = {
   label: {
     fontSize: '13px',
     fontWeight: '500',
-    color: '#3a3a3c',
+    color: 'var(--ios-secondary-label)',
     letterSpacing: '0px',
   },
   input: {
     width: '100%',
     padding: '13px 15px',
     fontSize: '15px',
-    color: '#1d1d1f',
-    background: '#fafafa',
-    border: '1.5px solid #d1d1d6',
+    color: 'var(--ios-label)',
+    background: 'var(--ios-input-bg)',
+    border: '1.5px solid var(--ios-separator)',
     borderRadius: '10px',
     outline: 'none',
     boxSizing: 'border-box',
@@ -86,9 +87,9 @@ const s = {
     WebkitAppearance: 'none',
   },
   inputFocus: {
-    borderColor: '#1d1d1f',
-    boxShadow: '0 0 0 3px rgba(29,29,31,0.08)',
-    background: '#ffffff',
+    borderColor: 'var(--ios-label)',
+    boxShadow: '0 0 0 3px var(--ios-fill)',
+    background: 'var(--ios-input-bg-focus)',
   },
   button: {
     marginTop: '8px',
@@ -96,8 +97,8 @@ const s = {
     padding: '14px',
     fontSize: '15px',
     fontWeight: '500',
-    color: '#ffffff',
-    background: '#1d1d1f',
+    color: 'var(--ios-primary-btn-text)',
+    background: 'var(--ios-primary-btn-bg)',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
@@ -106,7 +107,7 @@ const s = {
     letterSpacing: '-0.1px',
   },
   buttonHover: {
-    background: '#3a3a3c',
+    background: 'var(--ios-primary-btn-bg-hover)',
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -120,7 +121,7 @@ const s = {
     background: 'none',
     border: 'none',
     fontSize: '13px',
-    color: '#6e6e73',
+    color: 'var(--ios-secondary-label)',
     cursor: 'pointer',
     padding: '0',
     fontFamily: FONT,
@@ -131,34 +132,34 @@ const s = {
     alignItems: 'flex-start',
     gap: '8px',
     padding: '12px 14px',
-    background: '#fff2f2',
-    border: '1px solid #ffd6d6',
+    background: 'var(--ios-error-bg)',
+    border: '1px solid var(--ios-error-border)',
     borderRadius: '10px',
     fontSize: '13px',
-    color: '#c0392b',
+    color: 'var(--ios-error-text)',
     lineHeight: '1.45',
   },
   success: {
     padding: '12px 14px',
-    background: '#f0fff4',
-    border: '1px solid #b2dfdb',
+    background: 'var(--ios-success-bg)',
+    border: '1px solid var(--ios-success-border)',
     borderRadius: '10px',
     fontSize: '13px',
-    color: '#1a7f4b',
+    color: 'var(--ios-success-text)',
     lineHeight: '1.45',
   },
   divider: {
     height: '1px',
-    background: '#f0f0f0',
+    background: 'var(--ios-separator)',
     margin: '24px 0',
   },
   backBtn: {
     background: 'none',
-    border: '1.5px solid #d1d1d6',
+    border: '1.5px solid var(--ios-separator)',
     borderRadius: '10px',
     padding: '12px',
     fontSize: '14px',
-    color: '#3a3a3c',
+    color: 'var(--ios-label)',
     cursor: 'pointer',
     width: '100%',
     fontFamily: FONT,
@@ -169,7 +170,7 @@ const s = {
     marginTop: '28px',
     textAlign: 'center',
     fontSize: '12px',
-    color: '#aeaeb2',
+    color: 'var(--ios-tertiary-label)',
     lineHeight: '1.5',
     maxWidth: '400px',
     width: '100%',
@@ -314,14 +315,15 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
 
     return (
       <div style={s.page}>
+        <ThemeToggle className="theme-toggle-fixed" />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           <div style={s.card}>
             <Header />
             <div style={s.divider} />
-            <p style={{ fontSize: '20px', fontWeight: '600', color: '#1d1d1f', marginTop: 0, marginBottom: '6px' }}>
+            <p style={{ fontSize: '20px', fontWeight: '600', color: 'var(--ios-label)', marginTop: 0, marginBottom: '6px' }}>
               Reset Password
             </p>
-            <p style={{ fontSize: '14px', color: '#6e6e73', marginTop: 0, marginBottom: '20px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ios-secondary-label)', marginTop: 0, marginBottom: '20px' }}>
               Enter your email and we'll send a reset link.
             </p>
 
@@ -361,6 +363,7 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
 
   return (
     <div style={s.page}>
+      <ThemeToggle className="theme-toggle-fixed" />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         <div style={s.card}>
           <Header />
@@ -405,8 +408,8 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
               type="button"
               style={s.forgotBtn}
               onClick={() => { setShowReset(true); setInlineError(''); }}
-              onMouseEnter={e => e.target.style.color = '#1d1d1f'}
-              onMouseLeave={e => e.target.style.color = '#6e6e73'}
+              onMouseEnter={e => { e.target.style.color = 'var(--ios-label)'; }}
+              onMouseLeave={e => { e.target.style.color = 'var(--ios-secondary-label)'; }}
             >
               Forgot Password?
             </button>

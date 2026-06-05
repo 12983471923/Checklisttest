@@ -18,6 +18,7 @@ import {
 } from '../firebase/database';
 import { ADMIN_EMAIL } from '../config/admin';
 import './admin.css';
+import ThemeToggle from './ThemeToggle';
 
 const SECTIONS = [
   { id: 'tasks', label: 'Tasks', icon: '✅' },
@@ -57,9 +58,12 @@ const AdminPanel = ({ onClose }) => {
               <p>Scandic Falkoner · {ADMIN_EMAIL}</p>
             </div>
           </div>
-          <button className="admin-close-btn" onClick={onClose} title="Back to checklist">
-            ✕ Exit
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <ThemeToggle />
+            <button className="admin-close-btn" onClick={onClose} title="Back to checklist">
+              ✕ Exit
+            </button>
+          </div>
         </header>
 
         <div className="admin-body">
