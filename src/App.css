@@ -182,8 +182,8 @@ body {
 /* Enhanced floating effect on scroll */
 .header-card.floating {
   transform: translateY(-3px);
-  border-color: #c7d2fe;
-  background: rgba(255, 255, 255, 1);
+  border-color: transparent;
+  background: var(--ios-card);
 }
 
 /* Smooth performance optimizations */
@@ -4864,8 +4864,8 @@ textarea {
   margin-bottom: 14px;
   color: var(--ios-label);
   backdrop-filter: none;
-  position: sticky;
-  top: 20px;
+  position: relative;
+  top: auto;
   transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
