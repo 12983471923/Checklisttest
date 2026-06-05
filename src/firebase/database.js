@@ -323,11 +323,11 @@ export const DEFAULT_PRICING = {
 };
 
 const normalizePricing = (data = {}) => ({
-  bikeRegular: data.bikeRegular ?? DEFAULT_PRICING.bikeRegular,
-  bikeLufthansa: data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa,
-  breakfastDuringBooking: data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking,
-  breakfastAtCheckIn: data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn,
-  breakfastOnTheDay: data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay,
+  bikeRegular: String(data.bikeRegular ?? DEFAULT_PRICING.bikeRegular),
+  bikeLufthansa: String(data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa),
+  breakfastDuringBooking: String(data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking),
+  breakfastAtCheckIn: String(data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn),
+  breakfastOnTheDay: String(data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay),
 });
 
 export const savePricingInfo = async (pricing) => {

@@ -101,8 +101,11 @@ const AdminPanel = ({ onClose }) => {
 /* ------------------------------------------------------------------ */
 /* Shared save-status pill                                            */
 /* ------------------------------------------------------------------ */
-const SaveStatus = ({ status }) => {
+const SaveStatus = ({ status, message }) => {
   if (!status) return null;
+  if (status === 'error' && message) {
+    return <span className="admin-save-status error" title={message}>Save failed</span>;
+  }
   return <span className={`admin-save-status ${status}`}>{status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved ✓' : 'Save failed'}</span>;
 };
 
@@ -707,6 +710,7 @@ const PricingSection = () => {
   const [pricing, setPricing] = useState({ ...DEFAULT_PRICING });
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -732,10 +736,12 @@ const PricingSection = () => {
 
   const save = async () => {
     setStatus('saving');
+    setErrorMessage('');
     for (const group of PRICING_FIELDS) {
       for (const field of group.fields) {
         if (!isValidPrice(pricing[field.key])) {
           setStatus('error');
+          setErrorMessage(`Invalid price for "${field.label}"`);
           alert(`Please enter a valid price for "${field.label}" (1-4 digits).`);
           setTimeout(() => setStatus(null), 2000);
           return;
@@ -751,11 +757,15 @@ const PricingSection = () => {
       await savePricingInfoToDB(normalizedPricing);
       setPricing(normalizedPricing);
       setStatus('saved');
+      setErrorMessage('');
       setTimeout(() => setStatus(null), 2000);
     } catch (error) {
       console.error('Error saving pricing info:', error);
+      const message = error?.message || 'Unknown error while saving pricing.';
+      setErrorMessage(message);
       setStatus('error');
-      setTimeout(() => setStatus(null), 2000);
+      alert(`Could not save pricing: ${message}`);
+      setTimeout(() => setStatus(null), 4000);
     }
   };
 
@@ -766,7 +776,7 @@ const PricingSection = () => {
           <h2>Pricing Information</h2>
           <p>Update bike rental and breakfast prices shown in the left sidebar.</p>
         </div>
-        <SaveStatus status={status} />
+        <SaveStatus status={status} message={errorMessage} />
       </div>
 
       {loading ? (
