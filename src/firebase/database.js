@@ -312,7 +312,9 @@ export const subscribeToBreakfastTimes = (callback) => {
 };
 
 // Pricing Information Functions
-const PRICING_COLLECTION = 'pricing-info';
+// Stored under breakfast-times/pricing so reads/writes use the existing
+// deployed Firestore rules for that collection (pricing-info is not deployed).
+const PRICING_DOC_ID = 'pricing';
 
 export const DEFAULT_PRICING = {
   bikeRegular: '175',
@@ -331,7 +333,7 @@ const normalizePricing = (data = {}) => ({
 });
 
 export const savePricingInfo = async (pricing) => {
-  const docRef = doc(db, PRICING_COLLECTION, 'current');
+  const docRef = doc(db, BREAKFAST_COLLECTION, PRICING_DOC_ID);
 
   try {
     await setDoc(docRef, {
@@ -345,7 +347,7 @@ export const savePricingInfo = async (pricing) => {
 };
 
 export const getPricingInfo = async () => {
-  const docRef = doc(db, PRICING_COLLECTION, 'current');
+  const docRef = doc(db, BREAKFAST_COLLECTION, PRICING_DOC_ID);
 
   try {
     const docSnap = await getDoc(docRef);
@@ -360,7 +362,7 @@ export const getPricingInfo = async () => {
 };
 
 export const subscribeToPricingInfo = (callback) => {
-  const docRef = doc(db, PRICING_COLLECTION, 'current');
+  const docRef = doc(db, BREAKFAST_COLLECTION, PRICING_DOC_ID);
 
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {

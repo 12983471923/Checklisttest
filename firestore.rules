@@ -102,11 +102,6 @@ service cloud.firestore {
       allow write: if isActive() && withinSizeLimit();
     }
 
-    match /pricing-info/{document} {
-      allow read: if isActive();
-      allow write: if isAdmin() && withinSizeLimit();
-    }
-
     // Audit trail — managers read; any active user can append; no edits/deletes
     match /auditTrail/{document} {
       allow read: if isManager();
