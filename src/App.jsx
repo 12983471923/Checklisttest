@@ -12,7 +12,9 @@ import {
   subscribeToWakeUpCalls,
   saveBreakfastTimes as saveBreakfastTimesToDB,
   getBreakfastTimes,
-  subscribeToBreakfastTimes
+  subscribeToBreakfastTimes,
+  subscribeToPricingInfo,
+  DEFAULT_PRICING,
 } from "./firebase/database";
 import { signOutUser } from "./firebase/auth";
 import { isAdminEmail } from "./config/admin";
@@ -81,6 +83,7 @@ function ChecklistApp({ userProfile, currentUser }) {
     date: new Date().toISOString().split('T')[0]
   });
   const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
+  const [pricingInfo, setPricingInfo] = useState({ ...DEFAULT_PRICING });
   const [showBreakfastModal, setShowBreakfastModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
@@ -105,6 +108,7 @@ function ChecklistApp({ userProfile, currentUser }) {
     const unsubscribeHandovers = subscribeToHandoverNotes(setSavedHandovers);
     const unsubscribeWakeUpCalls = subscribeToWakeUpCalls(setWakeUpCalls);
     const unsubscribeBreakfastTimes = subscribeToBreakfastTimes(setBreakfastTimes);
+    const unsubscribePricingInfo = subscribeToPricingInfo(setPricingInfo);
 
     // Load handover notes for current date
     getHandoverNotes(handoverDate).then(setHandoverNotes);
@@ -113,6 +117,7 @@ function ChecklistApp({ userProfile, currentUser }) {
       unsubscribeHandovers();
       unsubscribeWakeUpCalls();
       unsubscribeBreakfastTimes();
+      unsubscribePricingInfo();
     };
   }, []);
 
@@ -642,11 +647,11 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <div className="price-list">
                   <div className="price-item">
                     <span className="price-label">Regular rate:</span>
-                    <span className="price-value">175 DKK per person</span>
+                    <span className="price-value">{pricingInfo.bikeRegular} DKK per person</span>
                   </div>
                   <div className="price-item">
                     <span className="price-label">Lufthansa rate:</span>
-                    <span className="price-value">100 DKK per person</span>
+                    <span className="price-value">{pricingInfo.bikeLufthansa} DKK per person</span>
                   </div>
                 </div>
               </div>
@@ -656,15 +661,15 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <div className="price-list">
                   <div className="price-item">
                     <span className="price-label">During booking:</span>
-                    <span className="price-value">140 DKK</span>
+                    <span className="price-value">{pricingInfo.breakfastDuringBooking} DKK</span>
                   </div>
                   <div className="price-item">
                     <span className="price-label">At check-in:</span>
-                    <span className="price-value">179 DKK</span>
+                    <span className="price-value">{pricingInfo.breakfastAtCheckIn} DKK</span>
                   </div>
                   <div className="price-item">
                     <span className="price-label">On the day:</span>
-                    <span className="price-value">229 DKK</span>
+                    <span className="price-value">{pricingInfo.breakfastOnTheDay} DKK</span>
                   </div>
                 </div>
               </div>

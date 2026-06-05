@@ -310,3 +310,65 @@ export const subscribeToBreakfastTimes = (callback) => {
     console.error('Error listening to breakfast times updates:', error);
   });
 };
+
+// Pricing Information Functions
+const PRICING_COLLECTION = 'pricing-info';
+
+export const DEFAULT_PRICING = {
+  bikeRegular: '175',
+  bikeLufthansa: '100',
+  breakfastDuringBooking: '140',
+  breakfastAtCheckIn: '179',
+  breakfastOnTheDay: '229',
+};
+
+const normalizePricing = (data = {}) => ({
+  bikeRegular: data.bikeRegular ?? DEFAULT_PRICING.bikeRegular,
+  bikeLufthansa: data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa,
+  breakfastDuringBooking: data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking,
+  breakfastAtCheckIn: data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn,
+  breakfastOnTheDay: data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay,
+});
+
+export const savePricingInfo = async (pricing) => {
+  const docRef = doc(db, PRICING_COLLECTION, 'current');
+
+  try {
+    await setDoc(docRef, {
+      ...normalizePricing(pricing),
+      lastUpdated: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error('Error saving pricing info:', error);
+    throw error;
+  }
+};
+
+export const getPricingInfo = async () => {
+  const docRef = doc(db, PRICING_COLLECTION, 'current');
+
+  try {
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return normalizePricing(docSnap.data());
+    }
+    return { ...DEFAULT_PRICING };
+  } catch (error) {
+    console.error('Error getting pricing info:', error);
+    return { ...DEFAULT_PRICING };
+  }
+};
+
+export const subscribeToPricingInfo = (callback) => {
+  const docRef = doc(db, PRICING_COLLECTION, 'current');
+
+  return onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(normalizePricing(docSnap.data()));
+    } else {
+      callback({ ...DEFAULT_PRICING });
+    }
+  }, (error) => {
+    console.error('Error listening to pricing info updates:', error);
+  });
+};

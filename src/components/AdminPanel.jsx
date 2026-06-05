@@ -14,7 +14,10 @@ import {
 } from '../firebase/shiftConfig';
 import {
   getBreakfastTimes,
-  saveBreakfastTimes as saveBreakfastTimesToDB
+  saveBreakfastTimes as saveBreakfastTimesToDB,
+  getPricingInfo,
+  savePricingInfo as savePricingInfoToDB,
+  DEFAULT_PRICING,
 } from '../firebase/database';
 import { ADMIN_EMAIL } from '../config/admin';
 import './admin.css';
@@ -25,7 +28,8 @@ const SECTIONS = [
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'instructions', label: 'Instructions', icon: '📋' },
   { id: 'downtime', label: 'Downtime Times', icon: '⏱️' },
-  { id: 'breakfast', label: 'Breakfast Times', icon: '🍳' }
+  { id: 'breakfast', label: 'Breakfast Times', icon: '🍳' },
+  { id: 'pricing', label: 'Pricing', icon: '💰' },
 ];
 
 const AdminPanel = ({ onClose }) => {
@@ -86,6 +90,7 @@ const AdminPanel = ({ onClose }) => {
             {activeSection === 'instructions' && <InstructionsSection />}
             {activeSection === 'downtime' && <DowntimeSection />}
             {activeSection === 'breakfast' && <BreakfastSection />}
+            {activeSection === 'pricing' && <PricingSection />}
           </main>
         </div>
       </div>
@@ -666,6 +671,132 @@ const BreakfastSection = () => {
           </div>
           <button className="admin-btn admin-btn-primary" onClick={save}>
             Save Breakfast Times
+          </button>
+        </>
+      )}
+    </section>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* PRICING INFORMATION                                                */
+/* ------------------------------------------------------------------ */
+const PRICING_FIELDS = [
+  {
+    group: 'Bike Rental',
+    icon: '🚴',
+    fields: [
+      { key: 'bikeRegular', label: 'Regular rate (DKK per person)' },
+      { key: 'bikeLufthansa', label: 'Lufthansa rate (DKK per person)' },
+    ],
+  },
+  {
+    group: 'Breakfast Pricing',
+    icon: '🍳',
+    fields: [
+      { key: 'breakfastDuringBooking', label: 'During booking (DKK)' },
+      { key: 'breakfastAtCheckIn', label: 'At check-in (DKK)' },
+      { key: 'breakfastOnTheDay', label: 'On the day (DKK)' },
+    ],
+  },
+];
+
+const isValidPrice = (value) => /^\d{1,4}$/.test(String(value).trim());
+
+const PricingSection = () => {
+  const [pricing, setPricing] = useState({ ...DEFAULT_PRICING });
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const saved = await getPricingInfo();
+        if (!cancelled) setPricing(saved);
+      } catch (error) {
+        console.error('Error loading pricing info:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const updatePrice = (key, value) => {
+    setPricing((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const save = async () => {
+    setStatus('saving');
+    for (const group of PRICING_FIELDS) {
+      for (const field of group.fields) {
+        if (!isValidPrice(pricing[field.key])) {
+          setStatus('error');
+          alert(`Please enter a valid price for "${field.label}" (1-4 digits).`);
+          setTimeout(() => setStatus(null), 2000);
+          return;
+        }
+      }
+    }
+
+    const normalizedPricing = Object.fromEntries(
+      Object.entries(pricing).map(([key, value]) => [key, String(value).trim()])
+    );
+
+    try {
+      await savePricingInfoToDB(normalizedPricing);
+      setPricing(normalizedPricing);
+      setStatus('saved');
+      setTimeout(() => setStatus(null), 2000);
+    } catch (error) {
+      console.error('Error saving pricing info:', error);
+      setStatus('error');
+      setTimeout(() => setStatus(null), 2000);
+    }
+  };
+
+  return (
+    <section className="admin-section">
+      <div className="admin-section-head">
+        <div>
+          <h2>Pricing Information</h2>
+          <p>Update bike rental and breakfast prices shown in the left sidebar.</p>
+        </div>
+        <SaveStatus status={status} />
+      </div>
+
+      {loading ? (
+        <div className="admin-loading">Loading pricing…</div>
+      ) : (
+        <>
+          {PRICING_FIELDS.map((group) => (
+            <div className="admin-pricing-group" key={group.group}>
+              <h3 className="admin-pricing-group-title">{group.icon} {group.group}</h3>
+              <div className="admin-time-grid">
+                {group.fields.map((field) => (
+                  <div className="admin-time-item" key={field.key}>
+                    <label htmlFor={`pricing-${field.key}`}>{field.label}</label>
+                    <input
+                      id={`pricing-${field.key}`}
+                      className="admin-input"
+                      type="number"
+                      min="0"
+                      max="9999"
+                      inputMode="numeric"
+                      value={pricing[field.key]}
+                      onChange={(e) => updatePrice(field.key, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          <button className="admin-btn admin-btn-primary" onClick={save}>
+            Save Pricing
           </button>
         </>
       )}
