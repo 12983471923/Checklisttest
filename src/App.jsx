@@ -668,6 +668,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                     <span className="price-value">{pricingInfo.breakfastAtCheckIn} DKK</span>
                   </div>
                   <div className="price-item">
+                    <span className="price-label">Lufthansa Price:</span>
+                    <span className="price-value">{pricingInfo.breakfastLufthansa} DKK</span>
+                  </div>
+                  <div className="price-item">
                     <span className="price-label">On the day:</span>
                     <span className="price-value">{pricingInfo.breakfastOnTheDay} DKK</span>
                   </div>
