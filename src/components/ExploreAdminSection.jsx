@@ -21,6 +21,7 @@ import {
   runAutoSync,
   formatLastUpdated,
   getPendingPlaces,
+  getLocalExploreContent,
 } from '../firebase/exploreContent';
 import './explore-admin.css';
 
@@ -230,6 +231,7 @@ const ExploreAdminSection = () => {
   const [status, setStatus] = useState(null);
   const [activeCategory, setActiveCategory] = useState('attractions');
   const [view, setView] = useState('content');
+  const [syncWarning, setSyncWarning] = useState('');
   const statusTimer = useRef(null);
 
   const editor = useMemo(
@@ -252,45 +254,55 @@ const ExploreAdminSection = () => {
 
   useEffect(() => {
     let unsub = () => {};
-    ensureExploreContent()
-      .then((data) => {
+    setContent(getLocalExploreContent());
+    setLoading(false);
+
+    ensureExploreContent().then((data) => {
+      setContent(data);
+      setSyncWarning('');
+    });
+
+    unsub = subscribeExploreContent(
+      (data) => {
         setContent(data);
-        setLoading(false);
-        unsub = subscribeExploreContent(setContent);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+        setSyncWarning('');
+      },
+      () => {
+        setSyncWarning('Showing offline content — Firestore sync unavailable. Deploy updated Firestore rules to enable live sync.');
+      }
+    );
+
     return () => unsub();
   }, []);
 
+  const activeContent = content || getLocalExploreContent();
+
   const pendingPlaces = useMemo(
-    () => (content ? getPendingPlaces(content) : []),
-    [content]
+    () => getPendingPlaces(activeContent),
+    [activeContent]
   );
 
   const categoryPlaces = useMemo(() => {
-    if (!content) return [];
-    return content.places
+    return activeContent.places
       .filter((p) => p.categoryId === activeCategory)
       .sort((a, b) => {
         if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
         return (a.order ?? 0) - (b.order ?? 0);
       });
-  }, [content, activeCategory]);
+  }, [activeContent, activeCategory]);
 
-  const activeCat = content?.categories.find((c) => c.id === activeCategory);
+  const activeCat = activeContent.categories.find((c) => c.id === activeCategory);
 
   const runAction = async (action) => {
-    if (!content) return;
+    if (!activeContent) return;
     flash('saving');
     try {
-      const next = await action(content);
+      const next = await action(activeContent);
       setContent(next);
       flash('saved');
     } catch (err) {
       console.error(err);
+      setSyncWarning(err.message || 'Save failed — changes may only be stored on this device.');
       flash('error');
     }
   };
@@ -316,11 +328,17 @@ const ExploreAdminSection = () => {
     runAction((c) => fn(c, placeId, editor));
   };
 
-  if (loading) return <div className="admin-loading">Loading Explore Copenhagen content…</div>;
-  if (!content) return <div className="admin-empty">Could not load explore content.</div>;
+  if (loading && !content) {
+    return <div className="admin-loading">Loading Explore Copenhagen content…</div>;
+  }
 
   return (
     <section className="admin-section explore-admin-section">
+      {syncWarning && (
+        <div className="explore-admin-sync-warning" role="status">
+          {syncWarning}
+        </div>
+      )}
       <div className="admin-section-head">
         <div>
           <h2>Explore Copenhagen</h2>
@@ -371,7 +389,7 @@ const ExploreAdminSection = () => {
                 <PlaceEditor
                   key={place.id}
                   place={place}
-                  categories={content.categories}
+                  categories={activeContent.categories}
                   onSave={handlePlaceSave}
                   onDelete={(id) => {
                     if (window.confirm(`Remove "${place.name}"?`)) runAction((c) => removePlace(c, id));
@@ -388,29 +406,29 @@ const ExploreAdminSection = () => {
 
       {view === 'categories' && (
         <div className="explore-admin-categories">
-          {[...content.categories].sort((a, b) => a.order - b.order).map((cat, index) => (
+          {[...activeContent.categories].sort((a, b) => a.order - b.order).map((cat, index) => (
             <div key={cat.id} className="explore-admin-category-row">
               <div className="explore-admin-category-reorder">
                 <button type="button" className="admin-icon-btn" disabled={index === 0} onClick={() => runAction((c) => reorderCategories(c, cat.id, -1))}>▲</button>
-                <button type="button" className="admin-icon-btn" disabled={index === content.categories.length - 1} onClick={() => runAction((c) => reorderCategories(c, cat.id, 1))}>▼</button>
+                <button type="button" className="admin-icon-btn" disabled={index === activeContent.categories.length - 1} onClick={() => runAction((c) => reorderCategories(c, cat.id, 1))}>▼</button>
               </div>
               <input
                 className="admin-input explore-admin-cat-icon"
                 value={cat.icon}
-                onChange={(e) => setContent({ ...content, categories: content.categories.map((c) => c.id === cat.id ? { ...c, icon: e.target.value } : c) })}
+                onChange={(e) => setContent({ ...activeContent, categories: activeContent.categories.map((c) => c.id === cat.id ? { ...c, icon: e.target.value } : c) })}
                 onBlur={() => runAction((c) => updateCategory(c, cat.id, { icon: cat.icon }, editor, { publish: isManager }))}
               />
               <input
                 className="admin-input"
                 value={cat.name}
-                onChange={(e) => setContent({ ...content, categories: content.categories.map((c) => c.id === cat.id ? { ...c, name: e.target.value } : c) })}
+                onChange={(e) => setContent({ ...activeContent, categories: activeContent.categories.map((c) => c.id === cat.id ? { ...c, name: e.target.value } : c) })}
                 onBlur={() => runAction((c) => updateCategory(c, cat.id, { name: stripHtml(cat.name) }, editor, { publish: isManager }))}
               />
               <input
                 className="admin-input"
                 value={cat.description}
                 placeholder="Description"
-                onChange={(e) => setContent({ ...content, categories: content.categories.map((c) => c.id === cat.id ? { ...c, description: e.target.value } : c) })}
+                onChange={(e) => setContent({ ...activeContent, categories: activeContent.categories.map((c) => c.id === cat.id ? { ...c, description: e.target.value } : c) })}
                 onBlur={() => runAction((c) => updateCategory(c, cat.id, { description: stripHtml(cat.description) }, editor, { publish: isManager }))}
               />
               {cat.custom && (
@@ -435,7 +453,7 @@ const ExploreAdminSection = () => {
       {view === 'content' && (
         <div className="explore-admin-layout">
           <nav className="explore-admin-sidebar">
-            {[...content.categories].sort((a, b) => a.order - b.order).map((cat) => (
+            {[...activeContent.categories].sort((a, b) => a.order - b.order).map((cat) => (
               <button
                 key={cat.id}
                 type="button"
@@ -444,7 +462,7 @@ const ExploreAdminSection = () => {
               >
                 <span>{cat.icon}</span>
                 <span>{cat.name}</span>
-                <small>{content.places.filter((p) => p.categoryId === cat.id).length}</small>
+                <small>{activeContent.places.filter((p) => p.categoryId === cat.id).length}</small>
               </button>
             ))}
           </nav>
@@ -460,8 +478,8 @@ const ExploreAdminSection = () => {
                     value={activeCat.note}
                     onChange={(e) =>
                       setContent({
-                        ...content,
-                        categories: content.categories.map((c) =>
+                        ...activeContent,
+                        categories: activeContent.categories.map((c) =>
                           c.id === activeCategory ? { ...c, note: e.target.value } : c
                         ),
                       })
@@ -490,7 +508,7 @@ const ExploreAdminSection = () => {
                 <PlaceEditor
                   key={place.id}
                   place={place}
-                  categories={content.categories}
+                  categories={activeContent.categories}
                   onSave={handlePlaceSave}
                   onDelete={(id) => {
                     if (window.confirm(`Remove "${place.name}"?`)) runAction((c) => removePlace(c, id));

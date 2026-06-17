@@ -105,7 +105,7 @@ const PlaceCard = ({ place, categoryId }) => {
 
 const CategoryMapModal = ({ isOpen, onClose }) => {
   const { isAuthenticated } = useAuth();
-  const { categories, getPlacesByCategory, featuredPlaces, loading, content } = useExploreContent();
+  const { categories, getPlacesByCategory, featuredPlaces, loading, content, usingLocalFallback } = useExploreContent();
   const [selectedCategory, setSelectedCategory] = useState('attractions');
   const [searchTerm, setSearchTerm] = useState('');
   const [showEditor, setShowEditor] = useState(false);
@@ -228,6 +228,12 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {usingLocalFallback && (
+          <div className="explore-offline-banner" role="status">
+            Showing saved recommendations — live sync will resume when Firestore is available.
           </div>
         )}
 

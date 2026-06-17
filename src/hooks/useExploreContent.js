@@ -4,44 +4,40 @@ import {
   subscribeExploreContent,
   getPublishedCategories,
   getPublishedPlaces,
+  getLocalExploreContent,
 } from '../firebase/exploreContent';
 
 export const useExploreContent = ({ publishedOnly = true } = {}) => {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [usingLocalFallback, setUsingLocalFallback] = useState(false);
 
   useEffect(() => {
     let unsub = () => {};
     let mounted = true;
 
-    const init = async () => {
-      try {
-        await ensureExploreContent();
-      } catch (err) {
-        console.error('Explore content init failed:', err);
-        if (mounted) setError(err.message);
-      }
-    };
+    setContent(getLocalExploreContent());
+    setLoading(false);
 
-    init().then(() => {
-      unsub = subscribeExploreContent(
-        (data) => {
-          if (mounted) {
-            setContent(data);
-            setLoading(false);
-            setError(null);
-          }
-        },
-        (err) => {
-          console.error('Explore content subscription error:', err);
-          if (mounted) {
-            setError(err.message);
-            setLoading(false);
-          }
-        }
-      );
+    ensureExploreContent().then((data) => {
+      if (mounted) setContent(data);
     });
+
+    unsub = subscribeExploreContent(
+      (data) => {
+        if (mounted) {
+          setContent(data);
+          setLoading(false);
+        }
+      },
+      () => {
+        if (mounted) {
+          setUsingLocalFallback(true);
+          setError('Using offline content — Firestore sync unavailable.');
+        }
+      }
+    );
 
     return () => {
       mounted = false;
@@ -89,5 +85,6 @@ export const useExploreContent = ({ publishedOnly = true } = {}) => {
     getPlacesByCategory,
     loading,
     error,
+    usingLocalFallback,
   };
 };

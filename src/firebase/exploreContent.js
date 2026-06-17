@@ -32,8 +32,31 @@ export const PLACE_FIELDS = [
 export const CATEGORY_FIELDS = ['name', 'icon', 'description', 'note'];
 
 const docRef = () => doc(db, EXPLORE_DOC, EXPLORE_ID);
+const LOCAL_CACHE_KEY = 'explore-content-cache';
 
 const nowIso = () => new Date().toISOString();
+
+export const getSeedContent = () => normalizeExploreContent(EXPLORE_SEED);
+
+const getCachedContent = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+    if (raw) return normalizeExploreContent(JSON.parse(raw));
+  } catch (error) {
+    console.warn('Explore local cache read failed:', error);
+  }
+  return null;
+};
+
+const setCachedContent = (content) => {
+  try {
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(content));
+  } catch (error) {
+    console.warn('Explore local cache write failed:', error);
+  }
+};
+
+export const getLocalExploreContent = () => getCachedContent() || getSeedContent();
 
 const sortCategories = (categories) =>
   [...categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -64,26 +87,48 @@ export const getPendingPlaces = (content) =>
   (content?.places || []).filter((p) => p.status === 'pending' || p.pendingUpdate);
 
 export const ensureExploreContent = async () => {
-  const ref = docRef();
-  const snap = await getDoc(ref);
-  if (snap.exists()) {
-    return normalizeExploreContent(snap.data());
+  try {
+    const snap = await getDoc(docRef());
+    if (snap.exists()) {
+      const content = normalizeExploreContent(snap.data());
+      setCachedContent(content);
+      return content;
+    }
+
+    const seed = getSeedContent();
+    try {
+      await setDoc(docRef(), EXPLORE_SEED);
+      setCachedContent(seed);
+    } catch (seedError) {
+      console.warn('Explore seed write failed — using local data:', seedError);
+    }
+    return seed;
+  } catch (error) {
+    console.warn('Explore Firestore unavailable — using local data:', error);
+    return getLocalExploreContent();
   }
-  await setDoc(ref, EXPLORE_SEED);
-  return normalizeExploreContent(EXPLORE_SEED);
 };
 
 export const subscribeExploreContent = (callback, onError) => {
+  // Deliver cached/seed data immediately so the UI never stays blank
+  callback(getLocalExploreContent());
+
   return onSnapshot(
     docRef(),
     (snap) => {
       if (snap.exists()) {
-        callback(normalizeExploreContent(snap.data()));
+        const content = normalizeExploreContent(snap.data());
+        setCachedContent(content);
+        callback(content);
       } else {
-        callback(normalizeExploreContent(EXPLORE_SEED));
+        callback(getSeedContent());
       }
     },
-    onError
+    (error) => {
+      console.warn('Explore subscription error — using local data:', error);
+      callback(getLocalExploreContent());
+      onError?.(error);
+    }
   );
 };
 
@@ -92,8 +137,16 @@ export const saveExploreContent = async (content) => {
     ...content,
     version: (content.version ?? 0) + 1,
   };
-  await setDoc(docRef(), payload);
-  return payload;
+  setCachedContent(payload);
+  try {
+    await setDoc(docRef(), payload);
+    return payload;
+  } catch (error) {
+    console.error('Explore save to Firestore failed:', error);
+    throw new Error(
+      'Could not sync to Firestore. Changes are saved locally on this device — deploy updated Firestore rules if this persists.'
+    );
+  }
 };
 
 const withEditorMeta = (item, user, source = 'manual') => ({
