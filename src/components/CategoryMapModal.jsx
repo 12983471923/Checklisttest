@@ -3,6 +3,8 @@ import { useExploreContent } from '../hooks/useExploreContent';
 import { formatLastUpdated } from '../firebase/exploreContent';
 import { useAuth } from '../hooks/useAuth';
 import ExploreAdminSection from './ExploreAdminSection';
+import './FloatingMapButton.css';
+import './explore-ui.css';
 
 const HOTEL_ADDRESS = 'Scandic Falkoner, Falkoner Alle 9, 2000 Frederiksberg, Denmark';
 
@@ -28,27 +30,23 @@ const includesSearchTerm = (place, searchTerm) => {
   return haystack.includes(searchTerm.toLowerCase());
 };
 
-const PlaceCard = ({ place, categoryId }) => {
+const PlaceRow = ({ place }) => {
   const updated = formatLastUpdated(place.lastUpdated, place.updateSource);
 
   return (
     <article
       className={`explore-place-card ${place.pinned ? 'is-pinned' : ''} ${place.featured ? 'is-featured' : ''}`}
-      key={`${categoryId}-${place.id}`}
     >
       <div className="explore-card-top">
         <div className="explore-place-icon" aria-hidden="true">{place.icon}</div>
         <div className="explore-card-heading">
           <div className="explore-card-title-row">
             <h4>{place.name}</h4>
-            {place.pinned && <span className="explore-pin-badge" title="Pinned recommendation">📌</span>}
-            {place.featured && <span className="explore-featured-badge" title="Featured">⭐</span>}
+            {place.pinned && <span className="explore-pin-badge" title="Pinned">•</span>}
           </div>
           {place.distance && <p className="explore-distance">{place.distance}</p>}
           {place.lastUpdated && (
-            <span className={`explore-card-updated ${updated.type}`} title={updated.label}>
-              {updated.label}
-            </span>
+            <span className={`explore-card-updated ${updated.type}`}>{updated.label}</span>
           )}
         </div>
       </div>
@@ -57,7 +55,7 @@ const PlaceCard = ({ place, categoryId }) => {
 
       {place.staffTip && (
         <div className="explore-staff-tip">
-          <span>Front desk tip</span>
+          <span>Staff tip</span>
           <p>{place.staffTip}</p>
         </div>
       )}
@@ -71,12 +69,12 @@ const PlaceCard = ({ place, categoryId }) => {
       )}
 
       <div className="explore-contact-list">
-        {place.address && <span>📍 {place.address}</span>}
-        {place.openingHours && <span>🕐 {place.openingHours}</span>}
+        {place.address && <span>{place.address}</span>}
+        {place.openingHours && <span>{place.openingHours}</span>}
         {place.phone && (
-          <a href={`tel:${place.phone.replace(/\s/g, '')}`}>📞 {place.phone}</a>
+          <a href={`tel:${place.phone.replace(/\s/g, '')}`}>{place.phone}</a>
         )}
-        {place.email && <a href={`mailto:${place.email}`}>✉️ {place.email}</a>}
+        {place.email && <a href={`mailto:${place.email}`}>{place.email}</a>}
       </div>
 
       <div className="explore-card-actions">
@@ -86,7 +84,7 @@ const PlaceCard = ({ place, categoryId }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          View on Map
+          Directions
         </a>
         {place.website && (
           <a
@@ -95,7 +93,7 @@ const PlaceCard = ({ place, categoryId }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Official info
+            Website
           </a>
         )}
       </div>
@@ -151,15 +149,15 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
   if (showEditor && isAuthenticated) {
     return (
       <div className="map-modal-overlay explore-overlay" onClick={onClose}>
-        <div className="explore-staff-editor" onClick={(e) => e.stopPropagation()}>
+        <div className="explore-staff-editor explore-premium" onClick={(e) => e.stopPropagation()}>
           <header className="explore-staff-editor-header">
             <div>
               <h2>Manage Explore Copenhagen</h2>
-              <p>Edit recommendations, events, and categories. Changes may require manager approval.</p>
+              <p>Edit recommendations, events, and categories.</p>
             </div>
             <div className="explore-staff-editor-actions">
               <button type="button" className="explore-secondary-link" onClick={() => setShowEditor(false)}>
-                ← Back to guide
+                Back
               </button>
               <button type="button" className="map-modal-close explore-close" onClick={onClose} aria-label="Close">
                 ×
@@ -177,19 +175,15 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
   return (
     <div className="map-modal-overlay explore-overlay" onClick={onClose}>
       <div className="map-modal-content explore-modal-content explore-premium" onClick={(event) => event.stopPropagation()}>
-        <div className="explore-hero">
+        <header className="explore-hero">
           <div>
-            <span className="explore-eyebrow">Digital concierge · Scandic Falkoner</span>
+            <span className="explore-eyebrow">Scandic Falkoner</span>
             <h2>Explore Copenhagen</h2>
-            <p>
-              Live recommendations for attractions, events, dining, transport and local essentials — curated for front desk and guests.
-            </p>
+            <p>Attractions, events, dining, transport and local essentials for front desk and guests.</p>
             <div className="explore-hero-meta">
-              <span>📍 Falkoner Alle 9</span>
-              {content?.lastAutoSync && (
-                <span>🔄 Live sync active</span>
-              )}
-              <span>🗺️ Directions via Google Maps</span>
+              <span>Falkoner Alle 9</span>
+              {content?.lastAutoSync && <span>Live sync</span>}
+              <span>{categories.length} categories · {totalPlaces} places</span>
             </div>
           </div>
           <div className="explore-hero-actions">
@@ -198,20 +192,19 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
                 type="button"
                 className="explore-manage-btn"
                 onClick={() => setShowEditor(true)}
-                title="Manage content"
               >
-                ✏️ Manage
+                Manage
               </button>
             )}
-            <button className="map-modal-close explore-close" onClick={onClose} aria-label="Close Explore Copenhagen">
+            <button className="map-modal-close explore-close" onClick={onClose} aria-label="Close">
               ×
             </button>
           </div>
-        </div>
+        </header>
 
         {featuredPlaces.length > 0 && !searchTerm && (
           <div className="explore-featured-strip">
-            <h3>Featured recommendations</h3>
+            <h3>Featured</h3>
             <div className="explore-featured-scroll">
               {featuredPlaces.slice(0, 6).map((place) => (
                 <button
@@ -223,7 +216,6 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
                     setSearchTerm('');
                   }}
                 >
-                  <span>{place.icon}</span>
                   <span>{place.name}</span>
                 </button>
               ))}
@@ -233,7 +225,7 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
 
         {usingLocalFallback && (
           <div className="explore-offline-banner" role="status">
-            Showing saved recommendations — live sync will resume when Firestore is available.
+            Offline mode — showing saved content on this device.
           </div>
         )}
 
@@ -244,7 +236,7 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Airport, pharmacy, jazz, dinner…"
+              placeholder="Search places, events, tips…"
             />
           </label>
           <div className="explore-quick-links" aria-label="Helpful links">
@@ -263,11 +255,11 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
         {loading ? (
           <div className="explore-loading">
             <div className="explore-loading-spinner" />
-            <p>Loading recommendations…</p>
+            <p>Loading…</p>
           </div>
         ) : (
           <div className="explore-layout">
-            <aside className="explore-sidebar" aria-label="Explore Copenhagen categories">
+            <aside className="explore-sidebar" aria-label="Categories">
               {categories.map((category) => (
                 <button
                   key={category.id}
@@ -278,7 +270,7 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
                   <span className="explore-category-icon">{category.icon}</span>
                   <span className="explore-category-text">
                     <strong>{category.name}</strong>
-                    <small>{category.count} recommendations</small>
+                    <small>{category.count}</small>
                   </span>
                 </button>
               ))}
@@ -289,31 +281,28 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
                 <>
                   <div className="explore-section-header">
                     <div>
-                      <h3>
-                        <span>{activeCategory.icon}</span>
-                        {activeCategory.name}
-                      </h3>
+                      <h3>{activeCategory.name}</h3>
                       <p>{activeCategory.description}</p>
                     </div>
-                    <div className="explore-count">{visiblePlaces.length} shown</div>
+                    <div className="explore-count">{visiblePlaces.length}</div>
                   </div>
 
                   {activeCategory.note && (
                     <div className="explore-advisory">
-                      <strong>Staff note:</strong> {activeCategory.note}
+                      <strong>Note.</strong> {activeCategory.note}
                     </div>
                   )}
 
                   {visiblePlaces.length > 0 ? (
                     <div className="explore-card-grid">
                       {visiblePlaces.map((place) => (
-                        <PlaceCard key={place.id} place={place} categoryId={selectedCategory} />
+                        <PlaceRow key={place.id} place={place} />
                       ))}
                     </div>
                   ) : (
                     <div className="explore-empty-state">
-                      <h4>No matches found</h4>
-                      <p>Try a broader search term or choose another category.</p>
+                      <h4>No results</h4>
+                      <p>Try a different search or category.</p>
                     </div>
                   )}
                 </>
@@ -322,12 +311,12 @@ const CategoryMapModal = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        <div className="map-footer explore-footer">
+        <footer className="map-footer explore-footer">
           <div className="map-stats">
-            📂 {categories.length} categories · 📍 {totalPlaces} recommendations
+            {categories.length} categories · {totalPlaces} recommendations
           </div>
-          <div className="map-credits">Confirm opening hours, prices and event dates before booking</div>
-        </div>
+          <div className="map-credits">Confirm hours and prices before booking</div>
+        </footer>
       </div>
     </div>
   );
