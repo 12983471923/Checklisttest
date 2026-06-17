@@ -124,6 +124,12 @@ service cloud.firestore {
       allow write: if isAdmin() && withinSizeLimit();
     }
 
+    // Explore Copenhagen content — all active staff read and edit (approval in app)
+    match /exploreContent/{document} {
+      allow read: if isActive();
+      allow write: if isActive() && withinSizeLimit();
+    }
+
     // Deny all other collections by default
     match /{document=**} {
       allow read, write: if false;

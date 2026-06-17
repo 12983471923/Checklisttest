@@ -23,8 +23,11 @@ import { ADMIN_EMAIL } from '../config/admin';
 import './admin.css';
 import ThemeToggle from './ThemeToggle';
 
+import ExploreAdminSection from './ExploreAdminSection';
+
 const SECTIONS = [
   { id: 'tasks', label: 'Tasks', icon: '✅' },
+  { id: 'explore', label: 'Explore Copenhagen', icon: '🗺️' },
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'instructions', label: 'Instructions', icon: '📋' },
   { id: 'downtime', label: 'Downtime Times', icon: '⏱️' },
@@ -86,6 +89,7 @@ const AdminPanel = ({ onClose }) => {
 
           <main className="admin-content">
             {activeSection === 'tasks' && <TasksSection />}
+            {activeSection === 'explore' && <ExploreAdminSection />}
             {activeSection === 'users' && <UsersSection />}
             {activeSection === 'instructions' && <InstructionsSection />}
             {activeSection === 'downtime' && <DowntimeSection />}
