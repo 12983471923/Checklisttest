@@ -23,7 +23,7 @@ const Sidebar = ({
             <span className="info-icon">📞</span>
             <div className="info-content">
               <span className="info-label">Main Phone:</span>
-              <span className="info-value">+45 38 15 80 01</span>
+                <span className="info-value">+45 72 42 55 00</span>
             </div>
           </div>
           

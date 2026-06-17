@@ -4,7 +4,6 @@ import './FloatingMapButton.css';
 
 const FloatingMapButton = () => {
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleOpenMap = () => {
     setIsMapOpen(true);
@@ -17,10 +16,8 @@ const FloatingMapButton = () => {
   return (
     <>
       <button
-        className={`floating-map-button ${isHovered ? 'hovered' : ''}`}
+        className="floating-map-button"
         onClick={handleOpenMap}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         title="Explore Copenhagen"
         aria-label="Open map with recommended places in Copenhagen"
       >
@@ -36,11 +33,7 @@ const FloatingMapButton = () => {
             fill="currentColor"
           />
         </svg>
-        {isHovered && (
-          <span className="button-tooltip">
-            Explore Copenhagen
-          </span>
-        )}
+        <span className="floating-map-label">Explore</span>
       </button>
       
       <SimpleMapModal 
