@@ -699,6 +699,7 @@ const PRICING_FIELDS = [
     fields: [
       { key: 'breakfastDuringBooking', label: 'During booking (DKK)' },
       { key: 'breakfastAtCheckIn', label: 'At check-in (DKK)' },
+      { key: 'breakfastLufthansa', label: 'Lufthansa Price (DKK)' },
       { key: 'breakfastOnTheDay', label: 'On the day (DKK)' },
     ],
   },

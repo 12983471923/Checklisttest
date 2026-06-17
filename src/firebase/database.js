@@ -321,6 +321,7 @@ export const DEFAULT_PRICING = {
   bikeLufthansa: '100',
   breakfastDuringBooking: '140',
   breakfastAtCheckIn: '179',
+  breakfastLufthansa: '100',
   breakfastOnTheDay: '229',
 };
 
@@ -329,6 +330,7 @@ const normalizePricing = (data = {}) => ({
   bikeLufthansa: String(data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa),
   breakfastDuringBooking: String(data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking),
   breakfastAtCheckIn: String(data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn),
+  breakfastLufthansa: String(data.breakfastLufthansa ?? DEFAULT_PRICING.breakfastLufthansa),
   breakfastOnTheDay: String(data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay),
 });
 

@@ -1,7 +1,9 @@
 import React from 'react';
+import { DEFAULT_PRICING } from '../firebase/database';
 
 const Sidebar = ({ 
   breakfastTimes, 
+  pricingInfo = DEFAULT_PRICING,
   onBreakfastEdit,
   handoverDate,
   onHandoverDateChange,
@@ -94,11 +96,11 @@ const Sidebar = ({
             <div className="price-list">
               <div className="price-item">
                 <span className="price-label">Regular rate:</span>
-                <span className="price-value">175 DKK per person</span>
+                <span className="price-value">{pricingInfo.bikeRegular} DKK per person</span>
               </div>
               <div className="price-item">
                 <span className="price-label">Lufthansa rate:</span>
-                <span className="price-value">100 DKK per person</span>
+                <span className="price-value">{pricingInfo.bikeLufthansa} DKK per person</span>
               </div>
             </div>
           </div>
@@ -108,15 +110,19 @@ const Sidebar = ({
             <div className="price-list">
               <div className="price-item">
                 <span className="price-label">During booking:</span>
-                <span className="price-value">140 DKK</span>
+                <span className="price-value">{pricingInfo.breakfastDuringBooking} DKK</span>
               </div>
               <div className="price-item">
                 <span className="price-label">At check-in:</span>
-                <span className="price-value">179 DKK</span>
+                <span className="price-value">{pricingInfo.breakfastAtCheckIn} DKK</span>
+              </div>
+              <div className="price-item">
+                <span className="price-label">Lufthansa Price:</span>
+                <span className="price-value">{pricingInfo.breakfastLufthansa} DKK</span>
               </div>
               <div className="price-item">
                 <span className="price-label">On the day:</span>
-                <span className="price-value">229 DKK</span>
+                <span className="price-value">{pricingInfo.breakfastOnTheDay} DKK</span>
               </div>
             </div>
           </div>
