@@ -112,32 +112,47 @@
   }
 
   .top-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px !important;
   }
 
   .night-title {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
+    flex: 1 1 120px;
+    min-width: 0;
+    margin: 0;
   }
 
+  /* Compact iOS-style segmented shift control */
   .shift-selector {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0 !important;
+    width: min(100%, 260px) !important;
+    max-width: 260px !important;
+    margin: 0 0 0 auto !important;
+    padding: 3px !important;
+    flex: 1 1 200px;
   }
 
   .shift-btn {
-    min-height: 44px;
-    font-size: 0.88rem;
+    min-height: 32px !important;
+    height: auto;
+    padding: 5px 6px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2;
   }
 
   /* Meta bar */
   .meta-bar {
     flex-direction: column;
     align-items: stretch !important;
-    gap: 12px;
-    padding: 12px 14px;
+    gap: 8px;
+    padding: 8px 12px !important;
   }
 
   .meta-bar-info,
@@ -175,23 +190,83 @@
     font-size: 0.88rem;
   }
 
-  /* Task cards */
-  .task-card {
-    grid-template-columns: 1fr !important;
-    gap: 10px;
-    padding: 14px;
-  }
-
-  .task-card-actions {
-    width: 100%;
-    flex-wrap: wrap;
+  /* Task cards — compact row layout */
+  .task-list {
     gap: 8px;
   }
 
+  .task-card {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .task-checkbox-control {
+    width: 28px;
+    height: 28px;
+  }
+
+  .ios-checkbox {
+    width: 22px;
+    height: 22px;
+  }
+
+  .task-title {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .task-title-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .task-card-body {
+    min-width: 0;
+  }
+
+  .task-card-actions {
+    grid-column: 1 / -1 !important;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-left: 34px !important;
+    justify-content: flex-start !important;
+  }
+
   .task-card-actions button {
-    flex: 1 1 auto;
-    min-height: 44px;
-    min-width: 44px;
+    flex: 0 1 auto !important;
+    min-height: 32px !important;
+    min-width: auto !important;
+    padding: 5px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .info-btn {
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 4px !important;
+  }
+
+  .progress-bar {
+    margin-bottom: 6px;
+  }
+
+  .progress-summary {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+
+  .shift-instructions-card,
+  .shift-instructions-card p {
+    font-size: 0.84rem;
+  }
+
+  .downtime-checklist {
+    margin-top: 12px;
   }
 
   /* Header cards in sidebar */
@@ -448,12 +523,40 @@
     grid-template-columns: 1fr;
   }
 
-  .shift-selector {
-    grid-template-columns: 1fr;
+  .top-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .night-title {
-    font-size: 1.35rem;
+    font-size: 1.05rem;
+  }
+
+  .shift-selector {
+    grid-template-columns: repeat(3, 1fr) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .shift-btn {
+    min-height: 30px !important;
+    font-size: 0.72rem !important;
+    padding: 4px 4px !important;
+  }
+
+  .task-card {
+    padding: 9px 10px !important;
+    gap: 8px !important;
+  }
+
+  .task-card-actions {
+    padding-left: 30px !important;
+  }
+
+  .task-title {
+    font-size: 0.84rem !important;
   }
 
   .footer-text {
@@ -504,8 +607,6 @@
 /* ── Touch devices ────────────────────────────────────────────── */
 @media (hover: none) and (pointer: coarse) {
   button,
-  .shift-btn,
-  .task-card-actions button,
   .explore-category-button,
   .explore-map-link,
   .explore-secondary-link,
@@ -515,10 +616,18 @@
     min-height: 44px;
   }
 
+  .shift-btn {
+    min-height: 32px !important;
+  }
+
+  .task-card-actions button {
+    min-height: 32px !important;
+  }
+
   .task-checkbox,
   .downtime-checkbox {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
   }
 }
 
