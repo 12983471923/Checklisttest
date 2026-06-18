@@ -25,6 +25,7 @@ import FloatingMapButton from "./components/FloatingMapButton";
 import ThemeToggle from "./components/ThemeToggle";
 import 'leaflet/dist/leaflet.css';
 import "./App.css";
+import "./responsive.css";
 import "./components/auth.css";
 
 function App() {
@@ -58,6 +59,9 @@ function ChecklistApp({ userProfile, currentUser }) {
   // Admin requires BOTH the hardcoded admin email AND the Firestore role.
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === "admin";
   const [showAdmin, setShowAdmin] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth > 1024
+  );
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
   const [showChangeInitials, setShowChangeInitials] = useState(false);
@@ -201,6 +205,17 @@ function ChecklistApp({ userProfile, currentUser }) {
       setInitialsSubmitted(true);
     }
   }, [profileInitials]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setMobileSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Handle initials submit
   const handleInitialsSubmit = (e) => {
@@ -566,8 +581,17 @@ function ChecklistApp({ userProfile, currentUser }) {
     <div className="checklist-container">
       {/* Main layout with sidebar and content */}
       <div className="main-layout">
-        {/* Left sidebar with hotel info */}
-        <div className="left-sidebar">
+        <button
+          type="button"
+          className="mobile-sidebar-toggle"
+          aria-expanded={mobileSidebarOpen}
+          onClick={() => setMobileSidebarOpen((open) => !open)}
+        >
+          <span>Hotel info &amp; quick links</span>
+          <span className="mobile-sidebar-toggle-icon" aria-hidden="true">▼</span>
+        </button>
+
+        <div className={`left-sidebar ${mobileSidebarOpen ? '' : 'is-collapsed'}`}>
           <div className="header-card">
             <strong>🏨 Scandic Falkoner</strong>
             
@@ -825,7 +849,7 @@ function ChecklistApp({ userProfile, currentUser }) {
 
           {/* Meta bar */}
           <div className="meta-bar">
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div className="meta-bar-info">
           <span className="meta-bar-user">
             Logged in as <strong>{displayName}</strong>
           </span>
@@ -834,7 +858,7 @@ function ChecklistApp({ userProfile, currentUser }) {
             &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
           </span>
         </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div className="meta-bar-actions">
             <ThemeToggle />
             <WeatherWidget />
             {isAdmin && (
@@ -1570,7 +1594,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 </div>
               </div>
 
-              <div className="wakeup-fullscreen-table-container">
+              <div className="wakeup-fullscreen-table-container is-mobile-cards">
                 <table className="wakeup-fullscreen-table">
                   <thead>
                     <tr>
@@ -1594,10 +1618,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                       })
                       .map(call => (
                         <tr key={call.id} className={call.completed ? 'wakeup-row-completed' : ''}>
-                          <td className="wakeup-room-cell">
+                          <td className="wakeup-room-cell" data-label="Room">
                             <span className="wakeup-room-number">Room {call.roomNumber}</span>
                           </td>
-                          <td className="wakeup-date-cell">
+                          <td className="wakeup-date-cell" data-label="Date">
                             {new Date(call.date).toLocaleDateString('en-GB', { 
                               weekday: 'short', 
                               month: 'short', 
@@ -1607,10 +1631,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                               <span className="wakeup-today-badge">Today</span>
                             )}
                           </td>
-                          <td className="wakeup-time-cell">
+                          <td className="wakeup-time-cell" data-label="Time">
                             <span className="wakeup-time-display">{call.time}</span>
                           </td>
-                          <td className="wakeup-notes-cell">
+                          <td className="wakeup-notes-cell" data-label="Notes">
                             {call.notes ? (
                               <span className="wakeup-notes-preview" title={call.notes}>
                                 {call.notes.length > 30 ? call.notes.substring(0, 30) + '...' : call.notes}
@@ -1619,10 +1643,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                               <span className="wakeup-no-notes">No notes</span>
                             )}
                           </td>
-                          <td className="wakeup-created-cell">
+                          <td className="wakeup-created-cell" data-label="Created by">
                             <span className="wakeup-initials-small">{call.createdBy}</span>
                           </td>
-                          <td className="wakeup-status-cell">
+                          <td className="wakeup-status-cell" data-label="Status">
                             {call.completed ? (
                               <span className="wakeup-status-completed">
                                 ✅ Completed by {call.completedBy}
@@ -1633,7 +1657,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                               </span>
                             )}
                           </td>
-                          <td className="wakeup-actions-cell">
+                          <td className="wakeup-actions-cell" data-label="Actions">
                             <div className="wakeup-action-buttons">
                               <button
                                 className={`wakeup-toggle-btn ${call.completed ? 'completed' : 'pending'}`}
@@ -1746,7 +1770,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 </div>
               </div>
 
-              <div className="handover-fullscreen-table-container">
+              <div className="handover-fullscreen-table-container is-mobile-cards">
                 {Object.keys(savedHandovers).length === 0 ? (
                   <div className="handover-fullscreen-empty">
                     <div className="handover-empty-icon">📝</div>

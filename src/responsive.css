@@ -1,0 +1,566 @@
+/**
+ * Responsive overrides — mobile & tablet only.
+ * Desktop (min-width: 1025px) is intentionally untouched.
+ */
+
+/* Preserve desktop meta-bar layout (replaces removed inline styles) */
+.meta-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Tablet (≤1024px) ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .checklist-container {
+    padding: 16px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .main-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .main-content {
+    order: 1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .left-sidebar {
+    order: 2;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Collapsible sidebar — hidden until toggled */
+  .mobile-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    order: 2;
+    margin: 0;
+    padding: 12px 16px;
+    border: 0.5px solid var(--ios-separator, rgba(60, 60, 67, 0.12));
+    border-radius: 12px;
+    background: var(--ios-card, #fff);
+    color: var(--ios-label, #1d1d1f);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .mobile-sidebar-toggle-icon {
+    font-size: 0.75rem;
+    color: var(--ios-secondary, #8e8e93);
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-sidebar-toggle[aria-expanded="true"] .mobile-sidebar-toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  .left-sidebar.is-collapsed {
+    display: none;
+  }
+
+  .left-sidebar:not(.is-collapsed) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .top-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .shift-selector {
+    flex-wrap: wrap;
+  }
+}
+
+/* Hide toggle on desktop */
+@media (min-width: 1025px) {
+  .mobile-sidebar-toggle {
+    display: none !important;
+  }
+
+  .left-sidebar.is-collapsed {
+    display: flex !important;
+  }
+}
+
+/* ── Mobile (≤768px) ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .checklist-container {
+    padding: 12px;
+    border-radius: 0;
+  }
+
+  .top-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .night-title {
+    font-size: 1.5rem;
+  }
+
+  .shift-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .shift-btn {
+    min-height: 44px;
+    font-size: 0.88rem;
+  }
+
+  /* Meta bar */
+  .meta-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .meta-bar-info,
+  .meta-bar-actions {
+    width: 100%;
+  }
+
+  .meta-bar-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    align-items: stretch !important;
+  }
+
+  .meta-bar-actions > * {
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .meta-bar-actions .initials-chip {
+    grid-column: 1 / -1;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reset-btn,
+  .add-note-btn,
+  .logout-btn,
+  .admin-panel-btn {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.88rem;
+  }
+
+  /* Task cards */
+  .task-card {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .task-card-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .task-card-actions button {
+    flex: 1 1 auto;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Header cards in sidebar */
+  .header-card {
+    padding: 14px;
+  }
+
+  .left-sidebar .header-card {
+    position: relative !important;
+    top: auto !important;
+  }
+
+  /* Modals — full screen on phones */
+  .info-modal-overlay,
+  .note-modal-overlay,
+  .initials-modal-overlay,
+  .handover-modal-overlay,
+  .wakeup-modal-overlay,
+  .breakfast-modal-overlay,
+  .celebration-modal-overlay,
+  .welcome-modal-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .info-modal-box,
+  .note-modal-box,
+  .initials-modal-box,
+  .handover-modal-container,
+  .wakeup-modal-box,
+  .breakfast-modal-box,
+  .celebration-modal-box,
+  .welcome-modal-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  .handover-modal-content {
+    flex-direction: column;
+  }
+
+  .handover-sidebar {
+    width: 100% !important;
+    max-height: min(36vh, 280px) !important;
+    flex-shrink: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .handover-editor {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fullscreen modals */
+  .wakeup-fullscreen-overlay,
+  .handover-fullscreen-overlay {
+    padding: 0;
+  }
+
+  .wakeup-fullscreen-container,
+  .handover-fullscreen-container {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  .wakeup-fullscreen-header,
+  .handover-fullscreen-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .wakeup-fullscreen-filters,
+  .handover-fullscreen-filters {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .wakeup-filter-tabs,
+  .handover-filter-tabs {
+    flex-wrap: nowrap;
+    min-width: min-content;
+  }
+
+  .wakeup-filter-tab,
+  .handover-filter-tab {
+    white-space: nowrap;
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+
+  /* Tables — horizontal scroll fallback */
+  .wakeup-fullscreen-table-container,
+  .handover-fullscreen-table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 16px;
+  }
+
+  .wakeup-fullscreen-table,
+  .handover-fullscreen-table {
+    min-width: 560px;
+  }
+
+  /* Wake-up cards on very small screens */
+  .wakeup-fullscreen-table-card-view .wakeup-fullscreen-table {
+    min-width: 0;
+  }
+
+  /* Downtime */
+  .downtime-checklist {
+    padding: 12px;
+  }
+
+  .downtime-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Progress */
+  .progress-summary {
+    font-size: 0.88rem;
+  }
+
+  /* Floating explore button */
+  .floating-map-button {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    right: max(16px, env(safe-area-inset-right));
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Forms */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Wake-up table → card layout on phones */
+@media (max-width: 640px) {
+  .wakeup-fullscreen-table-container {
+    padding: 12px;
+  }
+
+  .wakeup-fullscreen-table-card-view .wakeup-fullscreen-table,
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table {
+    min-width: 0;
+    display: block;
+    border: none;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table thead {
+    display: none;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table tr {
+    display: block;
+    background: var(--ios-card, #fff);
+    border: 0.5px solid var(--ios-separator, rgba(60, 60, 67, 0.12));
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 6px 0;
+    border: none;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-fullscreen-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--ios-secondary, #8e8e93);
+    flex-shrink: 0;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-actions-cell {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-action-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .wakeup-fullscreen-table-container.is-mobile-cards .wakeup-action-buttons button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Handover table cards */
+  .handover-fullscreen-table-container.is-mobile-cards .handover-fullscreen-table {
+    min-width: 0;
+    display: block;
+  }
+
+  .handover-fullscreen-table-container.is-mobile-cards .handover-fullscreen-table thead {
+    display: none;
+  }
+
+  .handover-fullscreen-table-container.is-mobile-cards .handover-fullscreen-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .handover-fullscreen-table-container.is-mobile-cards .handover-fullscreen-table tr {
+    display: block;
+    background: var(--ios-card, #fff);
+    border: 0.5px solid var(--ios-separator, rgba(60, 60, 67, 0.12));
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .handover-fullscreen-table-container.is-mobile-cards .handover-fullscreen-table td {
+    display: block;
+    padding: 6px 0;
+    border: none;
+  }
+}
+
+/* ── Small phones (≤480px) ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .checklist-container {
+    padding: 8px;
+  }
+
+  .meta-bar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .shift-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .night-title {
+    font-size: 1.35rem;
+  }
+
+  .footer-text {
+    font-size: 0.82rem;
+    padding: 12px;
+  }
+}
+
+/* ── Landscape phones ─────────────────────────────────────────── */
+@media (max-width: 896px) and (orientation: landscape) {
+  .main-layout {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .main-content {
+    flex: 1 1 55%;
+    min-width: 280px;
+    order: 1;
+  }
+
+  .mobile-sidebar-toggle {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .left-sidebar:not(.is-collapsed) {
+    flex: 1 1 40%;
+    min-width: 240px;
+    max-width: 320px;
+    order: 3;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .handover-modal-content {
+    flex-direction: row;
+  }
+
+  .handover-sidebar {
+    max-height: none !important;
+    width: 240px !important;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Touch devices ────────────────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .shift-btn,
+  .task-card-actions button,
+  .explore-category-button,
+  .explore-map-link,
+  .explore-secondary-link,
+  .mobile-sidebar-toggle,
+  .admin-nav-item,
+  .admin-btn {
+    min-height: 44px;
+  }
+
+  .task-checkbox,
+  .downtime-checkbox {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ── Auth login (mobile) ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .login-container,
+  .auth-container {
+    padding: 16px;
+    min-height: 100dvh;
+    box-sizing: border-box;
+  }
+
+  .auth-login-form,
+  .login-form {
+    width: min(100%, 400px);
+    padding: 24px 20px;
+    box-sizing: border-box;
+  }
+
+  .auth-login-form input,
+  .login-form input {
+    font-size: 16px;
+    min-height: 48px;
+  }
+
+  .auth-login-form button,
+  .login-form button {
+    min-height: 48px;
+  }
+}
+
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .checklist-container {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .floating-map-button {
+      bottom: max(20px, env(safe-area-inset-bottom));
+      right: max(20px, env(safe-area-inset-right));
+    }
+  }
+}

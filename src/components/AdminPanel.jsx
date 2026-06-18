@@ -21,6 +21,7 @@ import {
 } from '../firebase/database';
 import { ADMIN_EMAIL } from '../config/admin';
 import './admin.css';
+import './admin-responsive.css';
 import ThemeToggle from './ThemeToggle';
 
 import ExploreAdminSection from './ExploreAdminSection';
