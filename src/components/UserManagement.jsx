@@ -206,6 +206,8 @@ const UserManagement = ({ onClose }) => {
                       onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value }))}
                     >
                       <option value={USER_ROLES.STAFF}>Staff</option>
+                      <option value={USER_ROLES.RECEPTION}>Reception</option>
+                      <option value={USER_ROLES.HOUSEKEEPING}>Housekeeping</option>
                       <option value={USER_ROLES.MANAGER}>Manager</option>
                       {isAdmin && <option value={USER_ROLES.ADMIN}>Admin</option>}
                     </select>

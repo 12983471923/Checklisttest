@@ -37,6 +37,18 @@ service cloud.firestore {
       return isActive() && currentRole() in ['manager', 'admin'];
     }
 
+    function isReception() {
+      return isActive() && currentRole() in ['staff', 'reception', 'manager', 'admin'];
+    }
+
+    function isHousekeeping() {
+      return isActive() && currentRole() == 'housekeeping';
+    }
+
+    function isStaff() {
+      return isReception() || isHousekeeping();
+    }
+
     function isAdmin() {
       return isActive() && currentRole() == 'admin' && hasAdminEmail();
     }
@@ -122,6 +134,34 @@ service cloud.firestore {
     match /shiftConfig/{document} {
       allow read: if isActive();
       allow write: if isAdmin() && withinSizeLimit();
+    }
+
+    // Housekeeping shift configuration — read by all active staff, write by admin
+    match /housekeepingConfig/{document} {
+      allow read: if isActive();
+      allow write: if isAdmin() && withinSizeLimit();
+    }
+
+    // Room inventory — reception manages, housekeeping reads
+    match /rooms/{document} {
+      allow read: if isStaff();
+      allow create, update, delete: if isReception() && withinSizeLimit();
+    }
+
+    // Quick requests — reception creates, both departments read/update
+    match /requests/{document} {
+      allow read: if isStaff();
+      allow create: if isReception() && withinSizeLimit();
+      allow update: if isStaff() && withinSizeLimit();
+      allow delete: if isReception() && withinSizeLimit();
+    }
+
+    // Internal messaging between reception and housekeeping
+    match /messages/{document} {
+      allow read: if isStaff();
+      allow create: if isStaff() && withinSizeLimit();
+      allow update: if isStaff() && withinSizeLimit();
+      allow delete: if false;
     }
 
     // Deny all other collections by default

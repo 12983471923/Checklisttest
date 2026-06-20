@@ -17,13 +17,14 @@ const CHECKLISTS_COLLECTION = 'checklists';
 const DOWNTIME_COLLECTION = 'downtime';
 
 // Generate a session ID based on shift only (persistent across dates)
-const generateSessionId = (shift) => {
+const generateSessionId = (shift, customId = null) => {
+  if (customId) return customId;
   return `${shift.toLowerCase()}_current`;
 };
 
 // Get or create a checklist session
-export const getOrCreateChecklistSession = async (shift) => {
-  const sessionId = generateSessionId(shift);
+export const getOrCreateChecklistSession = async (shift, customSessionId = null) => {
+  const sessionId = generateSessionId(shift, customSessionId);
   const docRef = doc(db, CHECKLISTS_COLLECTION, sessionId);
   
   try {
