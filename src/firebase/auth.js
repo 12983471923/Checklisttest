@@ -15,8 +15,11 @@ import { logSecurityEvent } from '../utils/security';
 export const USER_ROLES = {
   STAFF: 'staff',
   MANAGER: 'manager',
-  ADMIN: 'admin'
+  ADMIN: 'admin',
+  HOUSEKEEPING: 'housekeeping',
 };
+
+export const RECEPTION_ROLES = [USER_ROLES.STAFF, USER_ROLES.MANAGER, USER_ROLES.ADMIN];
 
 // Shift types
 export const SHIFT_TYPES = {
@@ -214,6 +217,29 @@ export const onAuthStateChange = (callback) => {
 // Check if user has specific role
 export const hasRole = (userProfile, role) => {
   return userProfile?.role === role || userProfile?.role === USER_ROLES.ADMIN;
+};
+
+export const isHousekeepingRole = (userProfile) =>
+  userProfile?.role === USER_ROLES.HOUSEKEEPING;
+
+export const isReceptionRole = (userProfile) =>
+  RECEPTION_ROLES.includes(userProfile?.role);
+
+export const signInUserForPortal = async (email, password, { allowedRoles, portalLabel }) => {
+  const result = await signInUser(email, password);
+  if (result.error || !result.user) return result;
+
+  const { profile } = await getUserProfile(result.user.uid);
+  if (!allowedRoles.includes(profile?.role)) {
+    await signOut(auth);
+    logSecurityEvent('login_portal_denied', { email, role: profile?.role, portalLabel });
+    return {
+      user: null,
+      error: `This account is not authorized for ${portalLabel}. Please use the correct login page.`,
+    };
+  }
+
+  return { user: result.user, profile, error: null };
 };
 
 // Check if user can work specific shift

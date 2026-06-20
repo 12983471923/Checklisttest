@@ -21,6 +21,9 @@ import {
 import { signOutUser } from "./firebase/auth";
 import { isAdminEmail } from "./config/admin";
 import AuthLoginForm from "./components/AuthLoginForm";
+import HskLoginForm from "./components/hsk/HskLoginForm";
+import HskDashboard from "./components/hsk/HskDashboard";
+import ReceptionHskPanel from "./components/hsk/ReceptionHskPanel";
 import AdminPanel from "./components/AdminPanel";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
@@ -29,10 +32,12 @@ import 'leaflet/dist/leaflet.css';
 import "./App.css";
 import "./responsive.css";
 import "./components/auth.css";
+import "./components/hsk/hsk.css";
 
 function App() {
   const { currentUser, userProfile, loading, error } = useAuth();
   const [loginError, setLoginError] = useState("");
+  const [loginPortal, setLoginPortal] = useState("reception");
 
   if (loading) {
     return (
@@ -43,13 +48,27 @@ function App() {
   }
 
   if (!currentUser) {
+    if (loginPortal === "housekeeping") {
+      return (
+        <HskLoginForm
+          onLogin={() => setLoginError("")}
+          onBack={() => setLoginPortal("reception")}
+          externalError={loginError || error}
+        />
+      );
+    }
     return (
       <AuthLoginForm
         onLogin={() => setLoginError("")}
         onError={setLoginError}
         externalError={loginError || error}
+        onShowHsk={() => setLoginPortal("housekeeping")}
       />
     );
+  }
+
+  if (userProfile?.role === "housekeeping") {
+    return <HskDashboard currentUser={currentUser} userProfile={userProfile} />;
   }
 
   return <ChecklistApp userProfile={userProfile} currentUser={currentUser} />;
@@ -582,7 +601,7 @@ function ChecklistApp({ userProfile, currentUser }) {
     return (
     <div className="checklist-container">
       {/* Main layout with sidebar and content */}
-      <div className="main-layout">
+      <div className="main-layout main-layout--with-hsk">
         <button
           type="button"
           className="mobile-sidebar-toggle"
@@ -2067,6 +2086,8 @@ function ChecklistApp({ userProfile, currentUser }) {
         </div>
       )}
         </div>
+
+        <ReceptionHskPanel currentUser={currentUser} userProfile={userProfile} />
       </div>
 
       {/* Floating Map Button */}

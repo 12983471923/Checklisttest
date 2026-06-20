@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { signInUser, resetPassword } from '../firebase/auth';
+import { signInUserForPortal, resetPassword, RECEPTION_ROLES } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
 import ThemeToggle from './ThemeToggle';
+import './hsk/hsk.css';
 
 /* ─── Inline styles ─────────────────────────────────────────────────────────
    Kept here so the component is self-contained. All values follow
@@ -225,7 +226,7 @@ function PrimaryButton({ children, disabled, type = 'submit' }) {
 }
 
 /* ─── Main component ────────────────────────────────────────────────────── */
-const AuthLoginForm = ({ onLogin, onError, externalError }) => {
+const AuthLoginForm = ({ onLogin, onError, externalError, onShowHsk }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [inlineError, setInlineError] = useState('');
@@ -257,7 +258,11 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
     }
 
     try {
-      const { user, error: authError } = await signInUser(emailValidation.value, formData.password);
+      const { user, error: authError } = await signInUserForPortal(
+        emailValidation.value,
+        formData.password,
+        { allowedRoles: RECEPTION_ROLES, portalLabel: 'Reception' }
+      );
       if (authError) {
         setInlineError(authError);
         if (onError) onError(authError);
@@ -414,6 +419,12 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
               Forgot Password?
             </button>
           </div>
+
+          {onShowHsk && (
+            <button type="button" className="hsk-portal-switch" onClick={onShowHsk}>
+              Housekeeping (HSK)
+            </button>
+          )}
         </div>
 
         <p style={s.disclaimer}>

@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChange, getCurrentUserWithProfile } from '../firebase/auth';
+import {
+  onAuthStateChange,
+  getCurrentUserWithProfile,
+  isHousekeepingRole,
+  isReceptionRole,
+} from '../firebase/auth';
 import { isAdminEmail } from '../config/admin';
 
 const AuthContext = createContext();
@@ -59,6 +64,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
     isManager: userProfile?.role === 'manager' || isAdmin,
     isAdmin,
+    isHousekeeping: isHousekeepingRole(userProfile),
+    isReception: isReceptionRole(userProfile),
     hasAdminEmail,
     userInitials: userProfile?.initials || '',
     userName: userProfile?.displayName || currentUser?.displayName || 'Unknown User',
