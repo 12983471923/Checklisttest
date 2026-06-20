@@ -15,6 +15,8 @@ import {
   subscribeToBreakfastTimes,
   subscribeToPricingInfo,
   DEFAULT_PRICING,
+  getVisibleBreakfastItems,
+  formatBreakfastPrice,
 } from "./firebase/database";
 import { signOutUser } from "./firebase/auth";
 import { isAdminEmail } from "./config/admin";
@@ -683,18 +685,13 @@ function ChecklistApp({ userProfile, currentUser }) {
               <div className="pricing-category">
                 <strong>🍳 Breakfast Pricing</strong>
                 <div className="price-list">
-                  <div className="price-item">
-                    <span className="price-label">During booking:</span>
-                    <span className="price-value">{pricingInfo.breakfastDuringBooking} DKK</span>
-                  </div>
-                  <div className="price-item">
-                    <span className="price-label">At check-in:</span>
-                    <span className="price-value">{pricingInfo.breakfastAtCheckIn} DKK</span>
-                  </div>
-                  <div className="price-item">
-                    <span className="price-label">On the day:</span>
-                    <span className="price-value">{pricingInfo.breakfastOnTheDay} DKK</span>
-                  </div>
+                  {getVisibleBreakfastItems(pricingInfo).map((item) => (
+                    <div className="price-item" key={item.id}>
+                      <span className="price-label">{item.label}:</span>
+                      <span className="price-value">{formatBreakfastPrice(item)}</span>
+                      {item.note && <span className="price-note">{item.note}</span>}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

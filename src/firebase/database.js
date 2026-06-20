@@ -324,22 +324,113 @@ export const DEFAULT_PRICING = {
   breakfastOnTheDay: '229',
 };
 
-const normalizePricing = (data = {}) => ({
-  bikeRegular: String(data.bikeRegular ?? DEFAULT_PRICING.bikeRegular),
-  bikeLufthansa: String(data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa),
-  breakfastDuringBooking: String(data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking),
-  breakfastAtCheckIn: String(data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn),
-  breakfastOnTheDay: String(data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay),
+export const DEFAULT_BREAKFAST_ITEMS = [
+  {
+    id: 'breakfast-during-booking',
+    label: 'During booking',
+    value: '140',
+    suffix: 'DKK',
+    note: '',
+    order: 0,
+    hidden: false,
+  },
+  {
+    id: 'breakfast-at-check-in',
+    label: 'At check-in',
+    value: '179',
+    suffix: 'DKK',
+    note: '',
+    order: 1,
+    hidden: false,
+  },
+  {
+    id: 'breakfast-on-the-day',
+    label: 'On the day',
+    value: '229',
+    suffix: 'DKK',
+    note: '',
+    order: 2,
+    hidden: false,
+  },
+];
+
+const normalizeBreakfastItem = (item, index = 0) => ({
+  id: item.id || `breakfast-${Date.now()}-${index}`,
+  label: String(item.label ?? 'New rate').trim(),
+  value: String(item.value ?? '0').trim(),
+  suffix: String(item.suffix ?? 'DKK').trim(),
+  note: String(item.note ?? '').trim(),
+  order: typeof item.order === 'number' ? item.order : index,
+  hidden: item.hidden === true,
 });
+
+const migrateBreakfastItems = (data = {}) => {
+  if (Array.isArray(data.breakfastItems) && data.breakfastItems.length > 0) {
+    return data.breakfastItems
+      .map(normalizeBreakfastItem)
+      .sort((a, b) => a.order - b.order)
+      .map((item, order) => ({ ...item, order }));
+  }
+
+  return DEFAULT_BREAKFAST_ITEMS.map((item, index) =>
+    normalizeBreakfastItem(
+      {
+        ...item,
+        value:
+          index === 0
+            ? data.breakfastDuringBooking ?? item.value
+            : index === 1
+              ? data.breakfastAtCheckIn ?? item.value
+              : data.breakfastOnTheDay ?? item.value,
+      },
+      index
+    )
+  );
+};
+
+const normalizePricing = (data = {}) => {
+  const breakfastItems = migrateBreakfastItems(data);
+  return {
+    bikeRegular: String(data.bikeRegular ?? DEFAULT_PRICING.bikeRegular),
+    bikeLufthansa: String(data.bikeLufthansa ?? DEFAULT_PRICING.bikeLufthansa),
+    breakfastDuringBooking: String(
+      breakfastItems[0]?.value ?? data.breakfastDuringBooking ?? DEFAULT_PRICING.breakfastDuringBooking
+    ),
+    breakfastAtCheckIn: String(
+      breakfastItems[1]?.value ?? data.breakfastAtCheckIn ?? DEFAULT_PRICING.breakfastAtCheckIn
+    ),
+    breakfastOnTheDay: String(
+      breakfastItems[2]?.value ?? data.breakfastOnTheDay ?? DEFAULT_PRICING.breakfastOnTheDay
+    ),
+    breakfastItems,
+  };
+};
+
+export const getVisibleBreakfastItems = (pricing) =>
+  (pricing?.breakfastItems || [])
+    .filter((item) => !item.hidden)
+    .sort((a, b) => a.order - b.order);
+
+export const formatBreakfastPrice = (item) => {
+  const suffix = item.suffix?.trim();
+  return suffix ? `${item.value} ${suffix}` : item.value;
+};
 
 export const savePricingInfo = async (pricing) => {
   const docRef = doc(db, BREAKFAST_COLLECTION, PRICING_DOC_ID);
+  const normalized = normalizePricing(pricing);
 
   try {
     await setDoc(docRef, {
-      ...normalizePricing(pricing),
+      bikeRegular: normalized.bikeRegular,
+      bikeLufthansa: normalized.bikeLufthansa,
+      breakfastDuringBooking: normalized.breakfastDuringBooking,
+      breakfastAtCheckIn: normalized.breakfastAtCheckIn,
+      breakfastOnTheDay: normalized.breakfastOnTheDay,
+      breakfastItems: normalized.breakfastItems,
       lastUpdated: Timestamp.now(),
     });
+    return normalized;
   } catch (error) {
     console.error('Error saving pricing info:', error);
     throw error;

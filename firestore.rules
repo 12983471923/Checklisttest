@@ -99,7 +99,8 @@ service cloud.firestore {
 
     match /breakfast-times/{document} {
       allow read: if isActive();
-      allow write: if isActive() && withinSizeLimit();
+      allow write: if isActive() && withinSizeLimit()
+        && (document != 'pricing' || isAdmin());
     }
 
     // Audit trail — managers read; any active user can append; no edits/deletes
