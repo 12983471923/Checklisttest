@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { signInUser, resetPassword } from '../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../utils/security';
 import ThemeToggle from './ThemeToggle';
@@ -419,6 +420,9 @@ const AuthLoginForm = ({ onLogin, onError, externalError }) => {
         <p style={s.disclaimer}>
           Internal use only · Scandic Falkoner · No guest data stored
         </p>
+        <Link to="/housekeeping" style={{ ...s.disclaimer, marginTop: '12px', display: 'block' }}>
+          Housekeeping Portal →
+        </Link>
       </div>
     </div>
   );

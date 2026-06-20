@@ -14,9 +14,18 @@ import { logSecurityEvent } from '../utils/security';
 // User roles for the hotel
 export const USER_ROLES = {
   STAFF: 'staff',
+  RECEPTION: 'reception',
+  HOUSEKEEPING: 'housekeeping',
   MANAGER: 'manager',
   ADMIN: 'admin'
 };
+
+export const RECEPTION_ROLES = [
+  USER_ROLES.STAFF,
+  USER_ROLES.RECEPTION,
+  USER_ROLES.MANAGER,
+  USER_ROLES.ADMIN
+];
 
 // Shift types
 export const SHIFT_TYPES = {
@@ -215,6 +224,12 @@ export const onAuthStateChange = (callback) => {
 export const hasRole = (userProfile, role) => {
   return userProfile?.role === role || userProfile?.role === USER_ROLES.ADMIN;
 };
+
+export const isHousekeepingRole = (userProfile) =>
+  userProfile?.role === USER_ROLES.HOUSEKEEPING;
+
+export const isReceptionRole = (userProfile) =>
+  RECEPTION_ROLES.includes(userProfile?.role);
 
 // Check if user can work specific shift
 export const canWorkShift = (userProfile, shift) => {
