@@ -838,6 +838,22 @@
   transform: translateY(-1px) scale(1.01);
 }
 
+[data-theme="dark"] .floating-hsk-button {
+  background: #ffffff;
+  color: #1d1d1f;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .floating-hsk-button:hover {
+  background: #f5f5f7;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.42);
+}
+
+[data-theme="dark"] .floating-hsk-button svg {
+  color: #1d1d1f;
+  fill: #1d1d1f;
+}
+
 .floating-hsk-badge {
   position: absolute;
   top: -4px;
