@@ -538,74 +538,38 @@
     display: none;
   }
 
-  .hsk-floating-window--mobile {
-    position: fixed;
-    inset: 0;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    height: 100dvh !important;
-    border-radius: 0 !important;
+  /* HSK centered modal — mobile/tablet (matches Explore modal) */
+  .hsk-modal-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .hsk-modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
     border: none;
-    z-index: 10003;
-    transform: none !important;
-    opacity: 1;
-    display: flex;
-    flex-direction: column;
   }
 
-  .hsk-floating-window--mobile.is-closing {
-    opacity: 0;
-    transform: translateY(8px) !important;
+  .hsk-modal-header {
+    padding: max(16px, env(safe-area-inset-top)) 16px 14px;
   }
 
-  .hsk-floating-window--mobile .hsk-floating-header {
-    padding-top: max(16px, env(safe-area-inset-top));
+  .hsk-modal-header h2 {
+    font-size: 1.2rem;
   }
 
-  .hsk-floating-window--mobile .hsk-panel-content {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .hsk-floating-window--mobile .hsk-right-tabs {
-    flex-shrink: 0;
-    display: flex;
+  .hsk-modal-body .hsk-right-tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    gap: 4px;
-    padding: 8px 12px;
-    border-top: 1px solid var(--ios-separator, rgba(60, 60, 67, 0.12));
-    border-bottom: none;
-    order: 2;
-    background: var(--ios-card, #fff);
+    flex-wrap: nowrap;
   }
 
-  .hsk-floating-window--mobile .hsk-right-tabs button {
-    flex: 1;
-    min-width: 0;
-    min-height: 48px;
-    flex-direction: column;
-    gap: 2px;
-    padding: 6px 4px;
-    font-size: 0.62rem;
-    border-radius: 10px;
-  }
-
-  .hsk-floating-window--mobile .hsk-right-body {
-    flex: 1;
-    max-height: none;
-    order: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .hsk-floating-window--mobile .hsk-messenger-mobile {
-    height: 100%;
+  .hsk-modal-body .hsk-right-tabs button {
+    flex-shrink: 0;
+    min-height: 44px;
   }
 
   /* Panel content mobile touch targets */

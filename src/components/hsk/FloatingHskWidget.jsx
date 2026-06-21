@@ -1,18 +1,21 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import HskPanelContent from './HskPanelContent';
 import './hsk.css';
 import './mobile/hsk-mobile.css';
 
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
-import { useIsMobile } from '../../hooks/useIsMobile';
 import { isAdminEmail } from '../../config/admin';
+import {
+  subscribeMessages,
+  subscribeRequests,
+  countUnreadMessages,
+  countPendingRequests,
+} from '../../firebase/hsk';
 
 export default function FloatingHskWidget({ currentUser, userProfile }) {
-  const isMobile = useIsMobile();
   const { visibleFloatingTabs } = useDashboardConfig();
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === 'admin';
   const [open, setOpen] = useState(false);
-  const [closing, setClosing] = useState(false);
   const [badgeTotal, setBadgeTotal] = useState(0);
 
   const user = {
@@ -21,20 +24,50 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
     email: currentUser?.email,
   };
 
-  const handleOpen = () => {
-    setClosing(false);
-    setOpen(true);
-  };
+  const userId = user?.uid;
 
-  const handleClose = useCallback(() => {
-    setClosing(true);
-    window.setTimeout(() => {
-      setOpen(false);
-      setClosing(false);
-    }, 260);
-  }, []);
+  useEffect(() => {
+    if (!userId) return undefined;
+    let messages = [];
+    let requests = [];
+    const refreshBadge = () => {
+      const msgUnread = countUnreadMessages(messages, userId, 'reception');
+      const reqPending = countPendingRequests(requests, 'reception');
+      setBadgeTotal(msgUnread + reqPending);
+    };
+    const unsubMessages = subscribeMessages((next) => {
+      messages = next;
+      refreshBadge();
+    });
+    const unsubRequests = subscribeRequests((next) => {
+      requests = next;
+      refreshBadge();
+    });
+    return () => {
+      unsubMessages();
+      unsubRequests();
+    };
+  }, [userId]);
 
-  const showWindow = open || closing;
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = useCallback(() => setOpen(false), []);
 
   return (
     <>
@@ -43,7 +76,7 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
         className="floating-hsk-button"
         onClick={handleOpen}
         title="Housekeeping (HSK)"
-        aria-label="Open Housekeeping panel"
+        aria-label="Open HSK Management panel"
         aria-expanded={open}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -60,37 +93,43 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
         )}
       </button>
 
-      {/* Keep mounted for live badge counts and toast notifications */}
-      <div
-        className={`hsk-floating-window ${isMobile ? 'hsk-floating-window--mobile' : ''} ${showWindow ? 'is-visible' : ''} ${closing ? 'is-closing' : showWindow ? 'is-open' : ''}`}
-        role="dialog"
-        aria-modal={isMobile ? 'true' : 'false'}
-        aria-label="Housekeeping panel"
-        aria-hidden={!showWindow}
-      >
-        <header className="hsk-floating-header">
-          <div>
-            <h3>Housekeeping</h3>
-            <p>Messages, handovers, requests &amp; rooms</p>
-          </div>
-          <button
-            type="button"
-            className="hsk-floating-close"
-            onClick={handleClose}
-            aria-label="Close Housekeeping panel"
+      {open && (
+        <div className="hsk-modal-overlay" onClick={handleClose} role="presentation">
+          <div
+            className="hsk-modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="hsk-modal-title"
+            onClick={(e) => e.stopPropagation()}
           >
-            ×
-          </button>
-        </header>
-        <HskPanelContent
-          user={user}
-          role="reception"
-          canManageRooms
-          isAdmin={isAdmin}
-          onBadgeChange={setBadgeTotal}
-          visibleTabs={visibleFloatingTabs.length ? visibleFloatingTabs : undefined}
-        />
-      </div>
+            <header className="hsk-modal-header">
+              <div className="hsk-modal-header-text">
+                <span className="hsk-modal-eyebrow">Front Desk · Scandic Falkoner</span>
+                <h2 id="hsk-modal-title">HSK Management</h2>
+                <p>Messages, tasks, handovers, and room status — all in one place.</p>
+              </div>
+              <button
+                type="button"
+                className="hsk-modal-close"
+                onClick={handleClose}
+                aria-label="Close HSK Management panel"
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="hsk-modal-body">
+              <HskPanelContent
+                user={user}
+                role="reception"
+                canManageRooms
+                isAdmin={isAdmin}
+                visibleTabs={visibleFloatingTabs.length ? visibleFloatingTabs : undefined}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
