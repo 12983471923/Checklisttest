@@ -804,11 +804,34 @@
 }
 
 /* Login */
+.hsk-login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ios-bg, #f5f5f7);
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--ios-label, #1d1d1f);
+}
+
 .hsk-login-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+}
+
+.hsk-login-card {
+  background: var(--ios-card, #fff);
+  border: 1px solid var(--ios-separator, rgba(60, 60, 67, 0.12));
+  border-radius: 20px;
+  box-shadow: var(--ios-shadow, 0 10px 30px rgba(0, 0, 0, 0.08));
+  padding: 48px 44px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
 }
 
 .hsk-login-header {
@@ -819,12 +842,14 @@
 .hsk-login-header img {
   height: 48px;
   margin-bottom: 12px;
+  object-fit: contain;
 }
 
 .hsk-login-header h1 {
   font-size: 1.35rem;
   margin: 0;
   color: var(--ios-label, #1d1d1f);
+  letter-spacing: -0.02em;
 }
 
 .hsk-login-header p {
@@ -842,6 +867,7 @@
 .hsk-login-field label {
   display: block;
   font-size: 0.8rem;
+  font-weight: 500;
   color: var(--ios-secondary-label, #6e6e73);
   margin-bottom: 4px;
 }
@@ -853,11 +879,35 @@
   border-radius: 10px;
   font-size: 0.95rem;
   box-sizing: border-box;
+  color: var(--ios-label, #1d1d1f);
+  background: var(--ios-input-bg, rgba(255, 255, 255, 0.9));
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.hsk-login-field input::placeholder {
+  color: var(--ios-tertiary-label, #86868b);
+}
+
+.hsk-login-field input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .hsk-login-field input.is-focused {
-  border-color: var(--ios-label, #1d1d1f);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  border-color: var(--ios-input-focus-border, var(--ios-label, #1d1d1f));
+  box-shadow: 0 0 0 3px var(--ios-input-focus-ring, var(--ios-fill, rgba(0, 0, 0, 0.06)));
+  background: var(--ios-input-bg-focus, #fff);
+}
+
+.hsk-login-field input:-webkit-autofill,
+.hsk-login-field input:-webkit-autofill:hover,
+.hsk-login-field input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--ios-input-bg-focus, #fff) inset !important;
+  -webkit-text-fill-color: var(--ios-label, #1d1d1f) !important;
+  caret-color: var(--ios-label, #1d1d1f);
+  transition: background-color 9999s ease-out;
 }
 
 .hsk-login-submit {
@@ -866,10 +916,22 @@
   padding: 14px;
   border: none;
   border-radius: 10px;
-  background: var(--ios-label, #1d1d1f);
-  color: #fff;
+  background: var(--ios-primary-btn-bg, #111111);
+  color: var(--ios-primary-btn-text, #ffffff);
   font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hsk-login-submit:hover:not(:disabled) {
+  background: var(--ios-primary-btn-bg-hover, #000000);
+}
+
+.hsk-login-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .hsk-login-back {
@@ -879,8 +941,21 @@
   border: 1.5px solid var(--ios-separator, #d2d2d7);
   border-radius: 10px;
   background: transparent;
+  color: var(--ios-label, #1d1d1f);
   cursor: pointer;
   font-size: 0.875rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hsk-login-back:hover:not(:disabled) {
+  background: var(--ios-fill, rgba(120, 120, 128, 0.12));
+  border-color: transparent;
+}
+
+.hsk-login-back:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .hsk-login-error {
@@ -891,6 +966,7 @@
   color: var(--ios-error-text, #991b1b);
   font-size: 0.85rem;
   margin-bottom: 12px;
+  line-height: 1.45;
 }
 
 .hsk-login-disclaimer {
@@ -898,6 +974,8 @@
   text-align: center;
   font-size: 0.75rem;
   color: var(--ios-tertiary-label, #86868b);
+  line-height: 1.5;
+  max-width: 400px;
 }
 
 .hsk-portal-switch {
@@ -910,11 +988,18 @@
   cursor: pointer;
   font-size: 0.875rem;
   color: var(--ios-label, #1d1d1f);
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.hsk-portal-switch:hover {
-  background: var(--ios-card, #fff);
+.hsk-portal-switch:hover:not(:disabled) {
+  background: var(--ios-fill-hover, rgba(118, 118, 128, 0.18));
+  border-color: transparent;
+}
+
+.hsk-portal-switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Reception integration — floating bottom-right widget */

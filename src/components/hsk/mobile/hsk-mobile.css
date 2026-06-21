@@ -628,6 +628,29 @@
   .hsk-times-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  /* HSK login page */
+  .hsk-login-page {
+    padding: max(56px, calc(12px + env(safe-area-inset-top))) 16px max(24px, env(safe-area-inset-bottom));
+  }
+
+  .hsk-login-card {
+    padding: 32px 24px 28px;
+    border-radius: 16px;
+  }
+
+  .hsk-login-field input,
+  .hsk-login-submit,
+  .hsk-login-back,
+  .hsk-portal-switch {
+    min-height: 48px;
+    font-size: max(16px, 0.95rem);
+  }
+
+  .theme-toggle-fixed {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+  }
 }
 
 @media (max-width: 640px) {
