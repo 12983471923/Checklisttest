@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   subscribeMessages,
   sendMessage,
@@ -9,8 +9,12 @@ import {
   isMessageActive,
 } from '../../../firebase/hsk';
 import HskMessageAdminControls, { filterMessagesByView } from '../HskMessageAdminControls';
-
-const QUICK_EMOJIS = ['👍', '❤️', '😊', '🙏', '✅', '🏨', '🛏️', '🧹'];
+import ChatMessageList from './chat/ChatMessageList';
+import ChatThreadHeader from './chat/ChatThreadHeader';
+import ChatComposeBar from './chat/ChatComposeBar';
+import ConversationListItem from './chat/ConversationListItem';
+import { messageViewLabel } from './chat/chatUtils';
+import './chat/messenger-chat.css';
 
 export default function HskMessengerMobile({ user, role, onNewMessage, canManage = false }) {
   const [messages, setMessages] = useState([]);
@@ -29,6 +33,7 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
   const userId = user?.uid;
   const displayName = user?.displayName || user?.email || 'Staff';
   const peerLabel = role === 'housekeeping' ? 'Reception' : 'Housekeeping';
+  const peerIcon = role === 'housekeeping' ? '🛎️' : '🧹';
 
   useEffect(() => subscribeMessages(setMessages), []);
   useEffect(() => subscribeTyping(setTypingUsers, userId), [userId]);
@@ -53,9 +58,10 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
   }, [visibleMessages, userId, view]);
 
   useEffect(() => {
-    if (view === 'thread') {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (view !== 'thread') return;
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
   }, [visibleMessages.length, view, typingUsers.length]);
 
   useEffect(() => {
@@ -74,22 +80,6 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
   );
 
   const lastMessage = activeMessages[activeMessages.length - 1];
-
-  const formatTime = (ts) => {
-    if (!ts) return '';
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatListTime = (ts) => {
-    if (!ts) return '';
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    const now = new Date();
-    if (d.toDateString() === now.toDateString()) {
-      return formatTime(ts);
-    }
-    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-  };
 
   const handleTyping = (value) => {
     setText(value);
@@ -124,21 +114,15 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setAttachmentName(file.name);
-    }
+    if (file) setAttachmentName(file.name);
     e.target.value = '';
-  };
-
-  const appendEmoji = (emoji) => {
-    setText((t) => `${t}${emoji}`);
   };
 
   if (view === 'list') {
     return (
-      <div className="hsk-messenger-mobile">
-        <header className="hsk-messenger-mobile-header">
-          <h2>Messages</h2>
+      <div className="chat-ui">
+        <header className="chat-inbox-header">
+          <h2>Chats</h2>
         </header>
         {canManage && (
           <HskMessageAdminControls
@@ -150,31 +134,17 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
             compact
           />
         )}
-        {messageView === 'active' && (
-          <button
-            type="button"
-            className="hsk-conversation-card"
-            onClick={() => setView('thread')}
-          >
-            <div className="hsk-conversation-avatar">{role === 'housekeeping' ? '🛎️' : '🧹'}</div>
-            <div className="hsk-conversation-body">
-              <div className="hsk-conversation-top">
-                <strong>{peerLabel}</strong>
-                {lastMessage && (
-                  <span className="hsk-conversation-time">{formatListTime(lastMessage.createdAt)}</span>
-                )}
-              </div>
-              <p className="hsk-conversation-preview">
-                {lastMessage
-                  ? `${lastMessage.senderId === userId ? 'You: ' : ''}${lastMessage.text}`
-                  : 'Start a conversation…'}
-              </p>
-            </div>
-            {unread > 0 && <span className="hsk-conversation-unread">{unread}</span>}
-          </button>
-        )}
-        {messageView !== 'active' && (
-          <p className="hsk-messenger-empty hsk-messenger-empty--list">
+        {messageView === 'active' ? (
+          <ConversationListItem
+            peerLabel={peerLabel}
+            peerIcon={peerIcon}
+            lastMessage={lastMessage}
+            userId={userId}
+            unread={unread}
+            onOpen={() => setView('thread')}
+          />
+        ) : (
+          <p className="chat-empty">
             Open the conversation to review {messageView} messages.
           </p>
         )}
@@ -182,17 +152,16 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
     );
   }
 
+  const subtitle =
+    messageView === 'active' ? messageViewLabel(messageView) : messageViewLabel(messageView);
+
   return (
-    <div className="hsk-messenger-mobile hsk-messenger-mobile--thread">
-      <header className="hsk-messenger-thread-header">
-        <button type="button" className="hsk-messenger-back" onClick={() => setView('list')} aria-label="Back">
-          ←
-        </button>
-        <div className="hsk-messenger-thread-title">
-          <strong>{peerLabel}</strong>
-          <span>{messageView === 'active' ? 'Active now' : VIEW_LABEL(messageView)}</span>
-        </div>
-      </header>
+    <div className="chat-ui chat-ui--thread">
+      <ChatThreadHeader
+        title={peerLabel}
+        subtitle={subtitle}
+        onBack={() => setView('list')}
+      />
 
       {canManage && (
         <HskMessageAdminControls
@@ -205,84 +174,31 @@ export default function HskMessengerMobile({ user, role, onNewMessage, canManage
         />
       )}
 
-      <div className="hsk-messenger-bubbles" role="log" aria-live="polite">
-        {visibleMessages.length === 0 && (
-          <p className="hsk-messenger-empty">No {messageView} messages.</p>
-        )}
-        {visibleMessages.map((m) => {
-          const mine = m.senderId === userId;
-          const read = (m.readBy || []).length > 1;
-          return (
-            <div key={m.id} className={`hsk-bubble-row ${mine ? 'is-mine' : 'is-theirs'}`}>
-              {!mine && (
-                <span className="hsk-bubble-avatar" aria-hidden="true">
-                  {(m.senderName || 'S')[0]}
-                </span>
-              )}
-              <div className={`hsk-bubble ${mine ? 'is-mine' : 'is-theirs'}`}>
-                <p>{m.text}</p>
-                <div className="hsk-bubble-meta">
-                  <span>{formatTime(m.createdAt)}</span>
-                  {mine && <span className="hsk-read-receipt">{read ? 'Read ✓✓' : 'Delivered ✓'}</span>}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        {typingUsers.length > 0 && messageView === 'active' && (
-          <div className="hsk-typing-indicator" aria-live="polite">
-            <span className="hsk-typing-dots"><i /><i /><i /></span>
-            {typingUsers[0].name} is typing…
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
+      <ChatMessageList
+        messages={visibleMessages}
+        userId={userId}
+        bottomRef={bottomRef}
+        emptyLabel={`No ${messageView} messages.`}
+        typingUsers={typingUsers}
+        showTyping={messageView === 'active'}
+      />
 
       {messageView === 'active' && (
-        <>
-      {showEmoji && (
-        <div className="hsk-emoji-bar" role="toolbar" aria-label="Emoji">
-          {QUICK_EMOJIS.map((em) => (
-            <button key={em} type="button" onClick={() => appendEmoji(em)}>{em}</button>
-          ))}
-        </div>
-      )}
-
-      <form className="hsk-messenger-compose" onSubmit={handleSend}>
-        <button type="button" className="hsk-compose-icon" onClick={() => setShowEmoji((s) => !s)} aria-label="Emoji">
-          😊
-        </button>
-        <button type="button" className="hsk-compose-icon" onClick={() => fileRef.current?.click()} aria-label="Attach file">
-          📎
-        </button>
-        <input ref={fileRef} type="file" className="hsk-file-input" onChange={handleFile} hidden />
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => handleTyping(e.target.value)}
-          placeholder="Message…"
-          disabled={sending}
-          aria-label="Message text"
+        <ChatComposeBar
+          text={text}
+          sending={sending}
+          attachmentName={attachmentName}
+          showEmoji={showEmoji}
+          onTextChange={handleTyping}
+          onToggleEmoji={() => setShowEmoji((s) => !s)}
+          onAttach={() => fileRef.current?.click()}
+          onRemoveAttachment={() => setAttachmentName('')}
+          onSend={handleSend}
+          onAppendEmoji={(emoji) => handleTyping(text + emoji)}
+          fileRef={fileRef}
+          onFileChange={handleFile}
         />
-        <button type="submit" className="hsk-compose-send" disabled={sending || (!text.trim() && !attachmentName)}>
-          ↑
-        </button>
-      </form>
-      {attachmentName && (
-        <div className="hsk-attachment-chip">
-          📎 {attachmentName}
-          <button type="button" onClick={() => setAttachmentName('')}>×</button>
-        </div>
-      )}
-        </>
       )}
     </div>
   );
-}
-
-function VIEW_LABEL(view) {
-  if (view === 'archived') return 'Archived';
-  if (view === 'trash') return 'Trash';
-  if (view === 'all') return 'All messages';
-  return 'Active now';
 }

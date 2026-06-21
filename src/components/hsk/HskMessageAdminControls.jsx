@@ -39,11 +39,6 @@ export default function HskMessageAdminControls({
     [messages]
   );
 
-  const visibleMessages = useMemo(
-    () => filterMessagesByView(messages, messageView),
-    [messages, messageView]
-  );
-
   useEffect(() => {
     if (!canManage || messageView !== 'trash') return;
     purgeExpiredTrashMessages(messages).catch(() => {});
