@@ -2,6 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import { useAuth } from "./hooks/useAuth";
+import { useDashboardConfig } from "./hooks/useDashboardConfig";
+import TeamHandoverPanel from "./components/TeamHandoverPanel";
 import { validateUserInput } from "./utils/security";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
@@ -33,6 +35,7 @@ import "./App.css";
 import "./responsive.css";
 import "./components/auth.css";
 import "./components/hsk/hsk.css";
+import "./components/team-handover.css";
 
 function ProfileMissingScreen({ currentUser, loginPortal, onUseHskLogin, onLogout }) {
   return (
@@ -141,6 +144,7 @@ function ChecklistApp({ userProfile, currentUser }) {
   const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
   // Admin requires BOTH the hardcoded admin email AND the Firestore role.
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === "admin";
+  const { isReceptionWidgetVisible, hotelInfo } = useDashboardConfig();
   const [showAdmin, setShowAdmin] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(
     () => typeof window !== 'undefined' && window.innerWidth > 1024
@@ -675,15 +679,16 @@ function ChecklistApp({ userProfile, currentUser }) {
         </button>
 
         <div className={`left-sidebar ${mobileSidebarOpen ? '' : 'is-collapsed'}`}>
+          {isReceptionWidgetVisible('hotel-info') && (
           <div className="header-card">
-            <strong>🏨 Scandic Falkoner</strong>
+            <strong>🏨 {hotelInfo.name || 'Scandic Falkoner'}</strong>
             
             <div className="hotel-info-section">
               <div className="info-item">
                 <span className="info-icon">📍</span>
                 <div className="info-content">
                   <span className="info-label">Address</span>
-                  <span className="info-value">Falkoner Alle 9, 2000 Frederiksberg, Denmark</span>
+                  <span className="info-value">{hotelInfo.address}</span>
                 </div>
               </div>
               
@@ -691,7 +696,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="info-icon">📞</span>
                 <div className="info-content">
                   <span className="info-label">Phone</span>
-                  <span className="info-value">+45 72 42 55 00</span>
+                  <span className="info-value">{hotelInfo.phone}</span>
                 </div>
               </div>
               
@@ -700,13 +705,15 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <div className="info-content">
                   <span className="info-label">Email</span>
                   <span className="info-value">
-                    <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+                    <a href={`mailto:${hotelInfo.email}`}>{hotelInfo.email}</a>
                   </span>
                 </div>
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('hotel-times') && (
           <div className="header-card">
             <strong>⏰ Hotel Times</strong>
             
@@ -731,7 +738,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🚪</span>
                 <div className="time-content">
                   <span className="time-label">Check-Out</span>
-                  <span className="time-value">12:00</span>
+                  <span className="time-value">{hotelInfo.checkOut}</span>
                 </div>
               </div>
               
@@ -739,12 +746,14 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🔑</span>
                 <div className="time-content">
                   <span className="time-label">Check-In</span>
-                  <span className="time-value">16:00</span>
+                  <span className="time-value">{hotelInfo.checkIn}</span>
                 </div>
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('pricing') && (
           <div className="header-card">
             <strong>Pricing Information</strong>
             
@@ -777,7 +786,9 @@ function ChecklistApp({ userProfile, currentUser }) {
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('handover-daily') && (
           <div className="header-card">
             <strong>📝 Daily Handover</strong>
             
@@ -825,7 +836,20 @@ function ChecklistApp({ userProfile, currentUser }) {
               </div>
             </div>
           </div>
+          )}
+
+          {isReceptionWidgetVisible('team-handovers') && (
+          <div className="header-card team-handover-sidebar-card">
+            <TeamHandoverPanel
+              user={currentUser}
+              role="reception"
+              isAdmin={isAdmin}
+              compact
+            />
+          </div>
+          )}
           
+          {isReceptionWidgetVisible('wakeup') && (
           <div className="header-card">
             <strong>☎️ Wake-Up Calls</strong>
             
@@ -905,6 +929,7 @@ function ChecklistApp({ userProfile, currentUser }) {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Right content area */}

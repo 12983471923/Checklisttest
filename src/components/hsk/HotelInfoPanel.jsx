@@ -7,8 +7,9 @@ import {
   getVisibleBreakfastItems,
   formatBreakfastPrice,
 } from '../../firebase/database';
+import { DEFAULT_HOTEL_INFO } from '../../firebase/dashboardConfig';
 
-export default function HotelInfoPanel({ compact = false, hidePricing = false }) {
+export default function HotelInfoPanel({ compact = false, hidePricing = false, hotelInfo: hotelInfoProp }) {
   const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
   const [pricingInfo, setPricingInfo] = useState({ ...DEFAULT_PRICING });
   const [savedHandovers, setSavedHandovers] = useState({});
@@ -27,25 +28,26 @@ export default function HotelInfoPanel({ compact = false, hidePricing = false })
 
   const breakfastItems = hidePricing ? [] : getVisibleBreakfastItems(pricingInfo);
   const todayHandover = savedHandovers[today];
+  const hotel = { ...DEFAULT_HOTEL_INFO, ...hotelInfoProp };
 
   return (
     <div className={`hsk-hotel-info ${compact ? 'hsk-hotel-info--compact' : ''}`}>
       <h3 className="hsk-panel-title">Hotel Information</h3>
 
       <div className="hsk-hotel-card-block">
-        <strong>Scandic Falkoner</strong>
+        <strong>{hotel.name}</strong>
         <div className="hsk-info-row">
           <span className="hsk-info-icon">📍</span>
           <div>
             <span className="hsk-hotel-label">Address</span>
-            <p>Falkoner Alle 9, 2000 Frederiksberg, Denmark</p>
+            <p>{hotel.address}</p>
           </div>
         </div>
         <div className="hsk-info-row">
           <span className="hsk-info-icon">📞</span>
           <div>
             <span className="hsk-hotel-label">Phone</span>
-            <p>+45 72 42 55 00</p>
+            <p>{hotel.phone}</p>
           </div>
         </div>
         <div className="hsk-info-row">
@@ -53,7 +55,7 @@ export default function HotelInfoPanel({ compact = false, hidePricing = false })
           <div>
             <span className="hsk-hotel-label">Email</span>
             <p>
-              <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+              <a href={`mailto:${hotel.email}`}>{hotel.email}</a>
             </p>
           </div>
         </div>
@@ -68,11 +70,11 @@ export default function HotelInfoPanel({ compact = false, hidePricing = false })
           </div>
           <div>
             <span className="hsk-hotel-label">Check-Out</span>
-            <p>12:00</p>
+            <p>{hotel.checkOut}</p>
           </div>
           <div>
             <span className="hsk-hotel-label">Check-In</span>
-            <p>16:00</p>
+            <p>{hotel.checkIn}</p>
           </div>
         </div>
       </div>

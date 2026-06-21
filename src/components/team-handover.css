@@ -1,0 +1,247 @@
+/* Team handover notes — shared HSK + Reception */
+
+.team-handover {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.team-handover--embedded {
+  flex: 1;
+  overflow: hidden;
+}
+
+.team-handover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-handover-head h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.team-handover-count {
+  font-size: 0.75rem;
+  color: var(--ios-secondary-label, #6e6e73);
+}
+
+.team-handover-form textarea {
+  width: 100%;
+  border: 1px solid var(--ios-separator, #d2d2d7);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 64px;
+  box-sizing: border-box;
+}
+
+.team-handover-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.team-handover-form-row select,
+.team-handover-filters button {
+  border: 1px solid var(--ios-separator, #d2d2d7);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  background: var(--ios-card, #fff);
+}
+
+.team-handover-form-row button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: var(--ios-label, #1d1d1f);
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.team-handover-form-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-handover-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.team-handover-filters button {
+  cursor: pointer;
+  background: var(--ios-fill, #f2f2f7);
+  color: var(--ios-label, #1d1d1f);
+  border: none;
+}
+
+.team-handover-filters button.active {
+  background: var(--ios-label, #1d1d1f);
+  color: #fff;
+}
+
+.team-handover-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  max-height: 420px;
+}
+
+.team-handover--compact .team-handover-list {
+  max-height: 320px;
+}
+
+.team-handover--embedded .team-handover-list {
+  max-height: none;
+  flex: 1;
+}
+
+.team-handover-empty {
+  text-align: center;
+  color: var(--ios-secondary-label, #6e6e73);
+  font-size: 0.85rem;
+  padding: 16px;
+}
+
+.team-handover-card {
+  border: 1px solid var(--ios-separator, #e5e7eb);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--ios-fill, #fafafa);
+}
+
+.team-handover-card.priority-urgent {
+  border-left: 3px solid #ff3b30;
+}
+
+.team-handover-card.priority-high {
+  border-left: 3px solid #ff9500;
+}
+
+.team-handover-card-top {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.team-handover-status,
+.team-handover-priority {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.team-handover-status.status-open {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.team-handover-status.status-in-progress {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.team-handover-status.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.team-handover-priority.priority-urgent {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.team-handover-priority.priority-high {
+  background: #ff9500;
+  color: #fff;
+}
+
+.team-handover-priority.priority-medium {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.team-handover-priority.priority-low {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.team-handover-text {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.team-handover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--ios-secondary-label, #6e6e73);
+  margin-bottom: 8px;
+}
+
+.team-handover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.team-handover-actions button {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  background: var(--ios-label, #1d1d1f);
+  color: #fff;
+}
+
+.team-handover-actions button.danger {
+  background: #ff3b30;
+}
+
+.team-handover-sidebar-card {
+  background: var(--ios-card, #fff);
+  border: 1px solid var(--ios-separator, #e5e7eb);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.team-handover-sidebar-card .team-handover-list {
+  max-height: 280px;
+}
+
+@media (max-width: 640px) {
+  .team-handover-form-row {
+    flex-direction: column;
+  }
+
+  .team-handover-form-row button {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .team-handover-list {
+    max-height: 360px;
+  }
+}

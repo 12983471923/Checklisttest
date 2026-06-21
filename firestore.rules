@@ -172,6 +172,22 @@ service cloud.firestore {
       allow write: if isStaffPortalUser() && withinSizeLimit();
     }
 
+    // Team handover notes — all active staff; admin can delete
+    match /team-handovers/{handoverId} {
+      allow read: if isActive();
+      allow create: if isActive()
+        && withinSizeLimit()
+        && request.resource.data.authorId == request.auth.uid;
+      allow update: if isActive() && withinSizeLimit();
+      allow delete: if isAdmin();
+    }
+
+    // Dashboard layout customization — admin writes, all staff read
+    match /dashboardConfig/{document} {
+      allow read: if isActive();
+      allow write: if isAdmin() && withinSizeLimit();
+    }
+
     // Deny all other collections by default
     match /{document=**} {
       allow read, write: if false;

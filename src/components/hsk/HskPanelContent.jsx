@@ -3,6 +3,7 @@ import HskMessagesPanel from './HskMessagesPanel';
 import HskRequestsPanel from './HskRequestsPanel';
 import HskRoomsPanel from './HskRoomsPanel';
 import HskNotificationToasts from './HskNotificationToasts';
+import TeamHandoverPanel from '../TeamHandoverPanel';
 import {
   subscribeRooms,
   subscribeRequests,
@@ -14,6 +15,7 @@ import { useHskNotifications } from '../../hooks/useHskNotifications';
 
 const ALL_TABS = [
   { id: 'messages', label: 'Messages', icon: '💬' },
+  { id: 'handovers', label: 'Handovers', icon: '📝' },
   { id: 'requests', label: 'Requests', icon: '📋' },
   { id: 'rooms', label: 'Rooms', icon: '🚪' },
   { id: 'alerts', label: 'Alerts', icon: '🔔' },
@@ -25,6 +27,7 @@ export default function HskPanelContent({
   canManageRooms = false,
   onBadgeChange,
   visibleTabs,
+  isAdmin = false,
 }) {
   const tabs = visibleTabs
     ? ALL_TABS.filter((t) => visibleTabs.includes(t.id))
@@ -143,6 +146,15 @@ export default function HskPanelContent({
         <div className="hsk-right-body">
           {tab === 'messages' && (
             <HskMessagesPanel user={user} role={role} onNewMessage={handleNewMessage} />
+          )}
+          {tab === 'handovers' && (
+            <TeamHandoverPanel
+              user={user}
+              role={role}
+              isAdmin={isAdmin}
+              compact
+              embedded
+            />
           )}
           {tab === 'requests' && (
             <HskRequestsPanel user={user} role={role} rooms={rooms} canCreate={canManageRooms} />

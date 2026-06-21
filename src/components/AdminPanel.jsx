@@ -26,9 +26,11 @@ import './admin-responsive.css';
 import ThemeToggle from './ThemeToggle';
 
 import ExploreAdminSection from './ExploreAdminSection';
+import DashboardConfigSection from './admin/DashboardConfigSection';
 
 const SECTIONS = [
   { id: 'tasks', label: 'Tasks', icon: '✅' },
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'explore', label: 'Explore Copenhagen', icon: '🗺️' },
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'instructions', label: 'Instructions', icon: '📋' },
@@ -91,6 +93,7 @@ const AdminPanel = ({ onClose }) => {
 
           <main className="admin-content">
             {activeSection === 'tasks' && <TasksSection />}
+            {activeSection === 'dashboard' && <DashboardConfigSection />}
             {activeSection === 'explore' && <ExploreAdminSection />}
             {activeSection === 'users' && <UsersSection />}
             {activeSection === 'instructions' && <InstructionsSection />}

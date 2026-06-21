@@ -1,10 +1,12 @@
 import React from 'react';
 import { signOutUser } from '../../firebase/auth';
+import { useAuth } from '../../hooks/useAuth';
 import ThemeToggle from '../ThemeToggle';
 import HskPortalLayout from './HskPortalLayout';
 import './hsk.css';
 
 export default function HskDashboard({ currentUser, userProfile }) {
+  const { isAdmin } = useAuth();
   const displayName =
     userProfile?.displayName || currentUser?.displayName || currentUser?.email || 'Housekeeping';
 
@@ -31,6 +33,7 @@ export default function HskDashboard({ currentUser, userProfile }) {
         user={currentUser}
         role="housekeeping"
         canManageRooms={false}
+        isAdmin={isAdmin}
       />
     </div>
   );

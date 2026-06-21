@@ -2,7 +2,12 @@ import React, { useCallback, useState } from 'react';
 import HskPanelContent from './HskPanelContent';
 import './hsk.css';
 
+import { useDashboardConfig } from '../../hooks/useDashboardConfig';
+import { isAdminEmail } from '../../config/admin';
+
 export default function FloatingHskWidget({ currentUser, userProfile }) {
+  const { visibleFloatingTabs } = useDashboardConfig();
+  const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === 'admin';
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [badgeTotal, setBadgeTotal] = useState(0);
@@ -63,7 +68,7 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
         <header className="hsk-floating-header">
           <div>
             <h3>Housekeeping</h3>
-            <p>Messages, requests &amp; rooms</p>
+            <p>Messages, handovers, requests &amp; rooms</p>
           </div>
           <button
             type="button"
@@ -78,7 +83,9 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
           user={user}
           role="reception"
           canManageRooms
+          isAdmin={isAdmin}
           onBadgeChange={setBadgeTotal}
+          visibleTabs={visibleFloatingTabs.length ? visibleFloatingTabs : undefined}
         />
       </div>
     </>
