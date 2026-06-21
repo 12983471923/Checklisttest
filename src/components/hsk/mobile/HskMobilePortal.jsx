@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import HotelInfoPanel from '../HotelInfoPanel';
 import HskMessengerMobile from './HskMessengerMobile';
 import HskPanelContent from '../HskPanelContent';
 import HskMobileBottomNav, { HSK_MOBILE_NAV_ITEMS } from './HskMobileBottomNav';
-import HskNotificationToasts from '../HskNotificationToasts';
 import TeamHandoverPanel from '../../TeamHandoverPanel';
-import { useHskNotifications } from '../../../hooks/useHskNotifications';
 import { useDashboardConfig } from '../../../hooks/useDashboardConfig';
 import { countUnreadMessages, countPendingRequests, subscribeMessages, subscribeRequests } from '../../../firebase/hsk';
 
@@ -15,19 +13,11 @@ export default function HskMobilePortal({ user, role, canManageRooms = false, is
   const [messages, setMessages] = useState([]);
   const [requests, setRequests] = useState([]);
   const { hotelInfo, isHskWidgetVisible } = useDashboardConfig();
-  const { toasts, pushNotification } = useHskNotifications();
 
   const userId = user?.uid;
 
   useEffect(() => subscribeMessages(setMessages), []);
   useEffect(() => subscribeRequests(setRequests), []);
-
-  const handleNewMessage = useCallback(
-    (msg) => {
-      pushNotification({ type: 'message', title: 'New message', body: msg.text });
-    },
-    [pushNotification]
-  );
 
   const badges = useMemo(
     () => ({
@@ -64,12 +54,10 @@ export default function HskMobilePortal({ user, role, canManageRooms = false, is
 
   return (
     <>
-      <HskNotificationToasts toasts={toasts} />
-
       <div className="hsk-mobile-portal">
         <main className="hsk-mobile-content">
           {tab === 'chat' && showChat && (
-            <HskMessengerMobile user={user} role={role} onNewMessage={handleNewMessage} />
+            <HskMessengerMobile user={user} role={role} />
           )}
           {tab === 'tasks' && showTools && (
             <div className="hsk-mobile-panel">

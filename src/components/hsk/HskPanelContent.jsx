@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HskMessagesPanel from './HskMessagesPanel';
 import HskMessengerMobile from './mobile/HskMessengerMobile';
 import HskRequestsPanel from './HskRequestsPanel';
@@ -48,7 +48,6 @@ export default function HskPanelContent({
   const {
     toasts,
     unreadCount,
-    pushNotification,
     notifyIfNew,
     markAllRead,
   } = useHskNotifications();
@@ -70,29 +69,6 @@ export default function HskPanelContent({
       }
     });
   }, [requests, notifyIfNew]);
-
-  useEffect(() => {
-    messages.forEach((m) => {
-      if (m.senderId !== userId) {
-        notifyIfNew(`msg-${m.id}`, {
-          type: 'message',
-          title: 'New message',
-          body: m.text,
-        });
-      }
-    });
-  }, [messages, userId, notifyIfNew]);
-
-  const handleNewMessage = useCallback(
-    (msg) => {
-      pushNotification({
-        type: 'message',
-        title: 'New message',
-        body: msg.text,
-      });
-    },
-    [pushNotification]
-  );
 
   const msgUnread = countUnreadMessages(messages, userId, role);
   const reqPending = countPendingRequests(requests, role);
@@ -147,9 +123,9 @@ export default function HskPanelContent({
         <div className="hsk-right-body">
           {tab === 'messages' && (
             isMobile ? (
-              <HskMessengerMobile user={user} role={role} onNewMessage={handleNewMessage} />
+              <HskMessengerMobile user={user} role={role} />
             ) : (
-              <HskMessagesPanel user={user} role={role} onNewMessage={handleNewMessage} />
+              <HskMessagesPanel user={user} role={role} />
             )
           )}
           {tab === 'handovers' && (

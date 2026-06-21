@@ -6,6 +6,8 @@ export function useHskNotifications() {
   const seenRef = useRef(new Set());
 
   const pushNotification = useCallback((item) => {
+    if (item.type === 'message') return;
+
     const id = item.id || `${Date.now()}-${Math.random()}`;
     const entry = { ...item, id, read: false, createdAt: Date.now() };
 

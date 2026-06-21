@@ -1,11 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import HotelInfoPanel from './HotelInfoPanel';
 import HskMessagesPanel from './HskMessagesPanel';
 import HskPanelContent from './HskPanelContent';
-import HskNotificationToasts from './HskNotificationToasts';
 import HskMobilePortal from './mobile/HskMobilePortal';
 import TeamHandoverPanel from '../TeamHandoverPanel';
-import { useHskNotifications } from '../../hooks/useHskNotifications';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import '../team-handover.css';
@@ -15,21 +13,6 @@ const DEFAULT_SIDE_TABS = ['requests', 'rooms', 'alerts'];
 export default function HskPortalLayout({ user, role, canManageRooms = false, isAdmin = false }) {
   const isMobile = useIsMobile();
   const { hotelInfo, isHskWidgetVisible } = useDashboardConfig();
-  const {
-    toasts,
-    pushNotification,
-  } = useHskNotifications();
-
-  const handleNewMessage = useCallback(
-    (msg) => {
-      pushNotification({
-        type: 'message',
-        title: 'New message from Reception',
-        body: msg.text,
-      });
-    },
-    [pushNotification]
-  );
 
   const showHotelInfo = isHskWidgetVisible('hotel-info');
   const showHandovers = isHskWidgetVisible('team-handovers');
@@ -49,8 +32,6 @@ export default function HskPortalLayout({ user, role, canManageRooms = false, is
 
   return (
     <>
-      <HskNotificationToasts toasts={toasts} />
-
       <div className={`hsk-layout-portal ${!showHotelInfo && !showHandovers ? 'hsk-layout-portal--chat-only' : ''}`}>
         {(showHotelInfo || showHandovers) && (
           <aside className="hsk-portal-sidebar">
@@ -82,7 +63,6 @@ export default function HskPortalLayout({ user, role, canManageRooms = false, is
               <HskMessagesPanel
                 user={user}
                 role={role}
-                onNewMessage={handleNewMessage}
                 primary
               />
             </div>
