@@ -24,7 +24,7 @@ export default function HskRequestsPanel({
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState('all');
   const [form, setForm] = useState({
-    roomId: '',
+    roomNumber: '',
     requestType: REQUEST_TYPES[0],
     priority: 'Medium',
     notes: '',
@@ -48,15 +48,20 @@ export default function HskRequestsPanel({
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    const room = rooms.find((r) => r.id === form.roomId);
+    const roomNumber = form.roomNumber.trim();
+    if (!roomNumber) return;
+    const matchedRoom = rooms.find(
+      (r) => String(r.roomNumber).trim() === roomNumber
+    );
     await createRequest(
       {
         ...form,
-        roomNumber: room?.roomNumber || '',
+        roomNumber,
+        roomId: matchedRoom?.id || '',
       },
       { uid: user?.uid, name: displayName }
     );
-    setForm((f) => ({ ...f, notes: '' }));
+    setForm((f) => ({ ...f, roomNumber: '', notes: '' }));
   };
 
   const handleStatus = async (id, status) => {
@@ -79,18 +84,15 @@ export default function HskRequestsPanel({
 
       {canCreate && (
         <form className="hsk-request-form" onSubmit={handleCreate}>
-          <select
-            value={form.roomId}
-            onChange={(e) => setForm((f) => ({ ...f, roomId: e.target.value }))}
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Room number"
+            value={form.roomNumber}
+            onChange={(e) => setForm((f) => ({ ...f, roomNumber: e.target.value }))}
             required
-          >
-            <option value="">Select room</option>
-            {rooms.map((r) => (
-              <option key={r.id} value={r.id}>
-                Room {r.roomNumber}
-              </option>
-            ))}
-          </select>
+            aria-label="Room number"
+          />
           <select
             value={form.requestType}
             onChange={(e) => setForm((f) => ({ ...f, requestType: e.target.value }))}
