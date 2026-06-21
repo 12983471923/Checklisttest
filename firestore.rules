@@ -163,7 +163,16 @@ service cloud.firestore {
       allow read: if isStaffPortalUser();
       allow create: if isStaffPortalUser() && withinSizeLimit();
       allow update: if isStaffPortalUser() && withinSizeLimit();
-      allow delete: if false;
+      allow delete: if isReception() || isAdmin();
+    }
+
+    // Ephemeral typing indicators for HSK chat
+    match /hsk-typing/{userId} {
+      allow read: if isStaffPortalUser();
+      allow create, update: if isStaffPortalUser()
+        && request.auth.uid == userId
+        && withinSizeLimit();
+      allow delete: if isStaffPortalUser() && request.auth.uid == userId;
     }
 
     // Shared housekeeping checklist

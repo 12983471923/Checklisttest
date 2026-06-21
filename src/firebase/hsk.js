@@ -5,10 +5,12 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   onSnapshot,
   query,
   orderBy,
   Timestamp,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from './config';
 import { housekeepingChecklist } from '../Checklists/housekeeping';
@@ -30,6 +32,11 @@ export const ROOM_STATUSES = [
 
 export const REQUEST_PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
 export const REQUEST_STATUSES = ['Pending', 'Accepted', 'In Progress', 'Completed'];
+export const MESSAGE_VIEWS = ['active', 'archived', 'trash', 'all'];
+export const REQUEST_VIEWS = ['active', 'completed', 'archived', 'all'];
+export const TRASH_RETENTION_DAYS = 30;
+export const TRASH_RETENTION_MS = TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+const BATCH_SIZE = 400;
 export const REQUEST_TYPES = [
   'Room cleaning',
   'Extra towels',
@@ -118,14 +125,186 @@ export const addRequestComment = async (requestId, comment, user) => {
   await updateDoc(ref, { comments, updatedAt: now() });
 };
 
+const tsToMs = (ts) => {
+  if (!ts) return 0;
+  if (ts.toDate) return ts.toDate().getTime();
+  return new Date(ts).getTime();
+};
+
+export const isMessageInTrash = (message, atMs = Date.now()) => {
+  if (!message?.deletedAt || message?.purgedAt) return false;
+  return atMs - tsToMs(message.deletedAt) < TRASH_RETENTION_MS;
+};
+
+export const isMessageArchived = (message) =>
+  Boolean(message?.archivedAt && !message?.deletedAt && !message?.purgedAt);
+
+export const isMessageActive = (message) =>
+  !message?.deletedAt && !message?.archivedAt && !message?.purgedAt;
+
+export const isRequestArchived = (request) => Boolean(request?.archivedAt);
+
+export const isRequestCompleted = (request) =>
+  request?.status === 'Completed' && !request?.archivedAt;
+
+export const isRequestActive = (request) =>
+  request?.status !== 'Completed' && !request?.archivedAt;
+
+export const filterMessagesByView = (messages, view, atMs = Date.now()) => {
+  switch (view) {
+    case 'archived':
+      return messages.filter(isMessageArchived);
+    case 'trash':
+      return messages.filter((m) => isMessageInTrash(m, atMs));
+    case 'all':
+      return messages.filter((m) => !m.deletedAt || isMessageInTrash(m, atMs));
+    case 'active':
+    default:
+      return messages.filter(isMessageActive);
+  }
+};
+
+export const filterRequestsByView = (requests, view) => {
+  switch (view) {
+    case 'completed':
+      return requests.filter(isRequestCompleted);
+    case 'archived':
+      return requests.filter(isRequestArchived);
+    case 'all':
+      return requests;
+    case 'active':
+    default:
+      return requests.filter(isRequestActive);
+  }
+};
+
+export const countMessagesByView = (messages, view, atMs = Date.now()) =>
+  filterMessagesByView(messages, view, atMs).length;
+
+export const countRequestsByView = (requests, view) =>
+  filterRequestsByView(requests, view).length;
+
+const commitMessageBatches = async (messages, apply) => {
+  for (let i = 0; i < messages.length; i += BATCH_SIZE) {
+    const chunk = messages.slice(i, i + BATCH_SIZE);
+    const batch = writeBatch(db);
+    chunk.forEach((m) => apply(batch, m));
+    await batch.commit();
+  }
+};
+
+const batchUpdateMessages = async (messages, updates) => {
+  if (!messages.length) return;
+  await commitMessageBatches(messages, (batch, m) => {
+    batch.update(doc(db, MESSAGES, m.id), { ...updates, updatedAt: now() });
+  });
+};
+
+export const archiveMessages = async (messages, user) =>
+  batchUpdateMessages(messages, {
+    archivedAt: now(),
+    archivedBy: user?.uid || '',
+    deletedAt: deleteField(),
+    deletedBy: deleteField(),
+  });
+
+export const softDeleteMessages = async (messages, user) =>
+  batchUpdateMessages(messages, {
+    deletedAt: now(),
+    deletedBy: user?.uid || '',
+    archivedAt: deleteField(),
+    archivedBy: deleteField(),
+  });
+
+export const restoreMessages = async (messages) =>
+  batchUpdateMessages(messages, {
+    deletedAt: deleteField(),
+    deletedBy: deleteField(),
+    archivedAt: deleteField(),
+    archivedBy: deleteField(),
+    purgedAt: deleteField(),
+    purgedBy: deleteField(),
+  });
+
+export const permanentlyDeleteMessages = async (messages, user) => {
+  if (!messages.length) return;
+
+  const uid = user?.uid || '';
+
+  // Mark as purged via update — works even when Firestore delete rules are not deployed
+  await commitMessageBatches(messages, (batch, m) => {
+    batch.update(doc(db, MESSAGES, m.id), {
+      purgedAt: now(),
+      purgedBy: uid,
+      updatedAt: now(),
+    });
+  });
+
+  // Best-effort hard delete to remove documents when rules allow
+  try {
+    await commitMessageBatches(messages, (batch, m) => {
+      batch.delete(doc(db, MESSAGES, m.id));
+    });
+  } catch (err) {
+    console.warn('HSK message hard-delete skipped (messages are hidden via purgedAt):', err);
+  }
+};
+
+export const purgeExpiredTrashMessages = async (messages, user, atMs = Date.now()) => {
+  const expired = messages.filter(
+    (m) => m.deletedAt && !m.purgedAt && !isMessageInTrash(m, atMs)
+  );
+  await permanentlyDeleteMessages(expired, user);
+  return expired.length;
+};
+
+export const deleteRequest = async (requestId) => deleteDoc(doc(db, REQUESTS, requestId));
+
+export const deleteRequests = async (requestIds) => {
+  if (!requestIds.length) return;
+  const batch = writeBatch(db);
+  requestIds.forEach((id) => batch.delete(doc(db, REQUESTS, id)));
+  await batch.commit();
+};
+
+export const archiveRequests = async (requests, user) => {
+  if (!requests.length) return;
+  const batch = writeBatch(db);
+  requests.forEach((r) => {
+    batch.update(doc(db, REQUESTS, r.id), {
+      archivedAt: now(),
+      archivedBy: user?.uid || '',
+      updatedAt: now(),
+    });
+  });
+  await batch.commit();
+};
+
+export const restoreRequests = async (requests) => {
+  if (!requests.length) return;
+  const batch = writeBatch(db);
+  requests.forEach((r) => {
+    batch.update(doc(db, REQUESTS, r.id), {
+      archivedAt: null,
+      archivedBy: '',
+      updatedAt: now(),
+    });
+  });
+  await batch.commit();
+};
+
 export const subscribeMessages = (callback) => {
   const q = query(collection(db, MESSAGES), orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    callback(
+      snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((m) => !m.purgedAt)
+    );
   }, (err) => console.error('messages sub error', err));
 };
 
-export const sendMessage = async (text, user, senderRole) => {
+export const sendMessage = async (text, user, senderRole, extras = {}) => {
   const id = `msg-${Date.now()}`;
   await setDoc(doc(db, MESSAGES, id), {
     text: text.trim(),
@@ -135,9 +314,35 @@ export const sendMessage = async (text, user, senderRole) => {
     receiverRole: senderRole === 'housekeeping' ? 'reception' : 'housekeeping',
     createdAt: now(),
     readBy: [user?.uid].filter(Boolean),
+    attachmentName: extras.attachmentName || '',
   });
   return id;
 };
+
+const TYPING_COLLECTION = 'hsk-typing';
+
+export const setTypingStatus = async (user, role, isTyping) => {
+  if (!user?.uid) return;
+  const ref = doc(db, TYPING_COLLECTION, user.uid);
+  if (!isTyping) {
+    await deleteDoc(ref).catch(() => {});
+    return;
+  }
+  await setDoc(ref, {
+    userId: user.uid,
+    name: user.name || 'Staff',
+    role,
+    updatedAt: now(),
+  });
+};
+
+export const subscribeTyping = (callback, excludeUserId) =>
+  onSnapshot(collection(db, TYPING_COLLECTION), (snap) => {
+    const typing = snap.docs
+      .map((d) => d.data())
+      .filter((t) => t.userId !== excludeUserId);
+    callback(typing);
+  }, (err) => console.error('typing sub error', err));
 
 export const markMessageRead = async (messageId, userId, currentReadBy = []) => {
   if (!userId || currentReadBy.includes(userId)) return;
@@ -176,14 +381,16 @@ export const updateHskChecklistTasks = async (tasks) => {
 export const countUnreadMessages = (messages, userId, role) =>
   messages.filter(
     (m) =>
+      isMessageActive(m) &&
       m.senderId !== userId &&
       m.senderRole !== role &&
       !(m.readBy || []).includes(userId)
   ).length;
 
 export const countPendingRequests = (requests, role) => {
+  const active = requests.filter(isRequestActive);
   if (role === 'housekeeping') {
-    return requests.filter((r) => r.status === 'Pending' || r.status === 'Accepted').length;
+    return active.filter((r) => r.status === 'Pending' || r.status === 'Accepted').length;
   }
-  return requests.filter((r) => r.status !== 'Completed').length;
+  return active.length;
 };
