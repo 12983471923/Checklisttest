@@ -29,6 +29,7 @@ export default function HskMessageAdminControls({
 }) {
   const [confirm, setConfirm] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   const counts = useMemo(
     () =>
@@ -41,13 +42,17 @@ export default function HskMessageAdminControls({
 
   useEffect(() => {
     if (!canManage || messageView !== 'trash') return;
-    purgeExpiredTrashMessages(messages).catch(() => {});
-  }, [canManage, messageView, messages]);
+    purgeExpiredTrashMessages(messages, user).catch(() => {});
+  }, [canManage, messageView, messages, user]);
 
   const runAction = async (action) => {
     setBusy(true);
+    setError('');
     try {
       await action();
+    } catch (err) {
+      console.error('HSK message admin action failed:', err);
+      setError(err?.message || 'Could not complete that action. Please try again.');
     } finally {
       setBusy(false);
       setConfirm(null);
@@ -158,7 +163,7 @@ export default function HskMessageAdminControls({
                     confirmLabel: 'Delete permanently',
                     danger: true,
                     action: () =>
-                      permanentlyDeleteMessages(filterMessagesByView(messages, 'trash')),
+                      permanentlyDeleteMessages(filterMessagesByView(messages, 'trash'), user),
                   })
                 }
               >
@@ -167,6 +172,8 @@ export default function HskMessageAdminControls({
             </>
           )}
         </div>
+
+        {error && <p className="hsk-admin-error" role="alert">{error}</p>}
 
         {messageView === 'trash' && (
           <p className="hsk-admin-hint">

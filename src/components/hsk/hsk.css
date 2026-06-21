@@ -1086,6 +1086,17 @@
   line-height: 1.4;
 }
 
+.hsk-admin-error {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ios-error-bg, #fff5f5);
+  border: 1px solid var(--ios-error-border, #fecaca);
+  color: var(--ios-error-text, #991b1b);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
 .hsk-bulk-bar {
   display: flex;
   flex-direction: column;

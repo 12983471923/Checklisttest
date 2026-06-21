@@ -5,6 +5,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   onSnapshot,
   query,
   orderBy,
@@ -35,6 +36,7 @@ export const MESSAGE_VIEWS = ['active', 'archived', 'trash', 'all'];
 export const REQUEST_VIEWS = ['active', 'completed', 'archived', 'all'];
 export const TRASH_RETENTION_DAYS = 30;
 export const TRASH_RETENTION_MS = TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+const BATCH_SIZE = 400;
 export const REQUEST_TYPES = [
   'Room cleaning',
   'Extra towels',
@@ -130,13 +132,15 @@ const tsToMs = (ts) => {
 };
 
 export const isMessageInTrash = (message, atMs = Date.now()) => {
-  if (!message?.deletedAt) return false;
+  if (!message?.deletedAt || message?.purgedAt) return false;
   return atMs - tsToMs(message.deletedAt) < TRASH_RETENTION_MS;
 };
 
-export const isMessageArchived = (message) => Boolean(message?.archivedAt && !message?.deletedAt);
+export const isMessageArchived = (message) =>
+  Boolean(message?.archivedAt && !message?.deletedAt && !message?.purgedAt);
 
-export const isMessageActive = (message) => !message?.deletedAt && !message?.archivedAt;
+export const isMessageActive = (message) =>
+  !message?.deletedAt && !message?.archivedAt && !message?.purgedAt;
 
 export const isRequestArchived = (request) => Boolean(request?.archivedAt);
 
@@ -180,51 +184,77 @@ export const countMessagesByView = (messages, view, atMs = Date.now()) =>
 export const countRequestsByView = (requests, view) =>
   filterRequestsByView(requests, view).length;
 
-const batchUpdateMessages = async (messages, updates, user) => {
+const commitMessageBatches = async (messages, apply) => {
+  for (let i = 0; i < messages.length; i += BATCH_SIZE) {
+    const chunk = messages.slice(i, i + BATCH_SIZE);
+    const batch = writeBatch(db);
+    chunk.forEach((m) => apply(batch, m));
+    await batch.commit();
+  }
+};
+
+const batchUpdateMessages = async (messages, updates) => {
   if (!messages.length) return;
-  const batch = writeBatch(db);
-  messages.forEach((m) => {
+  await commitMessageBatches(messages, (batch, m) => {
     batch.update(doc(db, MESSAGES, m.id), { ...updates, updatedAt: now() });
   });
-  await batch.commit();
 };
 
 export const archiveMessages = async (messages, user) =>
   batchUpdateMessages(messages, {
     archivedAt: now(),
     archivedBy: user?.uid || '',
-    deletedAt: null,
-    deletedBy: '',
-  }, user);
+    deletedAt: deleteField(),
+    deletedBy: deleteField(),
+  });
 
 export const softDeleteMessages = async (messages, user) =>
   batchUpdateMessages(messages, {
     deletedAt: now(),
     deletedBy: user?.uid || '',
-    archivedAt: null,
-    archivedBy: '',
-  }, user);
+    archivedAt: deleteField(),
+    archivedBy: deleteField(),
+  });
 
 export const restoreMessages = async (messages) =>
   batchUpdateMessages(messages, {
-    deletedAt: null,
-    deletedBy: '',
-    archivedAt: null,
-    archivedBy: '',
+    deletedAt: deleteField(),
+    deletedBy: deleteField(),
+    archivedAt: deleteField(),
+    archivedBy: deleteField(),
+    purgedAt: deleteField(),
+    purgedBy: deleteField(),
   });
 
-export const permanentlyDeleteMessages = async (messages) => {
+export const permanentlyDeleteMessages = async (messages, user) => {
   if (!messages.length) return;
-  const batch = writeBatch(db);
-  messages.forEach((m) => batch.delete(doc(db, MESSAGES, m.id)));
-  await batch.commit();
+
+  const uid = user?.uid || '';
+
+  // Mark as purged via update — works even when Firestore delete rules are not deployed
+  await commitMessageBatches(messages, (batch, m) => {
+    batch.update(doc(db, MESSAGES, m.id), {
+      purgedAt: now(),
+      purgedBy: uid,
+      updatedAt: now(),
+    });
+  });
+
+  // Best-effort hard delete to remove documents when rules allow
+  try {
+    await commitMessageBatches(messages, (batch, m) => {
+      batch.delete(doc(db, MESSAGES, m.id));
+    });
+  } catch (err) {
+    console.warn('HSK message hard-delete skipped (messages are hidden via purgedAt):', err);
+  }
 };
 
-export const purgeExpiredTrashMessages = async (messages, atMs = Date.now()) => {
+export const purgeExpiredTrashMessages = async (messages, user, atMs = Date.now()) => {
   const expired = messages.filter(
-    (m) => m.deletedAt && !isMessageInTrash(m, atMs)
+    (m) => m.deletedAt && !m.purgedAt && !isMessageInTrash(m, atMs)
   );
-  await permanentlyDeleteMessages(expired);
+  await permanentlyDeleteMessages(expired, user);
   return expired.length;
 };
 
@@ -266,7 +296,11 @@ export const restoreRequests = async (requests) => {
 export const subscribeMessages = (callback) => {
   const q = query(collection(db, MESSAGES), orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    callback(
+      snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((m) => !m.purgedAt)
+    );
   }, (err) => console.error('messages sub error', err));
 };
 
