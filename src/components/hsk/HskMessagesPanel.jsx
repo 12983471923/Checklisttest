@@ -4,10 +4,19 @@ import {
   sendMessage,
   markMessageRead,
   countUnreadMessages,
+  isMessageActive,
 } from '../../firebase/hsk';
+import HskMessageAdminControls, { filterMessagesByView } from './HskMessageAdminControls';
 
-export default function HskMessagesPanel({ user, role, onNewMessage, primary = false }) {
+export default function HskMessagesPanel({
+  user,
+  role,
+  onNewMessage,
+  primary = false,
+  canManage = false,
+}) {
   const [messages, setMessages] = useState([]);
+  const [messageView, setMessageView] = useState('active');
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
@@ -16,22 +25,25 @@ export default function HskMessagesPanel({ user, role, onNewMessage, primary = f
   const userId = user?.uid;
   const displayName = user?.displayName || user?.email || 'Staff';
 
-  useEffect(() => {
-    return subscribeMessages(setMessages);
-  }, []);
+  useEffect(() => subscribeMessages(setMessages), []);
+
+  const visibleMessages = useMemo(
+    () => filterMessagesByView(messages, messageView),
+    [messages, messageView]
+  );
 
   useEffect(() => {
     if (!userId) return;
-    messages.forEach((m) => {
-      if (m.senderId !== userId && !(m.readBy || []).includes(userId)) {
+    visibleMessages.forEach((m) => {
+      if (isMessageActive(m) && m.senderId !== userId && !(m.readBy || []).includes(userId)) {
         markMessageRead(m.id, userId, m.readBy || []);
       }
     });
-  }, [messages, userId]);
+  }, [visibleMessages, userId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length]);
+  }, [visibleMessages.length]);
 
   useEffect(() => {
     if (messages.length > prevCountRef.current && prevCountRef.current > 0) {
@@ -55,6 +67,7 @@ export default function HskMessagesPanel({ user, role, onNewMessage, primary = f
     try {
       await sendMessage(text, { uid: userId, name: displayName }, role);
       setText('');
+      setMessageView('active');
     } finally {
       setSending(false);
     }
@@ -75,11 +88,26 @@ export default function HskMessagesPanel({ user, role, onNewMessage, primary = f
         </div>
       )}
 
+      {canManage && (
+        <HskMessageAdminControls
+          messages={messages}
+          user={user}
+          canManage={canManage}
+          messageView={messageView}
+          onViewChange={setMessageView}
+          compact={primary}
+        />
+      )}
+
       <div className="hsk-messages-list">
-        {messages.length === 0 && (
-          <p className="hsk-empty">No messages yet. Start a conversation with Reception.</p>
+        {visibleMessages.length === 0 && (
+          <p className="hsk-empty">
+            {messageView === 'active'
+              ? 'No messages yet. Start a conversation with Reception.'
+              : `No ${messageView} messages.`}
+          </p>
         )}
-        {messages.map((m) => {
+        {visibleMessages.map((m) => {
           const mine = m.senderId === userId;
           const read = (m.readBy || []).length > 1;
           return (
@@ -98,18 +126,20 @@ export default function HskMessagesPanel({ user, role, onNewMessage, primary = f
         <div ref={bottomRef} />
       </div>
 
-      <form className="hsk-message-compose" onSubmit={handleSend}>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message…"
-          disabled={sending}
-        />
-        <button type="submit" disabled={sending || !text.trim()}>
-          Send
-        </button>
-      </form>
+      {messageView === 'active' && (
+        <form className="hsk-message-compose" onSubmit={handleSend}>
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type a message…"
+            disabled={sending}
+          />
+          <button type="submit" disabled={sending || !text.trim()}>
+            Send
+          </button>
+        </form>
+      )}
     </div>
   );
 }

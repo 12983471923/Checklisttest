@@ -6,12 +6,15 @@ import {
   countUnreadMessages,
   setTypingStatus,
   subscribeTyping,
+  isMessageActive,
 } from '../../../firebase/hsk';
+import HskMessageAdminControls, { filterMessagesByView } from '../HskMessageAdminControls';
 
 const QUICK_EMOJIS = ['👍', '❤️', '😊', '🙏', '✅', '🏨', '🛏️', '🧹'];
 
-export default function HskMessengerMobile({ user, role, onNewMessage }) {
+export default function HskMessengerMobile({ user, role, onNewMessage, canManage = false }) {
   const [messages, setMessages] = useState([]);
+  const [messageView, setMessageView] = useState('active');
   const [view, setView] = useState('list');
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -30,37 +33,47 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
   useEffect(() => subscribeMessages(setMessages), []);
   useEffect(() => subscribeTyping(setTypingUsers, userId), [userId]);
 
+  const visibleMessages = useMemo(
+    () => filterMessagesByView(messages, messageView),
+    [messages, messageView]
+  );
+
+  const activeMessages = useMemo(
+    () => filterMessagesByView(messages, 'active'),
+    [messages]
+  );
+
   useEffect(() => {
     if (!userId || view !== 'thread') return;
-    messages.forEach((m) => {
-      if (m.senderId !== userId && !(m.readBy || []).includes(userId)) {
+    visibleMessages.forEach((m) => {
+      if (isMessageActive(m) && m.senderId !== userId && !(m.readBy || []).includes(userId)) {
         markMessageRead(m.id, userId, m.readBy || []);
       }
     });
-  }, [messages, userId, view]);
+  }, [visibleMessages, userId, view]);
 
   useEffect(() => {
     if (view === 'thread') {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages.length, view, typingUsers.length]);
+  }, [visibleMessages.length, view, typingUsers.length]);
 
   useEffect(() => {
-    if (messages.length > prevCountRef.current && prevCountRef.current > 0) {
-      const latest = messages[messages.length - 1];
+    if (activeMessages.length > prevCountRef.current && prevCountRef.current > 0) {
+      const latest = activeMessages[activeMessages.length - 1];
       if (latest?.senderId !== userId && onNewMessage) {
         onNewMessage(latest);
       }
     }
-    prevCountRef.current = messages.length;
-  }, [messages, userId, onNewMessage, view]);
+    prevCountRef.current = activeMessages.length;
+  }, [activeMessages, userId, onNewMessage, view]);
 
   const unread = useMemo(
     () => countUnreadMessages(messages, userId, role),
     [messages, userId, role]
   );
 
-  const lastMessage = messages[messages.length - 1];
+  const lastMessage = activeMessages[activeMessages.length - 1];
 
   const formatTime = (ts) => {
     if (!ts) return '';
@@ -102,6 +115,7 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
       setText('');
       setAttachmentName('');
       setShowEmoji(false);
+      setMessageView('active');
       await setTypingStatus({ uid: userId, name: displayName }, role, false);
     } finally {
       setSending(false);
@@ -126,27 +140,44 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
         <header className="hsk-messenger-mobile-header">
           <h2>Messages</h2>
         </header>
-        <button
-          type="button"
-          className="hsk-conversation-card"
-          onClick={() => setView('thread')}
-        >
-          <div className="hsk-conversation-avatar">{role === 'housekeeping' ? '🛎️' : '🧹'}</div>
-          <div className="hsk-conversation-body">
-            <div className="hsk-conversation-top">
-              <strong>{peerLabel}</strong>
-              {lastMessage && (
-                <span className="hsk-conversation-time">{formatListTime(lastMessage.createdAt)}</span>
-              )}
+        {canManage && (
+          <HskMessageAdminControls
+            messages={messages}
+            user={user}
+            canManage={canManage}
+            messageView={messageView}
+            onViewChange={setMessageView}
+            compact
+          />
+        )}
+        {messageView === 'active' && (
+          <button
+            type="button"
+            className="hsk-conversation-card"
+            onClick={() => setView('thread')}
+          >
+            <div className="hsk-conversation-avatar">{role === 'housekeeping' ? '🛎️' : '🧹'}</div>
+            <div className="hsk-conversation-body">
+              <div className="hsk-conversation-top">
+                <strong>{peerLabel}</strong>
+                {lastMessage && (
+                  <span className="hsk-conversation-time">{formatListTime(lastMessage.createdAt)}</span>
+                )}
+              </div>
+              <p className="hsk-conversation-preview">
+                {lastMessage
+                  ? `${lastMessage.senderId === userId ? 'You: ' : ''}${lastMessage.text}`
+                  : 'Start a conversation…'}
+              </p>
             </div>
-            <p className="hsk-conversation-preview">
-              {lastMessage
-                ? `${lastMessage.senderId === userId ? 'You: ' : ''}${lastMessage.text}`
-                : 'Start a conversation…'}
-            </p>
-          </div>
-          {unread > 0 && <span className="hsk-conversation-unread">{unread}</span>}
-        </button>
+            {unread > 0 && <span className="hsk-conversation-unread">{unread}</span>}
+          </button>
+        )}
+        {messageView !== 'active' && (
+          <p className="hsk-messenger-empty hsk-messenger-empty--list">
+            Open the conversation to review {messageView} messages.
+          </p>
+        )}
       </div>
     );
   }
@@ -159,15 +190,26 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
         </button>
         <div className="hsk-messenger-thread-title">
           <strong>{peerLabel}</strong>
-          <span>Active now</span>
+          <span>{messageView === 'active' ? 'Active now' : VIEW_LABEL(messageView)}</span>
         </div>
       </header>
 
+      {canManage && (
+        <HskMessageAdminControls
+          messages={messages}
+          user={user}
+          canManage={canManage}
+          messageView={messageView}
+          onViewChange={setMessageView}
+          compact
+        />
+      )}
+
       <div className="hsk-messenger-bubbles" role="log" aria-live="polite">
-        {messages.length === 0 && (
-          <p className="hsk-messenger-empty">Say hello to {peerLabel}</p>
+        {visibleMessages.length === 0 && (
+          <p className="hsk-messenger-empty">No {messageView} messages.</p>
         )}
-        {messages.map((m) => {
+        {visibleMessages.map((m) => {
           const mine = m.senderId === userId;
           const read = (m.readBy || []).length > 1;
           return (
@@ -187,7 +229,7 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
             </div>
           );
         })}
-        {typingUsers.length > 0 && (
+        {typingUsers.length > 0 && messageView === 'active' && (
           <div className="hsk-typing-indicator" aria-live="polite">
             <span className="hsk-typing-dots"><i /><i /><i /></span>
             {typingUsers[0].name} is typing…
@@ -196,6 +238,8 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
         <div ref={bottomRef} />
       </div>
 
+      {messageView === 'active' && (
+        <>
       {showEmoji && (
         <div className="hsk-emoji-bar" role="toolbar" aria-label="Emoji">
           {QUICK_EMOJIS.map((em) => (
@@ -230,6 +274,15 @@ export default function HskMessengerMobile({ user, role, onNewMessage }) {
           <button type="button" onClick={() => setAttachmentName('')}>×</button>
         </div>
       )}
+        </>
+      )}
     </div>
   );
+}
+
+function VIEW_LABEL(view) {
+  if (view === 'archived') return 'Archived';
+  if (view === 'trash') return 'Trash';
+  if (view === 'all') return 'All messages';
+  return 'Active now';
 }

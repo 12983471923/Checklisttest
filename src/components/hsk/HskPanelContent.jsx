@@ -11,6 +11,8 @@ import {
   subscribeMessages,
   countPendingRequests,
   countUnreadMessages,
+  isMessageActive,
+  isRequestActive,
 } from '../../firebase/hsk';
 import { useHskNotifications } from '../../hooks/useHskNotifications';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -60,7 +62,7 @@ export default function HskPanelContent({
 
   useEffect(() => {
     requests.forEach((r) => {
-      if (r.status === 'Pending') {
+      if (r.status === 'Pending' && !r.archivedAt) {
         notifyIfNew(`req-${r.id}`, {
           type: 'request',
           title: 'New request',
@@ -80,12 +82,12 @@ export default function HskPanelContent({
 
   const alerts = [
     ...messages
-      .filter((m) => m.senderId !== userId)
+      .filter((m) => isMessageActive(m) && m.senderId !== userId)
       .slice(-5)
       .reverse()
       .map((m) => ({ id: m.id, type: 'message', title: 'Message', body: m.text })),
     ...requests
-      .filter((r) => r.status !== 'Completed')
+      .filter((r) => isRequestActive(r))
       .slice(0, 5)
       .map((r) => ({
         id: r.id,
@@ -94,6 +96,8 @@ export default function HskPanelContent({
         body: `Room ${r.roomNumber} · ${r.status}`,
       })),
   ];
+
+  const canManageMessages = canManageRooms;
 
   return (
     <>
@@ -123,9 +127,9 @@ export default function HskPanelContent({
         <div className="hsk-right-body">
           {tab === 'messages' && (
             isMobile ? (
-              <HskMessengerMobile user={user} role={role} />
+              <HskMessengerMobile user={user} role={role} canManage={canManageMessages} />
             ) : (
-              <HskMessagesPanel user={user} role={role} />
+              <HskMessagesPanel user={user} role={role} canManage={canManageMessages} />
             )
           )}
           {tab === 'handovers' && (
@@ -138,7 +142,13 @@ export default function HskPanelContent({
             />
           )}
           {tab === 'requests' && (
-            <HskRequestsPanel user={user} role={role} rooms={rooms} canCreate={canManageRooms} />
+            <HskRequestsPanel
+              user={user}
+              role={role}
+              rooms={rooms}
+              canCreate={canManageRooms}
+              isAdmin={isAdmin}
+            />
           )}
           {tab === 'rooms' && (
             <HskRoomsPanel user={user} role={role} canManage={canManageRooms} />

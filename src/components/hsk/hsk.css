@@ -1002,6 +1002,205 @@
   cursor: not-allowed;
 }
 
+/* Admin controls — message center & task management */
+.hsk-admin-bar {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ios-separator, #e5e7eb);
+  background: var(--ios-fill, rgba(120, 120, 128, 0.08));
+}
+
+.hsk-admin-bar--compact {
+  padding: 8px 10px;
+}
+
+.hsk-filter-row--counts button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hsk-filter-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--ios-chip-bg, #f0f0f3);
+  color: var(--ios-secondary-label, #6e6e73);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.hsk-filter-row button.active .hsk-filter-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.hsk-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hsk-admin-actions button,
+.hsk-bulk-actions button,
+.hsk-request-manage-actions button {
+  border: 1px solid var(--ios-separator, #d2d2d7);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--ios-card, #fff);
+  color: var(--ios-label, #1d1d1f);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.hsk-admin-actions button:hover:not(:disabled),
+.hsk-bulk-actions button:hover:not(:disabled),
+.hsk-request-manage-actions button:hover:not(:disabled) {
+  background: var(--ios-fill-hover, rgba(118, 118, 128, 0.18));
+}
+
+.hsk-admin-actions button.is-danger,
+.hsk-bulk-actions button.is-danger,
+.hsk-request-manage-actions button.is-danger {
+  color: var(--ios-error-text, #991b1b);
+  border-color: var(--ios-error-border, #fecaca);
+  background: var(--ios-error-bg, #fff5f5);
+}
+
+.hsk-admin-actions button:disabled,
+.hsk-bulk-actions button:disabled,
+.hsk-request-manage-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hsk-admin-hint {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  color: var(--ios-tertiary-label, #86868b);
+  line-height: 1.4;
+}
+
+.hsk-bulk-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0 0 8px;
+  border: 1px solid var(--ios-separator, #e5e7eb);
+  border-radius: 10px;
+  background: var(--ios-fill, rgba(120, 120, 128, 0.08));
+}
+
+.hsk-bulk-select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ios-label, #1d1d1f);
+}
+
+.hsk-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hsk-request-select {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.hsk-request-select input {
+  width: 18px;
+  height: 18px;
+}
+
+.hsk-request-manage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hsk-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--ios-overlay, rgba(0, 0, 0, 0.36));
+}
+
+.hsk-confirm-dialog {
+  width: min(100%, 360px);
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--ios-card, #fff);
+  border: 1px solid var(--ios-separator, #e5e7eb);
+  box-shadow: var(--ios-shadow, 0 10px 30px rgba(0, 0, 0, 0.12));
+}
+
+.hsk-confirm-dialog h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--ios-label, #1d1d1f);
+}
+
+.hsk-confirm-dialog p {
+  margin: 0 0 16px;
+  font-size: 0.88rem;
+  color: var(--ios-secondary-label, #6e6e73);
+  line-height: 1.45;
+}
+
+.hsk-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hsk-confirm-cancel,
+.hsk-confirm-submit {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hsk-confirm-cancel {
+  border: 1px solid var(--ios-separator, #d2d2d7);
+  background: transparent;
+  color: var(--ios-label, #1d1d1f);
+}
+
+.hsk-confirm-submit {
+  border: none;
+  background: var(--ios-primary-btn-bg, #111);
+  color: var(--ios-primary-btn-text, #fff);
+}
+
+.hsk-confirm-submit.is-danger {
+  background: var(--ios-red, #ff3b30);
+  color: #fff;
+}
+
+.hsk-messenger-empty--list {
+  padding: 24px 16px;
+  text-align: center;
+}
+
 /* Reception integration — floating bottom-right widget */
 .hsk-panel-content {
   display: flex;

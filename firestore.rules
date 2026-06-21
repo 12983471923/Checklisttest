@@ -163,7 +163,7 @@ service cloud.firestore {
       allow read: if isStaffPortalUser();
       allow create: if isStaffPortalUser() && withinSizeLimit();
       allow update: if isStaffPortalUser() && withinSizeLimit();
-      allow delete: if false;
+      allow delete: if isReception() || isAdmin();
     }
 
     // Ephemeral typing indicators for HSK chat
