@@ -31,7 +31,7 @@ const ChecklistTable = ({
         </thead>
         <tbody>
           {tasks.map((task) => (
-            <tr key={task.id} className={`${task.completed ? "task-completed" : ""} ${task.text.includes("Cash Count + Drop + Night Audit") ? "task-critical" : ""}`}>
+            <tr key={task.id} className={`${task.completed ? "task-completed" : ""} ${task.highlighted ? "task-critical" : ""}`}>
               <td className="task-text-cell">
                 <span className={`task-text ${task.completed ? "task-text-completed" : ""}`}>
                   {task.text}

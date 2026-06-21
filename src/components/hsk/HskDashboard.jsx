@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import ThemeToggle from '../ThemeToggle';
 import HskPortalLayout from './HskPortalLayout';
 import './hsk.css';
+import './mobile/hsk-mobile.css';
 
 export default function HskDashboard({ currentUser, userProfile, isAdminView = false, onSwitchToReception }) {
   const { isAdmin } = useAuth();

@@ -312,6 +312,37 @@
   min-width: 0;
 }
 
+.admin-task-card-highlighted {
+  background: #fff9ef;
+  border-color: rgba(255, 149, 0, 0.35);
+  box-shadow: inset 4px 0 0 rgba(255, 149, 0, 0.86);
+}
+
+.admin-highlight-btn {
+  align-self: flex-start;
+  border: 1px solid #ececf1;
+  background: #fff;
+  color: #86868b;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-highlight-btn:hover {
+  background: #fff9ef;
+  border-color: rgba(255, 149, 0, 0.45);
+  color: #b45309;
+}
+
+.admin-highlight-btn.is-active {
+  background: #fff9ef;
+  border-color: rgba(255, 149, 0, 0.55);
+  color: #b45309;
+}
+
 .admin-icon-btn {
   border: none;
   background: #ececf1;

@@ -5,29 +5,6 @@ import ThemeToggle from '../ThemeToggle';
 import '../auth.css';
 import './hsk.css';
 
-const FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
-
-const s = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'var(--ios-bg)',
-    padding: '24px 16px',
-    fontFamily: FONT,
-  },
-  card: {
-    background: 'var(--ios-card)',
-    borderRadius: '20px',
-    boxShadow: 'var(--ios-shadow)',
-    padding: '48px 44px 40px',
-    width: '100%',
-    maxWidth: '400px',
-    boxSizing: 'border-box',
-  },
-};
-
 function Field({ id, label, type = 'text', value, onChange, placeholder, disabled, autoComplete, autoFocus }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -99,10 +76,10 @@ export default function HskLoginForm({ onLogin, onBack, externalError }) {
   };
 
   return (
-    <div style={s.page}>
+    <div className="hsk-login-page">
       <ThemeToggle className="theme-toggle-fixed" />
       <div className="hsk-login-wrap">
-        <div style={s.card} className="hsk-login-card">
+        <div className="hsk-login-card">
           <div className="hsk-login-header">
             <img src="/logo.png" alt="Scandic Falkoner" />
             <h1>Housekeeping Portal</h1>

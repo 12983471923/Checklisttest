@@ -18,6 +18,16 @@ const SHIFT_CONFIG_COLLECTION = 'shiftConfig';
 
 export const SHIFTS = ['Night', 'Morning', 'Evening'];
 
+const LEGACY_HIGHLIGHT_TEXT = 'Cash Count + Drop + Night Audit';
+
+/** Whether a task should render with the critical/highlight style. */
+export const isTaskHighlighted = (task) => {
+  if (!task) return false;
+  if (task.highlighted === true) return true;
+  if (task.highlighted === false) return false;
+  return Boolean(task.text?.includes(LEGACY_HIGHLIGHT_TEXT));
+};
+
 // Default downtime check times per shift (used when seeding the config).
 export const DEFAULT_DOWNTIME_TIMES = {
   Night: ['01:00', '04:00', '07:00'],
@@ -35,7 +45,8 @@ export const getDefaultShiftConfig = (shift) => ({
   tasks: (checklists[shift] || []).map((task) => ({
     id: task.id,
     text: task.text,
-    info: task.info || ''
+    info: task.info || '',
+    highlighted: isTaskHighlighted(task)
   })),
   instructions: '',
   downtimeTimes: DEFAULT_DOWNTIME_TIMES[shift] || DEFAULT_DOWNTIME_TIMES.Night

@@ -410,6 +410,11 @@
     min-width: 48px;
   }
 
+  /* Extra bottom space for floating HSK + Explore buttons */
+  .checklist-container {
+    padding-bottom: max(100px, calc(12px + env(safe-area-inset-bottom)));
+  }
+
   /* Forms */
   input,
   select,

@@ -1069,7 +1069,7 @@ function ChecklistApp({ userProfile, currentUser }) {
             {tasks.map((task) => {
               const isInProgress = Boolean(task.inProgressBy);
               const isMine = task.inProgressBy === initials;
-              const isCritical = task.text.includes("Cash Count + Drop + Night Audit");
+              const isCritical = task.highlighted;
 
               return (
                 <article
