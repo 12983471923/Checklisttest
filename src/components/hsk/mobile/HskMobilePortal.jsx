@@ -15,7 +15,7 @@ export default function HskMobilePortal({ user, role, canManageRooms = false, is
   const [messages, setMessages] = useState([]);
   const [requests, setRequests] = useState([]);
   const { hotelInfo, isHskWidgetVisible } = useDashboardConfig();
-  const { toasts, popups, pushNotification, dismissPopup } = useHskNotifications();
+  const { toasts, pushNotification } = useHskNotifications();
 
   const userId = user?.uid;
 
@@ -64,7 +64,7 @@ export default function HskMobilePortal({ user, role, canManageRooms = false, is
 
   return (
     <>
-      <HskNotificationToasts toasts={toasts} popups={popups} onDismissPopup={dismissPopup} />
+      <HskNotificationToasts toasts={toasts} />
 
       <div className="hsk-mobile-portal">
         <main className="hsk-mobile-content">

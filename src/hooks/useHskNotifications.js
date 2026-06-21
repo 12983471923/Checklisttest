@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useHskNotifications() {
   const [toasts, setToasts] = useState([]);
-  const [popups, setPopups] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const seenRef = useRef(new Set());
 
@@ -10,7 +9,6 @@ export function useHskNotifications() {
     const id = item.id || `${Date.now()}-${Math.random()}`;
     const entry = { ...item, id, read: false, createdAt: Date.now() };
 
-    setPopups((prev) => [entry, ...prev].slice(0, 5));
     setToasts((prev) => [entry, ...prev].slice(0, 6));
     setUnreadCount((c) => c + 1);
 
@@ -30,11 +28,6 @@ export function useHskNotifications() {
 
   const markAllRead = useCallback(() => {
     setUnreadCount(0);
-    setPopups((prev) => prev.map((p) => ({ ...p, read: true })));
-  }, []);
-
-  const dismissPopup = useCallback((id) => {
-    setPopups((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
   useEffect(() => {
@@ -46,11 +39,9 @@ export function useHskNotifications() {
 
   return {
     toasts,
-    popups,
     unreadCount,
     pushNotification,
     notifyIfNew,
     markAllRead,
-    dismissPopup,
   };
 }

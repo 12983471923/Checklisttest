@@ -17,9 +17,7 @@ export default function HskPortalLayout({ user, role, canManageRooms = false, is
   const { hotelInfo, isHskWidgetVisible } = useDashboardConfig();
   const {
     toasts,
-    popups,
     pushNotification,
-    dismissPopup,
   } = useHskNotifications();
 
   const handleNewMessage = useCallback(
@@ -51,7 +49,7 @@ export default function HskPortalLayout({ user, role, canManageRooms = false, is
 
   return (
     <>
-      <HskNotificationToasts toasts={toasts} popups={popups} onDismissPopup={dismissPopup} />
+      <HskNotificationToasts toasts={toasts} />
 
       <div className={`hsk-layout-portal ${!showHotelInfo && !showHandovers ? 'hsk-layout-portal--chat-only' : ''}`}>
         {(showHotelInfo || showHandovers) && (

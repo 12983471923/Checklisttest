@@ -47,12 +47,10 @@ export default function HskPanelContent({
   const [messages, setMessages] = useState([]);
   const {
     toasts,
-    popups,
     unreadCount,
     pushNotification,
     notifyIfNew,
     markAllRead,
-    dismissPopup,
   } = useHskNotifications();
 
   const userId = user?.uid;
@@ -123,7 +121,7 @@ export default function HskPanelContent({
 
   return (
     <>
-      <HskNotificationToasts toasts={toasts} popups={popups} onDismissPopup={dismissPopup} />
+      <HskNotificationToasts toasts={toasts} />
 
       <div className="hsk-panel-content">
         <div className="hsk-right-tabs">
