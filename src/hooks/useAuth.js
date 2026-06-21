@@ -34,6 +34,28 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // After sign-in, onAuthStateChanged can run before Firestore profile is created/read.
+  // Re-fetch once so we don't flash the wrong screen or a missing profile.
+  useEffect(() => {
+    if (!currentUser || userProfile) return undefined;
+
+    let cancelled = false;
+    const retry = async () => {
+      const { profile } = await getCurrentUserWithProfile();
+      if (!cancelled && profile) {
+        setUserProfile(profile);
+      }
+    };
+
+    retry();
+    const timer = window.setTimeout(retry, 800);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [currentUser, userProfile]);
+
   // Refresh user profile (useful after updates)
   const refreshProfile = async () => {
     if (currentUser) {

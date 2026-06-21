@@ -34,12 +34,60 @@ import "./responsive.css";
 import "./components/auth.css";
 import "./components/hsk/hsk.css";
 
+function ProfileMissingScreen({ currentUser, loginPortal, onUseHskLogin, onLogout }) {
+  return (
+    <div className="app-loading-screen">
+      <div className="profile-missing-card">
+        <h2>Profile not found</h2>
+        <p>
+          You are signed in as <strong>{currentUser.email}</strong>, but Firestore has no
+          matching profile at <code>users/{currentUser.uid}</code>.
+        </p>
+        <ul>
+          <li>In Firestore, create document <strong>users/{currentUser.uid}</strong> (use the UID from Authentication, not the email).</li>
+          <li>Add fields: <strong>role</strong>, <strong>isActive</strong> (true), <strong>email</strong>, <strong>displayName</strong>.</li>
+          <li>Housekeeping staff: set <strong>role</strong> to <code>housekeeping</code> and use the <strong>Housekeeping (HSK)</strong> login.</li>
+          <li>Reception staff: set <strong>role</strong> to <code>staff</code> and use the normal login.</li>
+        </ul>
+        {loginPortal !== "housekeeping" && (
+          <button type="button" className="hsk-portal-switch" onClick={onUseHskLogin}>
+            Switch to Housekeeping (HSK) login
+          </button>
+        )}
+        <button type="button" className="hsk-login-back" onClick={onLogout}>
+          Back to login
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const { currentUser, userProfile, loading, error } = useAuth();
   const [loginError, setLoginError] = useState("");
   const [loginPortal, setLoginPortal] = useState("reception");
+  const [profileWait, setProfileWait] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    if (!currentUser) {
+      setProfileWait(false);
+      return undefined;
+    }
+    if (userProfile) {
+      setProfileWait(false);
+      return undefined;
+    }
+    setProfileWait(true);
+    const timer = window.setTimeout(() => setProfileWait(false), 1500);
+    return () => window.clearTimeout(timer);
+  }, [currentUser, userProfile]);
+
+  const handleLogout = async () => {
+    await signOutUser();
+    setLoginError("");
+  };
+
+  if (loading || (currentUser && !userProfile && profileWait)) {
     return (
       <div className="app-loading-screen">
         <div className="app-loading-text">Loading…</div>
@@ -67,7 +115,21 @@ function App() {
     );
   }
 
-  if (userProfile?.role === "housekeeping") {
+  if (!userProfile) {
+    return (
+      <ProfileMissingScreen
+        currentUser={currentUser}
+        loginPortal={loginPortal}
+        onUseHskLogin={() => {
+          handleLogout();
+          setLoginPortal("housekeeping");
+        }}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  if (userProfile.role === "housekeeping") {
     return <HskDashboard currentUser={currentUser} userProfile={userProfile} />;
   }
 
