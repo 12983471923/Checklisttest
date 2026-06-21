@@ -2,6 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { checklists } from "./Checklists";
 import { useRealtimeChecklist } from "./hooks/useRealtimeChecklist";
 import { useAuth } from "./hooks/useAuth";
+import { useDashboardConfig } from "./hooks/useDashboardConfig";
+import TeamHandoverPanel from "./components/TeamHandoverPanel";
 import { validateUserInput } from "./utils/security";
 import { 
   saveHandoverNotes as saveHandoverNotesToDB,
@@ -15,23 +17,92 @@ import {
   subscribeToBreakfastTimes,
   subscribeToPricingInfo,
   DEFAULT_PRICING,
+  getVisibleBreakfastItems,
+  formatBreakfastPrice,
 } from "./firebase/database";
 import { signOutUser } from "./firebase/auth";
 import { isAdminEmail } from "./config/admin";
 import AuthLoginForm from "./components/AuthLoginForm";
+import HskLoginForm from "./components/hsk/HskLoginForm";
+import HskDashboard from "./components/hsk/HskDashboard";
+import FloatingHskWidget from "./components/hsk/FloatingHskWidget";
 import AdminPanel from "./components/AdminPanel";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
 import ThemeToggle from "./components/ThemeToggle";
 import 'leaflet/dist/leaflet.css';
 import "./App.css";
+import "./responsive.css";
 import "./components/auth.css";
+import "./components/hsk/hsk.css";
+import "./components/team-handover.css";
+
+function ProfileMissingScreen({ currentUser, loginPortal, onUseHskLogin, onLogout }) {
+  return (
+    <div className="app-loading-screen">
+      <div className="profile-missing-card">
+        <h2>Profile not found</h2>
+        <p>
+          You are signed in as <strong>{currentUser.email}</strong>, but Firestore has no
+          matching profile at <code>users/{currentUser.uid}</code>.
+        </p>
+        <ul>
+          <li>In Firestore, create document <strong>users/{currentUser.uid}</strong> (use the UID from Authentication, not the email).</li>
+          <li>Add fields: <strong>role</strong>, <strong>isActive</strong> (true), <strong>email</strong>, <strong>displayName</strong>.</li>
+          <li>Housekeeping staff: set <strong>role</strong> to <code>housekeeping</code> and use the <strong>Housekeeping (HSK)</strong> login.</li>
+          <li>Admin: set <strong>role</strong> to <code>admin</code> and use the main Sign In (Reception) or HSK login for the HSK Dashboard.</li>
+        </ul>
+        {loginPortal !== "housekeeping" && (
+          <button type="button" className="hsk-portal-switch" onClick={onUseHskLogin}>
+            Switch to Housekeeping (HSK) login
+          </button>
+        )}
+        <button type="button" className="hsk-login-back" onClick={onLogout}>
+          Back to login
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const { currentUser, userProfile, loading, error } = useAuth();
   const [loginError, setLoginError] = useState("");
+  const [loginPortal, setLoginPortal] = useState(
+    () => sessionStorage.getItem("loginPortal") || "reception"
+  );
+  const [profileWait, setProfileWait] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    sessionStorage.setItem("loginPortal", loginPortal);
+  }, [loginPortal]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setProfileWait(false);
+      return undefined;
+    }
+    if (userProfile) {
+      setProfileWait(false);
+      return undefined;
+    }
+    setProfileWait(true);
+    const timer = window.setTimeout(() => setProfileWait(false), 1500);
+    return () => window.clearTimeout(timer);
+  }, [currentUser, userProfile]);
+
+  const handleLogout = async () => {
+    await signOutUser();
+    setLoginError("");
+    sessionStorage.removeItem("loginPortal");
+    setLoginPortal("reception");
+  };
+
+  const role = userProfile?.role ?? userProfile?.Role;
+  const useHskDashboard =
+    role === "housekeeping" || (role === "admin" && loginPortal === "housekeeping");
+
+  if (loading || (currentUser && !userProfile && profileWait)) {
     return (
       <div className="app-loading-screen">
         <div className="app-loading-text">Loading…</div>
@@ -40,11 +111,46 @@ function App() {
   }
 
   if (!currentUser) {
+    if (loginPortal === "housekeeping") {
+      return (
+        <HskLoginForm
+          onLogin={() => setLoginError("")}
+          onBack={() => setLoginPortal("reception")}
+          externalError={loginError || error}
+        />
+      );
+    }
     return (
       <AuthLoginForm
         onLogin={() => setLoginError("")}
         onError={setLoginError}
         externalError={loginError || error}
+        onShowHsk={() => setLoginPortal("housekeeping")}
+      />
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <ProfileMissingScreen
+        currentUser={currentUser}
+        loginPortal={loginPortal}
+        onUseHskLogin={() => {
+          handleLogout();
+          setLoginPortal("housekeeping");
+        }}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  if (useHskDashboard) {
+    return (
+      <HskDashboard
+        currentUser={currentUser}
+        userProfile={userProfile}
+        isAdminView={role === "admin"}
+        onSwitchToReception={() => setLoginPortal("reception")}
       />
     );
   }
@@ -57,7 +163,11 @@ function ChecklistApp({ userProfile, currentUser }) {
   const displayName = userProfile?.displayName || currentUser?.displayName || currentUser?.email || "Authenticated user";
   // Admin requires BOTH the hardcoded admin email AND the Firestore role.
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === "admin";
+  const { isReceptionWidgetVisible, hotelInfo } = useDashboardConfig();
   const [showAdmin, setShowAdmin] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth > 1024
+  );
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
   const [showChangeInitials, setShowChangeInitials] = useState(false);
@@ -201,6 +311,17 @@ function ChecklistApp({ userProfile, currentUser }) {
       setInitialsSubmitted(true);
     }
   }, [profileInitials]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setMobileSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Handle initials submit
   const handleInitialsSubmit = (e) => {
@@ -566,17 +687,27 @@ function ChecklistApp({ userProfile, currentUser }) {
     <div className="checklist-container">
       {/* Main layout with sidebar and content */}
       <div className="main-layout">
-        {/* Left sidebar with hotel info */}
-        <div className="left-sidebar">
+        <button
+          type="button"
+          className="mobile-sidebar-toggle"
+          aria-expanded={mobileSidebarOpen}
+          onClick={() => setMobileSidebarOpen((open) => !open)}
+        >
+          <span>Hotel info &amp; quick links</span>
+          <span className="mobile-sidebar-toggle-icon" aria-hidden="true">▼</span>
+        </button>
+
+        <div className={`left-sidebar ${mobileSidebarOpen ? '' : 'is-collapsed'}`}>
+          {isReceptionWidgetVisible('hotel-info') && (
           <div className="header-card">
-            <strong>🏨 Scandic Falkoner</strong>
+            <strong>🏨 {hotelInfo.name || 'Scandic Falkoner'}</strong>
             
             <div className="hotel-info-section">
               <div className="info-item">
                 <span className="info-icon">📍</span>
                 <div className="info-content">
                   <span className="info-label">Address</span>
-                  <span className="info-value">Falkoner Alle 9, 2000 Frederiksberg, Denmark</span>
+                  <span className="info-value">{hotelInfo.address}</span>
                 </div>
               </div>
               
@@ -584,7 +715,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="info-icon">📞</span>
                 <div className="info-content">
                   <span className="info-label">Phone</span>
-                  <span className="info-value">+45 72 42 55 00</span>
+                  <span className="info-value">{hotelInfo.phone}</span>
                 </div>
               </div>
               
@@ -593,13 +724,15 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <div className="info-content">
                   <span className="info-label">Email</span>
                   <span className="info-value">
-                    <a href="mailto:falkoner@scandichotels.com">falkoner@scandichotels.com</a>
+                    <a href={`mailto:${hotelInfo.email}`}>{hotelInfo.email}</a>
                   </span>
                 </div>
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('hotel-times') && (
           <div className="header-card">
             <strong>⏰ Hotel Times</strong>
             
@@ -624,7 +757,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🚪</span>
                 <div className="time-content">
                   <span className="time-label">Check-Out</span>
-                  <span className="time-value">12:00</span>
+                  <span className="time-value">{hotelInfo.checkOut}</span>
                 </div>
               </div>
               
@@ -632,12 +765,14 @@ function ChecklistApp({ userProfile, currentUser }) {
                 <span className="time-icon">🔑</span>
                 <div className="time-content">
                   <span className="time-label">Check-In</span>
-                  <span className="time-value">16:00</span>
+                  <span className="time-value">{hotelInfo.checkIn}</span>
                 </div>
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('pricing') && (
           <div className="header-card">
             <strong>Pricing Information</strong>
             
@@ -659,23 +794,20 @@ function ChecklistApp({ userProfile, currentUser }) {
               <div className="pricing-category">
                 <strong>🍳 Breakfast Pricing</strong>
                 <div className="price-list">
-                  <div className="price-item">
-                    <span className="price-label">During booking:</span>
-                    <span className="price-value">{pricingInfo.breakfastDuringBooking} DKK</span>
-                  </div>
-                  <div className="price-item">
-                    <span className="price-label">At check-in:</span>
-                    <span className="price-value">{pricingInfo.breakfastAtCheckIn} DKK</span>
-                  </div>
-                  <div className="price-item">
-                    <span className="price-label">On the day:</span>
-                    <span className="price-value">{pricingInfo.breakfastOnTheDay} DKK</span>
-                  </div>
+                  {getVisibleBreakfastItems(pricingInfo).map((item) => (
+                    <div className="price-item" key={item.id}>
+                      <span className="price-label">{item.label}:</span>
+                      <span className="price-value">{formatBreakfastPrice(item)}</span>
+                      {item.note && <span className="price-note">{item.note}</span>}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
+          )}
           
+          {isReceptionWidgetVisible('handover-daily') && (
           <div className="header-card">
             <strong>📝 Daily Handover</strong>
             
@@ -723,7 +855,20 @@ function ChecklistApp({ userProfile, currentUser }) {
               </div>
             </div>
           </div>
+          )}
+
+          {isReceptionWidgetVisible('team-handovers') && (
+          <div className="header-card team-handover-sidebar-card">
+            <TeamHandoverPanel
+              user={currentUser}
+              role="reception"
+              isAdmin={isAdmin}
+              compact
+            />
+          </div>
+          )}
           
+          {isReceptionWidgetVisible('wakeup') && (
           <div className="header-card">
             <strong>☎️ Wake-Up Calls</strong>
             
@@ -803,6 +948,7 @@ function ChecklistApp({ userProfile, currentUser }) {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Right content area */}
@@ -825,7 +971,7 @@ function ChecklistApp({ userProfile, currentUser }) {
 
           {/* Meta bar */}
           <div className="meta-bar">
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div className="meta-bar-info">
           <span className="meta-bar-user">
             Logged in as <strong>{displayName}</strong>
           </span>
@@ -834,7 +980,7 @@ function ChecklistApp({ userProfile, currentUser }) {
             &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
           </span>
         </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div className="meta-bar-actions">
             <ThemeToggle />
             <WeatherWidget />
             {isAdmin && (
@@ -1570,7 +1716,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 </div>
               </div>
 
-              <div className="wakeup-fullscreen-table-container">
+              <div className="wakeup-fullscreen-table-container is-mobile-cards">
                 <table className="wakeup-fullscreen-table">
                   <thead>
                     <tr>
@@ -1594,10 +1740,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                       })
                       .map(call => (
                         <tr key={call.id} className={call.completed ? 'wakeup-row-completed' : ''}>
-                          <td className="wakeup-room-cell">
+                          <td className="wakeup-room-cell" data-label="Room">
                             <span className="wakeup-room-number">Room {call.roomNumber}</span>
                           </td>
-                          <td className="wakeup-date-cell">
+                          <td className="wakeup-date-cell" data-label="Date">
                             {new Date(call.date).toLocaleDateString('en-GB', { 
                               weekday: 'short', 
                               month: 'short', 
@@ -1607,10 +1753,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                               <span className="wakeup-today-badge">Today</span>
                             )}
                           </td>
-                          <td className="wakeup-time-cell">
+                          <td className="wakeup-time-cell" data-label="Time">
                             <span className="wakeup-time-display">{call.time}</span>
                           </td>
-                          <td className="wakeup-notes-cell">
+                          <td className="wakeup-notes-cell" data-label="Notes">
                             {call.notes ? (
                               <span className="wakeup-notes-preview" title={call.notes}>
                                 {call.notes.length > 30 ? call.notes.substring(0, 30) + '...' : call.notes}
@@ -1619,10 +1765,10 @@ function ChecklistApp({ userProfile, currentUser }) {
                               <span className="wakeup-no-notes">No notes</span>
                             )}
                           </td>
-                          <td className="wakeup-created-cell">
+                          <td className="wakeup-created-cell" data-label="Created by">
                             <span className="wakeup-initials-small">{call.createdBy}</span>
                           </td>
-                          <td className="wakeup-status-cell">
+                          <td className="wakeup-status-cell" data-label="Status">
                             {call.completed ? (
                               <span className="wakeup-status-completed">
                                 ✅ Completed by {call.completedBy}
@@ -1633,7 +1779,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                               </span>
                             )}
                           </td>
-                          <td className="wakeup-actions-cell">
+                          <td className="wakeup-actions-cell" data-label="Actions">
                             <div className="wakeup-action-buttons">
                               <button
                                 className={`wakeup-toggle-btn ${call.completed ? 'completed' : 'pending'}`}
@@ -1746,7 +1892,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                 </div>
               </div>
 
-              <div className="handover-fullscreen-table-container">
+              <div className="handover-fullscreen-table-container is-mobile-cards">
                 {Object.keys(savedHandovers).length === 0 ? (
                   <div className="handover-fullscreen-empty">
                     <div className="handover-empty-icon">📝</div>
@@ -2048,7 +2194,7 @@ function ChecklistApp({ userProfile, currentUser }) {
         </div>
       </div>
 
-      {/* Floating Map Button */}
+      <FloatingHskWidget currentUser={currentUser} userProfile={userProfile} />
       <FloatingMapButton />
 
       {/* Admin Panel (admin only) */}

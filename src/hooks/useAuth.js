@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChange, getCurrentUserWithProfile } from '../firebase/auth';
+import {
+  onAuthStateChange,
+  getCurrentUserWithProfile,
+  isHousekeepingRole,
+  isReceptionRole,
+} from '../firebase/auth';
 import { isAdminEmail } from '../config/admin';
 
 const AuthContext = createContext();
@@ -28,6 +33,28 @@ export const AuthProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
+  // After sign-in, onAuthStateChanged can run before Firestore profile is created/read.
+  // Re-fetch once so we don't flash the wrong screen or a missing profile.
+  useEffect(() => {
+    if (!currentUser || userProfile) return undefined;
+
+    let cancelled = false;
+    const retry = async () => {
+      const { profile } = await getCurrentUserWithProfile();
+      if (!cancelled && profile) {
+        setUserProfile(profile);
+      }
+    };
+
+    retry();
+    const timer = window.setTimeout(retry, 800);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [currentUser, userProfile]);
 
   // Refresh user profile (useful after updates)
   const refreshProfile = async () => {
@@ -59,6 +86,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
     isManager: userProfile?.role === 'manager' || isAdmin,
     isAdmin,
+    isHousekeeping: isHousekeepingRole(userProfile),
+    isReception: isReceptionRole(userProfile),
     hasAdminEmail,
     userInitials: userProfile?.initials || '',
     userName: userProfile?.displayName || currentUser?.displayName || 'Unknown User',

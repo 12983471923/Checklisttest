@@ -41,6 +41,18 @@ service cloud.firestore {
       return isActive() && currentRole() == 'admin' && hasAdminEmail();
     }
 
+    function isHousekeeping() {
+      return isActive() && currentRole() == 'housekeeping';
+    }
+
+    function isReception() {
+      return isActive() && currentRole() in ['staff', 'manager', 'admin'];
+    }
+
+    function isStaffPortalUser() {
+      return isReception() || isHousekeeping();
+    }
+
     function isSelf(userId) {
       return signedIn() && request.auth.uid == userId;
     }
@@ -99,7 +111,8 @@ service cloud.firestore {
 
     match /breakfast-times/{document} {
       allow read: if isActive();
-      allow write: if isActive() && withinSizeLimit();
+      allow write: if isActive() && withinSizeLimit()
+        && (document != 'pricing' || isAdmin());
     }
 
     // Audit trail — managers read; any active user can append; no edits/deletes
@@ -120,6 +133,57 @@ service cloud.firestore {
     // Any active staff member may read it (the checklist is built from it),
     // but only the admin may modify it.
     match /shiftConfig/{document} {
+      allow read: if isActive();
+      allow write: if isAdmin() && withinSizeLimit();
+    }
+
+    // Explore Copenhagen content — all active staff read and edit (approval in app)
+    match /exploreContent/{document} {
+      allow read: if isActive();
+      allow write: if isActive() && withinSizeLimit();
+    }
+
+    // Housekeeping portal — rooms (reception manages, HSK reads/updates status)
+    match /hsk-rooms/{roomId} {
+      allow read: if isStaffPortalUser();
+      allow create, delete: if isReception() && withinSizeLimit();
+      allow update: if (isReception() || isHousekeeping()) && withinSizeLimit();
+    }
+
+    // Housekeeping requests — reception creates, both roles update status/comments
+    match /hsk-requests/{requestId} {
+      allow read: if isStaffPortalUser();
+      allow create: if isReception() && withinSizeLimit();
+      allow update: if isStaffPortalUser() && withinSizeLimit();
+      allow delete: if isReception();
+    }
+
+    // Internal messaging between reception and housekeeping
+    match /hsk-messages/{messageId} {
+      allow read: if isStaffPortalUser();
+      allow create: if isStaffPortalUser() && withinSizeLimit();
+      allow update: if isStaffPortalUser() && withinSizeLimit();
+      allow delete: if false;
+    }
+
+    // Shared housekeeping checklist
+    match /hsk-checklists/{document} {
+      allow read: if isStaffPortalUser();
+      allow write: if isStaffPortalUser() && withinSizeLimit();
+    }
+
+    // Team handover notes — all active staff; admin can delete
+    match /team-handovers/{handoverId} {
+      allow read: if isActive();
+      allow create: if isActive()
+        && withinSizeLimit()
+        && request.resource.data.authorId == request.auth.uid;
+      allow update: if isActive() && withinSizeLimit();
+      allow delete: if isAdmin();
+    }
+
+    // Dashboard layout customization — admin writes, all staff read
+    match /dashboardConfig/{document} {
       allow read: if isActive();
       allow write: if isAdmin() && withinSizeLimit();
     }

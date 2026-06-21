@@ -18,13 +18,20 @@ import {
   getPricingInfo,
   savePricingInfo as savePricingInfoToDB,
   DEFAULT_PRICING,
+  DEFAULT_BREAKFAST_ITEMS,
 } from '../firebase/database';
 import { ADMIN_EMAIL } from '../config/admin';
 import './admin.css';
+import './admin-responsive.css';
 import ThemeToggle from './ThemeToggle';
+
+import ExploreAdminSection from './ExploreAdminSection';
+import DashboardConfigSection from './admin/DashboardConfigSection';
 
 const SECTIONS = [
   { id: 'tasks', label: 'Tasks', icon: '✅' },
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+  { id: 'explore', label: 'Explore Copenhagen', icon: '🗺️' },
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'instructions', label: 'Instructions', icon: '📋' },
   { id: 'downtime', label: 'Downtime Times', icon: '⏱️' },
@@ -86,6 +93,8 @@ const AdminPanel = ({ onClose }) => {
 
           <main className="admin-content">
             {activeSection === 'tasks' && <TasksSection />}
+            {activeSection === 'dashboard' && <DashboardConfigSection />}
+            {activeSection === 'explore' && <ExploreAdminSection />}
             {activeSection === 'users' && <UsersSection />}
             {activeSection === 'instructions' && <InstructionsSection />}
             {activeSection === 'downtime' && <DowntimeSection />}
@@ -684,33 +693,35 @@ const BreakfastSection = () => {
 /* ------------------------------------------------------------------ */
 /* PRICING INFORMATION                                                */
 /* ------------------------------------------------------------------ */
-const PRICING_FIELDS = [
-  {
-    group: 'Bike Rental',
-    icon: '🚴',
-    fields: [
-      { key: 'bikeRegular', label: 'Regular rate (DKK per person)' },
-      { key: 'bikeLufthansa', label: 'Lufthansa rate (DKK per person)' },
-    ],
-  },
-  {
-    group: 'Breakfast Pricing',
-    icon: '🍳',
-    fields: [
-      { key: 'breakfastDuringBooking', label: 'During booking (DKK)' },
-      { key: 'breakfastAtCheckIn', label: 'At check-in (DKK)' },
-      { key: 'breakfastOnTheDay', label: 'On the day (DKK)' },
-    ],
-  },
+const BIKE_PRICING_FIELDS = [
+  { key: 'bikeRegular', label: 'Regular rate (DKK per person)' },
+  { key: 'bikeLufthansa', label: 'Lufthansa rate (DKK per person)' },
 ];
 
 const isValidPrice = (value) => /^\d{1,4}$/.test(String(value).trim());
 
 const PricingSection = () => {
-  const [pricing, setPricing] = useState({ ...DEFAULT_PRICING });
+  const [pricing, setPricing] = useState({
+    ...DEFAULT_PRICING,
+    breakfastItems: DEFAULT_BREAKFAST_ITEMS.map((item) => ({ ...item })),
+  });
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const saveTimer = useRef(null);
+  const statusTimer = useRef(null);
+
+  const flash = useCallback((value, message = '') => {
+    setStatus(value);
+    setErrorMessage(message);
+    if (statusTimer.current) clearTimeout(statusTimer.current);
+    if (value === 'saved' || value === 'error') {
+      statusTimer.current = setTimeout(() => {
+        setStatus(null);
+        setErrorMessage('');
+      }, value === 'error' ? 4000 : 2000);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -730,51 +741,129 @@ const PricingSection = () => {
     };
   }, []);
 
-  const updatePrice = (key, value) => {
-    setPricing((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const save = async () => {
-    setStatus('saving');
-    setErrorMessage('');
-    for (const group of PRICING_FIELDS) {
-      for (const field of group.fields) {
-        if (!isValidPrice(pricing[field.key])) {
-          setStatus('error');
-          setErrorMessage(`Invalid price for "${field.label}"`);
-          alert(`Please enter a valid price for "${field.label}" (1-4 digits).`);
-          setTimeout(() => setStatus(null), 2000);
-          return;
-        }
+  const validatePricing = useCallback((nextPricing) => {
+    for (const field of BIKE_PRICING_FIELDS) {
+      if (!isValidPrice(nextPricing[field.key])) {
+        return `Invalid price for "${field.label}" (use 1–4 digits).`;
       }
     }
-
-    const normalizedPricing = Object.fromEntries(
-      Object.entries(pricing).map(([key, value]) => [key, String(value).trim()])
-    );
-
-    try {
-      await savePricingInfoToDB(normalizedPricing);
-      setPricing(normalizedPricing);
-      setStatus('saved');
-      setErrorMessage('');
-      setTimeout(() => setStatus(null), 2000);
-    } catch (error) {
-      console.error('Error saving pricing info:', error);
-      const message = error?.message || 'Unknown error while saving pricing.';
-      setErrorMessage(message);
-      setStatus('error');
-      alert(`Could not save pricing: ${message}`);
-      setTimeout(() => setStatus(null), 4000);
+    for (const item of nextPricing.breakfastItems || []) {
+      if (!String(item.label || '').trim()) {
+        return 'Every breakfast rate needs a label.';
+      }
+      if (!isValidPrice(item.value)) {
+        return `Invalid price for "${item.label}" (use 1–4 digits).`;
+      }
     }
+    return null;
+  }, []);
+
+  const persistPricing = useCallback(
+    async (nextPricing) => {
+      const validationError = validatePricing(nextPricing);
+      if (validationError) {
+        flash('error', validationError);
+        return;
+      }
+
+      flash('saving');
+      try {
+        const saved = await savePricingInfoToDB(nextPricing);
+        setPricing(saved);
+        flash('saved');
+      } catch (error) {
+        console.error('Error saving pricing info:', error);
+        flash('error', error?.message || 'Could not save pricing.');
+      }
+    },
+    [flash, validatePricing]
+  );
+
+  const scheduleSave = useCallback(
+    (nextPricing) => {
+      setPricing(nextPricing);
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => persistPricing(nextPricing), 700);
+    },
+    [persistPricing]
+  );
+
+  useEffect(
+    () => () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      if (statusTimer.current) clearTimeout(statusTimer.current);
+    },
+    []
+  );
+
+  const updateBikePrice = (key, value) => {
+    scheduleSave({ ...pricing, [key]: value });
   };
+
+  const updateBreakfastItem = (id, updates) => {
+    const breakfastItems = pricing.breakfastItems.map((item) =>
+      item.id === id ? { ...item, ...updates } : item
+    );
+    scheduleSave({ ...pricing, breakfastItems });
+  };
+
+  const commitBreakfastItem = (id, field) => {
+    const item = pricing.breakfastItems.find((entry) => entry.id === id);
+    if (!item) return;
+    const clean =
+      field === 'label' || field === 'suffix' || field === 'note'
+        ? stripHtml(item[field] || '')
+        : item[field];
+    updateBreakfastItem(id, { [field]: clean });
+  };
+
+  const addBreakfastItem = () => {
+    const order = pricing.breakfastItems.length;
+    const breakfastItems = [
+      ...pricing.breakfastItems,
+      {
+        id: `breakfast-${Date.now()}`,
+        label: 'New rate',
+        value: '0',
+        suffix: 'DKK',
+        note: '',
+        order,
+        hidden: false,
+      },
+    ];
+    scheduleSave({ ...pricing, breakfastItems });
+  };
+
+  const removeBreakfastItem = (id) => {
+    const item = pricing.breakfastItems.find((entry) => entry.id === id);
+    if (!window.confirm(`Remove "${item?.label || 'this rate'}"?`)) return;
+    const breakfastItems = pricing.breakfastItems
+      .filter((entry) => entry.id !== id)
+      .map((entry, order) => ({ ...entry, order }));
+    scheduleSave({ ...pricing, breakfastItems });
+  };
+
+  const moveBreakfastItem = (index, direction) => {
+    const items = [...pricing.breakfastItems].sort((a, b) => a.order - b.order);
+    const target = index + direction;
+    if (target < 0 || target >= items.length) return;
+    [items[index], items[target]] = [items[target], items[index]];
+    const breakfastItems = items.map((entry, order) => ({ ...entry, order }));
+    scheduleSave({ ...pricing, breakfastItems });
+  };
+
+  const sortedBreakfastItems = [...(pricing.breakfastItems || [])].sort(
+    (a, b) => a.order - b.order
+  );
 
   return (
     <section className="admin-section">
       <div className="admin-section-head">
         <div>
           <h2>Pricing Information</h2>
-          <p>Update bike rental and breakfast prices shown in the left sidebar.</p>
+          <p>
+            Admin only. Bike prices and breakfast rates save automatically and update live in the sidebar for all staff.
+          </p>
         </div>
         <SaveStatus status={status} message={errorMessage} />
       </div>
@@ -783,31 +872,134 @@ const PricingSection = () => {
         <div className="admin-loading">Loading pricing…</div>
       ) : (
         <>
-          {PRICING_FIELDS.map((group) => (
-            <div className="admin-pricing-group" key={group.group}>
-              <h3 className="admin-pricing-group-title">{group.icon} {group.group}</h3>
-              <div className="admin-time-grid">
-                {group.fields.map((field) => (
-                  <div className="admin-time-item" key={field.key}>
-                    <label htmlFor={`pricing-${field.key}`}>{field.label}</label>
-                    <input
-                      id={`pricing-${field.key}`}
-                      className="admin-input"
-                      type="number"
-                      min="0"
-                      max="9999"
-                      inputMode="numeric"
-                      value={pricing[field.key]}
-                      onChange={(e) => updatePrice(field.key, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
+          <div className="admin-pricing-group">
+            <h3 className="admin-pricing-group-title">🚴 Bike Rental</h3>
+            <div className="admin-time-grid">
+              {BIKE_PRICING_FIELDS.map((field) => (
+                <div className="admin-time-item" key={field.key}>
+                  <label htmlFor={`pricing-${field.key}`}>{field.label}</label>
+                  <input
+                    id={`pricing-${field.key}`}
+                    className="admin-input"
+                    type="number"
+                    min="0"
+                    max="9999"
+                    inputMode="numeric"
+                    value={pricing[field.key]}
+                    onChange={(e) => updateBikePrice(field.key, e.target.value)}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-          <button className="admin-btn admin-btn-primary" onClick={save}>
-            Save Pricing
-          </button>
+          </div>
+
+          <div className="admin-pricing-group">
+            <div className="admin-pricing-group-head">
+              <h3 className="admin-pricing-group-title">🍳 Breakfast Pricing</h3>
+              <button type="button" className="admin-btn admin-btn-primary" onClick={addBreakfastItem}>
+                + Add rate
+              </button>
+            </div>
+            <p className="admin-pricing-help">
+              Add, edit, reorder, or hide breakfast rates. Optional notes appear under each rate in the sidebar.
+            </p>
+
+            <div className="admin-pricing-item-list">
+              {sortedBreakfastItems.map((item, index) => (
+                <div className={`admin-pricing-item-card ${item.hidden ? 'is-hidden' : ''}`} key={item.id}>
+                  <div className="admin-pricing-item-reorder">
+                    <button
+                      type="button"
+                      className="admin-icon-btn"
+                      onClick={() => moveBreakfastItem(index, -1)}
+                      disabled={index === 0}
+                      title="Move up"
+                    >
+                      ▲
+                    </button>
+                    <span className="admin-task-number">{index + 1}</span>
+                    <button
+                      type="button"
+                      className="admin-icon-btn"
+                      onClick={() => moveBreakfastItem(index, 1)}
+                      disabled={index === sortedBreakfastItems.length - 1}
+                      title="Move down"
+                    >
+                      ▼
+                    </button>
+                  </div>
+
+                  <div className="admin-pricing-item-fields">
+                    <label>
+                      Rate label
+                      <input
+                        className="admin-input"
+                        value={item.label}
+                        onChange={(e) => updateBreakfastItem(item.id, { label: e.target.value })}
+                        onBlur={() => commitBreakfastItem(item.id, 'label')}
+                      />
+                    </label>
+                    <label>
+                      Price
+                      <input
+                        className="admin-input"
+                        type="number"
+                        min="0"
+                        max="9999"
+                        inputMode="numeric"
+                        value={item.value}
+                        onChange={(e) => updateBreakfastItem(item.id, { value: e.target.value })}
+                        onBlur={() => commitBreakfastItem(item.id, 'value')}
+                      />
+                    </label>
+                    <label>
+                      Suffix / unit
+                      <input
+                        className="admin-input"
+                        value={item.suffix}
+                        placeholder="DKK"
+                        onChange={(e) => updateBreakfastItem(item.id, { suffix: e.target.value })}
+                        onBlur={() => commitBreakfastItem(item.id, 'suffix')}
+                      />
+                    </label>
+                    <label className="admin-pricing-note-field">
+                      Note (optional)
+                      <input
+                        className="admin-input"
+                        value={item.note}
+                        placeholder="e.g. Children under 12"
+                        onChange={(e) => updateBreakfastItem(item.id, { note: e.target.value })}
+                        onBlur={() => commitBreakfastItem(item.id, 'note')}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="admin-pricing-item-actions">
+                    <button
+                      type="button"
+                      className={`admin-icon-btn ${item.hidden ? 'active' : ''}`}
+                      onClick={() => updateBreakfastItem(item.id, { hidden: !item.hidden })}
+                      title={item.hidden ? 'Show in sidebar' : 'Hide from sidebar'}
+                    >
+                      {item.hidden ? '👁‍🗨' : '👁'}
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-icon-btn admin-delete-btn"
+                      onClick={() => removeBreakfastItem(item.id)}
+                      title="Remove rate"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {sortedBreakfastItems.length === 0 && (
+                <div className="admin-empty">No breakfast rates yet. Add the first one above.</div>
+              )}
+            </div>
+          </div>
         </>
       )}
     </section>

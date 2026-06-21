@@ -15,8 +15,13 @@ import { logSecurityEvent } from '../utils/security';
 export const USER_ROLES = {
   STAFF: 'staff',
   MANAGER: 'manager',
-  ADMIN: 'admin'
+  ADMIN: 'admin',
+  HOUSEKEEPING: 'housekeeping',
 };
+
+export const RECEPTION_ROLES = [USER_ROLES.STAFF, USER_ROLES.MANAGER, USER_ROLES.ADMIN];
+
+export const HSK_PORTAL_ROLES = [USER_ROLES.HOUSEKEEPING, USER_ROLES.ADMIN];
 
 // Shift types
 export const SHIFT_TYPES = {
@@ -214,6 +219,37 @@ export const onAuthStateChange = (callback) => {
 // Check if user has specific role
 export const hasRole = (userProfile, role) => {
   return userProfile?.role === role || userProfile?.role === USER_ROLES.ADMIN;
+};
+
+export const isHousekeepingRole = (userProfile) =>
+  userProfile?.role === USER_ROLES.HOUSEKEEPING;
+
+export const isReceptionRole = (userProfile) =>
+  RECEPTION_ROLES.includes(userProfile?.role);
+
+export const signInUserForPortal = async (email, password, { allowedRoles, portalLabel }) => {
+  const result = await signInUser(email, password);
+  if (result.error || !result.user) return result;
+
+  const { profile } = await getUserProfile(result.user.uid);
+  const role = profile?.role ?? profile?.Role;
+
+  if (!allowedRoles.includes(role)) {
+    await signOut(auth);
+    logSecurityEvent('login_portal_denied', { email, role, portalLabel });
+    const hint =
+      role === USER_ROLES.ADMIN
+        ? ' Admin accounts should use the main Sign In page for Reception, or ensure admin role is set in Firestore.'
+        : role === USER_ROLES.HOUSEKEEPING
+          ? ' Housekeeping staff must use the Housekeeping (HSK) login page.'
+          : '';
+    return {
+      user: null,
+      error: `This account is not authorized for ${portalLabel}. Please use the correct login page.${hint}`,
+    };
+  }
+
+  return { user: result.user, profile: { ...profile, role }, error: null };
 };
 
 // Check if user can work specific shift
