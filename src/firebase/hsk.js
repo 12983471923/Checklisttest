@@ -125,7 +125,7 @@ export const subscribeMessages = (callback) => {
   }, (err) => console.error('messages sub error', err));
 };
 
-export const sendMessage = async (text, user, senderRole) => {
+export const sendMessage = async (text, user, senderRole, extras = {}) => {
   const id = `msg-${Date.now()}`;
   await setDoc(doc(db, MESSAGES, id), {
     text: text.trim(),
@@ -135,9 +135,35 @@ export const sendMessage = async (text, user, senderRole) => {
     receiverRole: senderRole === 'housekeeping' ? 'reception' : 'housekeeping',
     createdAt: now(),
     readBy: [user?.uid].filter(Boolean),
+    attachmentName: extras.attachmentName || '',
   });
   return id;
 };
+
+const TYPING_COLLECTION = 'hsk-typing';
+
+export const setTypingStatus = async (user, role, isTyping) => {
+  if (!user?.uid) return;
+  const ref = doc(db, TYPING_COLLECTION, user.uid);
+  if (!isTyping) {
+    await deleteDoc(ref).catch(() => {});
+    return;
+  }
+  await setDoc(ref, {
+    userId: user.uid,
+    name: user.name || 'Staff',
+    role,
+    updatedAt: now(),
+  });
+};
+
+export const subscribeTyping = (callback, excludeUserId) =>
+  onSnapshot(collection(db, TYPING_COLLECTION), (snap) => {
+    const typing = snap.docs
+      .map((d) => d.data())
+      .filter((t) => t.userId !== excludeUserId);
+    callback(typing);
+  }, (err) => console.error('typing sub error', err));
 
 export const markMessageRead = async (messageId, userId, currentReadBy = []) => {
   if (!userId || currentReadBy.includes(userId)) return;

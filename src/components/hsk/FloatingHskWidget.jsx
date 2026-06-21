@@ -1,11 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import HskPanelContent from './HskPanelContent';
 import './hsk.css';
+import './mobile/hsk-mobile.css';
 
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { isAdminEmail } from '../../config/admin';
 
 export default function FloatingHskWidget({ currentUser, userProfile }) {
+  const isMobile = useIsMobile();
   const { visibleFloatingTabs } = useDashboardConfig();
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === 'admin';
   const [open, setOpen] = useState(false);
@@ -59,9 +62,9 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
 
       {/* Keep mounted for live badge counts and toast notifications */}
       <div
-        className={`hsk-floating-window ${showWindow ? 'is-visible' : ''} ${closing ? 'is-closing' : showWindow ? 'is-open' : ''}`}
+        className={`hsk-floating-window ${isMobile ? 'hsk-floating-window--mobile' : ''} ${showWindow ? 'is-visible' : ''} ${closing ? 'is-closing' : showWindow ? 'is-open' : ''}`}
         role="dialog"
-        aria-modal="false"
+        aria-modal={isMobile ? 'true' : 'false'}
         aria-label="Housekeeping panel"
         aria-hidden={!showWindow}
       >

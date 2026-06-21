@@ -3,15 +3,18 @@ import HotelInfoPanel from './HotelInfoPanel';
 import HskMessagesPanel from './HskMessagesPanel';
 import HskPanelContent from './HskPanelContent';
 import HskNotificationToasts from './HskNotificationToasts';
+import HskMobilePortal from './mobile/HskMobilePortal';
 import TeamHandoverPanel from '../TeamHandoverPanel';
 import { useHskNotifications } from '../../hooks/useHskNotifications';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import '../team-handover.css';
 
 const DEFAULT_SIDE_TABS = ['requests', 'rooms', 'alerts'];
 
 export default function HskPortalLayout({ user, role, canManageRooms = false, isAdmin = false }) {
-  const { hotelInfo, isHskWidgetVisible, visibleFloatingTabs } = useDashboardConfig();
+  const isMobile = useIsMobile();
+  const { hotelInfo, isHskWidgetVisible } = useDashboardConfig();
   const {
     toasts,
     popups,
@@ -34,6 +37,17 @@ export default function HskPortalLayout({ user, role, canManageRooms = false, is
   const showHandovers = isHskWidgetVisible('team-handovers');
   const showChat = isHskWidgetVisible('chat');
   const showTools = isHskWidgetVisible('tools');
+
+  if (isMobile) {
+    return (
+      <HskMobilePortal
+        user={user}
+        role={role}
+        canManageRooms={canManageRooms}
+        isAdmin={isAdmin}
+      />
+    );
+  }
 
   return (
     <>

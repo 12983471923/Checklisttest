@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import HskMessagesPanel from './HskMessagesPanel';
+import HskMessengerMobile from './mobile/HskMessengerMobile';
 import HskRequestsPanel from './HskRequestsPanel';
 import HskRoomsPanel from './HskRoomsPanel';
 import HskNotificationToasts from './HskNotificationToasts';
@@ -12,6 +13,7 @@ import {
   countUnreadMessages,
 } from '../../firebase/hsk';
 import { useHskNotifications } from '../../hooks/useHskNotifications';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const ALL_TABS = [
   { id: 'messages', label: 'Messages', icon: '💬' },
@@ -29,6 +31,7 @@ export default function HskPanelContent({
   visibleTabs,
   isAdmin = false,
 }) {
+  const isMobile = useIsMobile();
   const tabs = visibleTabs
     ? ALL_TABS.filter((t) => visibleTabs.includes(t.id))
     : ALL_TABS;
@@ -145,7 +148,11 @@ export default function HskPanelContent({
 
         <div className="hsk-right-body">
           {tab === 'messages' && (
-            <HskMessagesPanel user={user} role={role} onNewMessage={handleNewMessage} />
+            isMobile ? (
+              <HskMessengerMobile user={user} role={role} onNewMessage={handleNewMessage} />
+            ) : (
+              <HskMessagesPanel user={user} role={role} onNewMessage={handleNewMessage} />
+            )
           )}
           {tab === 'handovers' && (
             <TeamHandoverPanel

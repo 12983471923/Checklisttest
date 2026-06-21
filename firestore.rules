@@ -166,6 +166,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Ephemeral typing indicators for HSK chat
+    match /hsk-typing/{userId} {
+      allow read: if isStaffPortalUser();
+      allow create, update: if isStaffPortalUser()
+        && request.auth.uid == userId
+        && withinSizeLimit();
+      allow delete: if isStaffPortalUser() && request.auth.uid == userId;
+    }
+
     // Shared housekeeping checklist
     match /hsk-checklists/{document} {
       allow read: if isStaffPortalUser();
