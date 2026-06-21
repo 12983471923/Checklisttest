@@ -8,7 +8,7 @@ import {
   formatBreakfastPrice,
 } from '../../firebase/database';
 
-export default function HotelInfoPanel({ compact = false }) {
+export default function HotelInfoPanel({ compact = false, hidePricing = false }) {
   const [breakfastTimes, setBreakfastTimes] = useState({ start: '07:00', end: '11:00' });
   const [pricingInfo, setPricingInfo] = useState({ ...DEFAULT_PRICING });
   const [savedHandovers, setSavedHandovers] = useState({});
@@ -16,16 +16,16 @@ export default function HotelInfoPanel({ compact = false }) {
 
   useEffect(() => {
     const u1 = subscribeToBreakfastTimes(setBreakfastTimes);
-    const u2 = subscribeToPricingInfo(setPricingInfo);
+    const u2 = hidePricing ? () => {} : subscribeToPricingInfo(setPricingInfo);
     const u3 = subscribeToHandoverNotes(setSavedHandovers);
     return () => {
       u1();
       u2();
       u3();
     };
-  }, []);
+  }, [hidePricing]);
 
-  const breakfastItems = getVisibleBreakfastItems(pricingInfo);
+  const breakfastItems = hidePricing ? [] : getVisibleBreakfastItems(pricingInfo);
   const todayHandover = savedHandovers[today];
 
   return (
@@ -77,23 +77,25 @@ export default function HotelInfoPanel({ compact = false }) {
         </div>
       </div>
 
-      <div className="hsk-hotel-card-block">
-        <strong>Pricing</strong>
-        <div className="hsk-price-row">
-          <span>Regular bike rental</span>
-          <strong>{pricingInfo.bikeRegular} DKK</strong>
-        </div>
-        <div className="hsk-price-row">
-          <span>Lufthansa bike rate</span>
-          <strong>{pricingInfo.bikeLufthansa} DKK</strong>
-        </div>
-        {breakfastItems.map((item) => (
-          <div className="hsk-price-row" key={item.id}>
-            <span>{item.label}</span>
-            <strong>{formatBreakfastPrice(item)}</strong>
+      {!hidePricing && (
+        <div className="hsk-hotel-card-block">
+          <strong>Pricing</strong>
+          <div className="hsk-price-row">
+            <span>Regular bike rental</span>
+            <strong>{pricingInfo.bikeRegular} DKK</strong>
           </div>
-        ))}
-      </div>
+          <div className="hsk-price-row">
+            <span>Lufthansa bike rate</span>
+            <strong>{pricingInfo.bikeLufthansa} DKK</strong>
+          </div>
+          {breakfastItems.map((item) => (
+            <div className="hsk-price-row" key={item.id}>
+              <span>{item.label}</span>
+              <strong>{formatBreakfastPrice(item)}</strong>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="hsk-hotel-card-block">
         <strong>Today&apos;s Handover</strong>

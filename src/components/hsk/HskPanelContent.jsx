@@ -12,7 +12,7 @@ import {
 } from '../../firebase/hsk';
 import { useHskNotifications } from '../../hooks/useHskNotifications';
 
-const TABS = [
+const ALL_TABS = [
   { id: 'messages', label: 'Messages', icon: '💬' },
   { id: 'requests', label: 'Requests', icon: '📋' },
   { id: 'rooms', label: 'Rooms', icon: '🚪' },
@@ -24,8 +24,18 @@ export default function HskPanelContent({
   role,
   canManageRooms = false,
   onBadgeChange,
+  visibleTabs,
 }) {
-  const [tab, setTab] = useState('messages');
+  const tabs = visibleTabs
+    ? ALL_TABS.filter((t) => visibleTabs.includes(t.id))
+    : ALL_TABS;
+  const [tab, setTab] = useState(tabs[0]?.id || 'messages');
+  useEffect(() => {
+    if (!tabs.some((t) => t.id === tab)) {
+      setTab(tabs[0]?.id || 'messages');
+    }
+  }, [tabs, tab]);
+
   const [rooms, setRooms] = useState([]);
   const [requests, setRequests] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -111,7 +121,7 @@ export default function HskPanelContent({
 
       <div className="hsk-panel-content">
         <div className="hsk-right-tabs">
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <button
               key={t.id}
               type="button"

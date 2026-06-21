@@ -6,7 +6,7 @@ import {
   countUnreadMessages,
 } from '../../firebase/hsk';
 
-export default function HskMessagesPanel({ user, role, onNewMessage }) {
+export default function HskMessagesPanel({ user, role, onNewMessage, primary = false }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -67,11 +67,13 @@ export default function HskMessagesPanel({ user, role, onNewMessage }) {
   };
 
   return (
-    <div className="hsk-messages">
-      <div className="hsk-panel-head">
-        <h4>Messages</h4>
-        {unread > 0 && <span className="hsk-badge">{unread}</span>}
-      </div>
+    <div className={`hsk-messages ${primary ? 'hsk-messages--primary' : ''}`}>
+      {!primary && (
+        <div className="hsk-panel-head">
+          <h4>Messages</h4>
+          {unread > 0 && <span className="hsk-badge">{unread}</span>}
+        </div>
+      )}
 
       <div className="hsk-messages-list">
         {messages.length === 0 && (
