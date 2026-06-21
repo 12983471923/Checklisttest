@@ -10,7 +10,8 @@ import {
   saveShiftTasks,
   saveShiftInstructions,
   saveShiftDowntimeTimes,
-  getDefaultShiftConfig
+  getDefaultShiftConfig,
+  isTaskHighlighted
 } from '../firebase/shiftConfig';
 import {
   getBreakfastTimes,
@@ -209,7 +210,15 @@ const TasksSection = () => {
   };
 
   const addTask = () => {
-    const next = [...tasks, { id: nextId(), text: 'New task', info: '' }];
+    const next = [...tasks, { id: nextId(), text: 'New task', info: '', highlighted: false }];
+    commit(next);
+  };
+
+  const toggleHighlight = (index) => {
+    const task = tasks[index];
+    const next = tasks.map((t, i) =>
+      i === index ? { ...t, highlighted: !isTaskHighlighted(task) } : t
+    );
     commit(next);
   };
 
@@ -245,7 +254,10 @@ const TasksSection = () => {
         <>
           <div className="admin-task-list">
             {tasks.map((task, index) => (
-              <div className="admin-task-card" key={task.id}>
+              <div
+                className={`admin-task-card ${isTaskHighlighted(task) ? 'admin-task-card-highlighted' : ''}`}
+                key={task.id}
+              >
                 <div className="admin-task-reorder">
                   <button
                     className="admin-icon-btn"
@@ -283,6 +295,14 @@ const TasksSection = () => {
                     onChange={(e) => updateField(index, 'info', e.target.value)}
                     onBlur={() => commitField(index, 'info')}
                   />
+                  <button
+                    type="button"
+                    className={`admin-highlight-btn ${isTaskHighlighted(task) ? 'is-active' : ''}`}
+                    onClick={() => toggleHighlight(index)}
+                    title={isTaskHighlighted(task) ? 'Remove highlight' : 'Mark as important'}
+                  >
+                    {isTaskHighlighted(task) ? '★ Highlighted' : '☆ Highlight'}
+                  </button>
                 </div>
 
                 <button

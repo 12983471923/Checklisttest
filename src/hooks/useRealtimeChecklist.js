@@ -8,7 +8,11 @@ import {
   initializeSession,
   resetSession
 } from '../firebase/database';
-import { subscribeToShiftConfig, DEFAULT_DOWNTIME_TIMES } from '../firebase/shiftConfig';
+import {
+  subscribeToShiftConfig,
+  DEFAULT_DOWNTIME_TIMES,
+  isTaskHighlighted
+} from '../firebase/shiftConfig';
 
 const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 const ordinal = (n) => ORDINALS[n - 1] || `${n}th`;
@@ -50,6 +54,7 @@ export const useRealtimeChecklist = (shift, initials) => {
           id: cfg.id,
           text: cfg.text,
           info: cfg.info || '',
+          highlighted: isTaskHighlighted(cfg),
           completed: !!state.completed,
           doneBy: state.doneBy || '',
           note: state.note || '',
