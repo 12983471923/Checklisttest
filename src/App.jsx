@@ -23,7 +23,7 @@ import { isAdminEmail } from "./config/admin";
 import AuthLoginForm from "./components/AuthLoginForm";
 import HskLoginForm from "./components/hsk/HskLoginForm";
 import HskDashboard from "./components/hsk/HskDashboard";
-import ReceptionHskPanel from "./components/hsk/ReceptionHskPanel";
+import FloatingHskWidget from "./components/hsk/FloatingHskWidget";
 import AdminPanel from "./components/AdminPanel";
 import WeatherWidget from "./components/WeatherWidget";
 import FloatingMapButton from "./components/FloatingMapButton";
@@ -601,7 +601,7 @@ function ChecklistApp({ userProfile, currentUser }) {
     return (
     <div className="checklist-container">
       {/* Main layout with sidebar and content */}
-      <div className="main-layout main-layout--with-hsk">
+      <div className="main-layout">
         <button
           type="button"
           className="mobile-sidebar-toggle"
@@ -2086,11 +2086,9 @@ function ChecklistApp({ userProfile, currentUser }) {
         </div>
       )}
         </div>
-
-        <ReceptionHskPanel currentUser={currentUser} userProfile={userProfile} />
       </div>
 
-      {/* Floating Map Button */}
+      <FloatingHskWidget currentUser={currentUser} userProfile={userProfile} />
       <FloatingMapButton />
 
       {/* Admin Panel (admin only) */}
