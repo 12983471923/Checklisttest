@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signInUserForPortal, USER_ROLES } from '../../firebase/auth';
+import { signInUserForPortal, HSK_PORTAL_ROLES } from '../../firebase/auth';
 import { rateLimitLogin, validateUserInput } from '../../utils/security';
 import ThemeToggle from '../ThemeToggle';
 import '../auth.css';
@@ -81,7 +81,7 @@ export default function HskLoginForm({ onLogin, onBack, externalError }) {
         emailValidation.value,
         formData.password,
         {
-          allowedRoles: [USER_ROLES.HOUSEKEEPING],
+          allowedRoles: HSK_PORTAL_ROLES,
           portalLabel: 'Housekeeping (HSK)',
         }
       );
@@ -106,7 +106,7 @@ export default function HskLoginForm({ onLogin, onBack, externalError }) {
           <div className="hsk-login-header">
             <img src="/logo.png" alt="Scandic Falkoner" />
             <h1>Housekeeping Portal</h1>
-            <p>Scandic Falkoner · HSK Staff Only</p>
+            <p>Scandic Falkoner · HSK Staff &amp; Admin</p>
           </div>
 
           {error && <div className="hsk-login-error">{error}</div>}

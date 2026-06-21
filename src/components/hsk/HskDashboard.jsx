@@ -5,7 +5,7 @@ import ThemeToggle from '../ThemeToggle';
 import HskPortalLayout from './HskPortalLayout';
 import './hsk.css';
 
-export default function HskDashboard({ currentUser, userProfile }) {
+export default function HskDashboard({ currentUser, userProfile, isAdminView = false, onSwitchToReception }) {
   const { isAdmin } = useAuth();
   const displayName =
     userProfile?.displayName || currentUser?.displayName || currentUser?.email || 'Housekeeping';
@@ -22,6 +22,11 @@ export default function HskDashboard({ currentUser, userProfile }) {
           <p>Scandic Falkoner · {displayName}</p>
         </div>
         <div className="hsk-header-actions">
+          {isAdminView && onSwitchToReception && (
+            <button type="button" className="hsk-logout-btn" onClick={onSwitchToReception}>
+              Reception Dashboard
+            </button>
+          )}
           <ThemeToggle />
           <button type="button" className="hsk-logout-btn" onClick={handleLogout}>
             Log Out

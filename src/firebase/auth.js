@@ -21,6 +21,8 @@ export const USER_ROLES = {
 
 export const RECEPTION_ROLES = [USER_ROLES.STAFF, USER_ROLES.MANAGER, USER_ROLES.ADMIN];
 
+export const HSK_PORTAL_ROLES = [USER_ROLES.HOUSEKEEPING, USER_ROLES.ADMIN];
+
 // Shift types
 export const SHIFT_TYPES = {
   NIGHT: 'night',
@@ -230,16 +232,24 @@ export const signInUserForPortal = async (email, password, { allowedRoles, porta
   if (result.error || !result.user) return result;
 
   const { profile } = await getUserProfile(result.user.uid);
-  if (!allowedRoles.includes(profile?.role)) {
+  const role = profile?.role ?? profile?.Role;
+
+  if (!allowedRoles.includes(role)) {
     await signOut(auth);
-    logSecurityEvent('login_portal_denied', { email, role: profile?.role, portalLabel });
+    logSecurityEvent('login_portal_denied', { email, role, portalLabel });
+    const hint =
+      role === USER_ROLES.ADMIN
+        ? ' Admin accounts should use the main Sign In page for Reception, or ensure admin role is set in Firestore.'
+        : role === USER_ROLES.HOUSEKEEPING
+          ? ' Housekeeping staff must use the Housekeeping (HSK) login page.'
+          : '';
     return {
       user: null,
-      error: `This account is not authorized for ${portalLabel}. Please use the correct login page.`,
+      error: `This account is not authorized for ${portalLabel}. Please use the correct login page.${hint}`,
     };
   }
 
-  return { user: result.user, profile, error: null };
+  return { user: result.user, profile: { ...profile, role }, error: null };
 };
 
 // Check if user can work specific shift
