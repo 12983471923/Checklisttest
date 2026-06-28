@@ -79,13 +79,7 @@ export default function FloatingHskWidget({ currentUser, userProfile }) {
         aria-label="Open HSK Management panel"
         aria-expanded={open}
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M4 10.5V19C4 20.1 4.9 21 6 21H9V14H15V21H18C19.1 21 20 20.1 20 19V10.5L12 4.5L4 10.5Z"
-            fill="currentColor"
-          />
-        </svg>
-        <span className="floating-hsk-label">HSK</span>
+        <span className="material-symbols-outlined" aria-hidden="true">cleaning_services</span>
         {badgeTotal > 0 && (
           <span className="floating-hsk-badge" aria-label={`${badgeTotal} notifications`}>
             {badgeTotal > 99 ? '99+' : badgeTotal}

@@ -32,6 +32,7 @@ import FloatingMapButton from "./components/FloatingMapButton";
 import ThemeToggle from "./components/ThemeToggle";
 import 'leaflet/dist/leaflet.css';
 import "./App.css";
+import "./frotask-shell.css";
 import "./responsive.css";
 import "./components/auth.css";
 import "./components/hsk/hsk.css";
@@ -165,9 +166,8 @@ function ChecklistApp({ userProfile, currentUser }) {
   const isAdmin = isAdminEmail(currentUser?.email) && userProfile?.role === "admin";
   const { isReceptionWidgetVisible, hotelInfo } = useDashboardConfig();
   const [showAdmin, setShowAdmin] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth > 1024
-  );
+  const [activeView, setActiveView] = useState('checklist');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [initials, setInitials] = useState("");
   const [initialsSubmitted, setInitialsSubmitted] = useState(false);
   const [showChangeInitials, setShowChangeInitials] = useState(false);
@@ -312,15 +312,50 @@ function ChecklistApp({ userProfile, currentUser }) {
     }
   }, [profileInitials]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 1024) {
-        setMobileSidebarOpen(true);
-      }
+  const widgetFilterForView = useCallback((view) => {
+    const map = {
+      'hotel-info': ['hotel-info'],
+      pricing: ['pricing'],
+      times: ['hotel-times'],
+      'wake-up': ['wakeup'],
+      handover: ['handover-daily', 'team-handovers'],
     };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return map[view] || [];
+  }, []);
+
+  const shouldShowWidget = useCallback((widgetId) => {
+    if (activeView === 'checklist') return false;
+    return widgetFilterForView(activeView).includes(widgetId);
+  }, [activeView, widgetFilterForView]);
+
+  const navItems = useMemo(() => [
+    { id: 'checklist', icon: 'checklist', label: 'Checklist', always: true },
+    { id: 'pricing', icon: 'payments', label: 'Pricing', widget: 'pricing' },
+    { id: 'hotel-info', icon: 'hotel', label: 'Hotel Info', widget: 'hotel-info' },
+    { id: 'times', icon: 'schedule', label: 'Times', widget: 'hotel-times' },
+    { id: 'wake-up', icon: 'alarm_on', label: 'Wake-Up', widget: 'wakeup' },
+    { id: 'handover', icon: 'history_edu', label: 'Handover Log', widgets: ['handover-daily', 'team-handovers'] },
+  ].filter((item) => {
+    if (item.always) return true;
+    if (item.widgets) return item.widgets.some((w) => isReceptionWidgetVisible(w));
+    return isReceptionWidgetVisible(item.widget);
+  }), [isReceptionWidgetVisible]);
+
+  const getViewTitle = useCallback((view, currentShift) => {
+    const titles = {
+      checklist: `${currentShift} Checklist`,
+      pricing: 'Pricing Management',
+      'hotel-info': 'Hotel Information',
+      times: 'Operational Hours',
+      'wake-up': 'Wake-Up Calls',
+      handover: 'Handover Log',
+    };
+    return titles[view] || 'Front Desk Operations';
+  }, []);
+
+  const handleNavSelect = useCallback((viewId) => {
+    setActiveView(viewId);
+    setMobileNavOpen(false);
   }, []);
 
   // Handle initials submit
@@ -684,333 +719,155 @@ function ChecklistApp({ userProfile, currentUser }) {
   }
 
     return (
-    <div className="checklist-container">
-      {/* Main layout with sidebar and content */}
-      <div className="main-layout">
-        <button
-          type="button"
-          className="mobile-sidebar-toggle"
-          aria-expanded={mobileSidebarOpen}
-          onClick={() => setMobileSidebarOpen((open) => !open)}
-        >
-          <span>Hotel info &amp; quick links</span>
-          <span className="mobile-sidebar-toggle-icon" aria-hidden="true">▼</span>
-        </button>
-
-        <div className={`left-sidebar ${mobileSidebarOpen ? '' : 'is-collapsed'}`}>
-          {isReceptionWidgetVisible('hotel-info') && (
-          <div className="header-card">
-            <strong>🏨 {hotelInfo.name || 'Scandic Falkoner'}</strong>
-            
-            <div className="hotel-info-section">
-              <div className="info-item">
-                <span className="info-icon">📍</span>
-                <div className="info-content">
-                  <span className="info-label">Address</span>
-                  <span className="info-value">{hotelInfo.address}</span>
-                </div>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-icon">📞</span>
-                <div className="info-content">
-                  <span className="info-label">Phone</span>
-                  <span className="info-value">{hotelInfo.phone}</span>
-                </div>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-icon">✉️</span>
-                <div className="info-content">
-                  <span className="info-label">Email</span>
-                  <span className="info-value">
-                    <a href={`mailto:${hotelInfo.email}`}>{hotelInfo.email}</a>
-                  </span>
-                </div>
-              </div>
+    <div className="frotask-app">
+      <aside className={`app-nav-sidebar ${mobileNavOpen ? 'is-open' : ''}`}>
+        <div className="app-nav-brand">
+          <div className="app-nav-brand-row">
+            <div className="app-nav-logo">
+              <span className="material-symbols-outlined">hotel</span>
             </div>
+            <h1 className="app-nav-title">FROTASK</h1>
           </div>
-          )}
-          
-          {isReceptionWidgetVisible('hotel-times') && (
-          <div className="header-card">
-            <strong>⏰ Hotel Times</strong>
-            
-            <div className="hotel-times-section">
-              <div className="time-item">
-                <span className="time-icon">🍳</span>
-                <div className="time-content">
-                  <span className="time-label">Breakfast</span>
-                  <div className="breakfast-display">
-                    <span 
-                      className="time-value time-value-clickable"
-                      onClick={() => setShowBreakfastModal(true)}
-                      title="Click to edit breakfast times"
-                    >
-                      {breakfastTimes.start} - {breakfastTimes.end}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="time-item">
-                <span className="time-icon">🚪</span>
-                <div className="time-content">
-                  <span className="time-label">Check-Out</span>
-                  <span className="time-value">{hotelInfo.checkOut}</span>
-                </div>
-              </div>
-              
-              <div className="time-item">
-                <span className="time-icon">🔑</span>
-                <div className="time-content">
-                  <span className="time-label">Check-In</span>
-                  <span className="time-value">{hotelInfo.checkIn}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          )}
-          
-          {isReceptionWidgetVisible('pricing') && (
-          <div className="header-card">
-            <strong>Pricing Information</strong>
-            
-            <div className="pricing-section">
-              <div className="pricing-category">
-                <strong>🚴 Bike Rental</strong>
-                <div className="price-list">
-                  <div className="price-item">
-                    <span className="price-label">Regular rate:</span>
-                    <span className="price-value">{pricingInfo.bikeRegular} DKK per person</span>
-                  </div>
-                  <div className="price-item">
-                    <span className="price-label">Lufthansa rate:</span>
-                    <span className="price-value">{pricingInfo.bikeLufthansa} DKK per person</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pricing-category">
-                <strong>🍳 Breakfast Pricing</strong>
-                <div className="price-list">
-                  {getVisibleBreakfastItems(pricingInfo).map((item) => (
-                    <div className="price-item" key={item.id}>
-                      <span className="price-label">{item.label}:</span>
-                      <span className="price-value">{formatBreakfastPrice(item)}</span>
-                      {item.note && <span className="price-note">{item.note}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          )}
-          
-          {isReceptionWidgetVisible('handover-daily') && (
-          <div className="header-card">
-            <strong>📝 Daily Handover</strong>
-            
-            <div className="handover-section">
-              <div className="handover-date-selector">
-                <input
-                  type="date"
-                  value={handoverDate}
-                  onChange={(e) => handleDateChange(e.target.value)}
-                  className="handover-date-input"
-                />
-              </div>
-              
-              <div className="handover-preview">
-                {savedHandovers[handoverDate] ? (
-                  <div className="handover-preview-text">
-                    {savedHandovers[handoverDate].substring(0, 80)}
-                    {savedHandovers[handoverDate].length > 80 ? "..." : ""}
-                  </div>
-                ) : (
-                  <div className="handover-preview-empty">
-                    No notes for this date
-                  </div>
-                )}
-              </div>
-              
-              <button
-                className="handover-btn"
-                onClick={openHandoverModal}
-              >
-                {savedHandovers[handoverDate] ? "Edit Notes" : "Add Notes"}
-              </button>
-              
-              <button
-                className="handover-view-all-btn"
-                onClick={() => setShowHandoverFullscreen(true)}
-              >
-                View All Handovers
-              </button>
-              
-              <div className="handover-stats">
-                <span className="handover-stat">
-                  📅 {Object.keys(savedHandovers).length} days recorded
-                </span>
-              </div>
-            </div>
-          </div>
-          )}
-
-          {isReceptionWidgetVisible('team-handovers') && (
-          <div className="header-card team-handover-sidebar-card">
-            <TeamHandoverPanel
-              user={currentUser}
-              role="reception"
-              isAdmin={isAdmin}
-              compact
-            />
-          </div>
-          )}
-          
-          {isReceptionWidgetVisible('wakeup') && (
-          <div className="header-card">
-            <strong>☎️ Wake-Up Calls</strong>
-            
-            <div className="wakeup-section">
-              <div className="wakeup-summary">
-                <div className="wakeup-stats">
-                  <span className="wakeup-stat">
-                    📞 {wakeUpCalls.filter(call => !call.completed && call.date >= new Date().toISOString().split('T')[0]).length} pending
-                  </span>
-                  <span className="wakeup-stat">
-                    ✅ {wakeUpCalls.filter(call => call.completed).length} completed
-                  </span>
-                </div>
-              </div>
-              
-              <div className="wakeup-list">
-                {wakeUpCalls
-                  .filter(call => call.date >= new Date().toISOString().split('T')[0])
-                  .slice(0, 4)
-                  .map(call => (
-                    <div key={call.id} className={`wakeup-item ${call.completed ? 'completed' : ''}`}>
-                      <div className="wakeup-info">
-                        <span className="wakeup-room">Room {call.roomNumber}</span>
-                        <span className="wakeup-time">{call.time}</span>
-                        {call.date !== new Date().toISOString().split('T')[0] && (
-                          <span className="wakeup-date">{new Date(call.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</span>
-                        )}
-                      </div>
-                      <div className="wakeup-actions">
-                        <button
-                          className={`wakeup-toggle ${call.completed ? 'completed' : ''}`}
-                          onClick={() => toggleWakeUpCallComplete(call.id)}
-                          title={call.completed ? 'Mark as pending' : 'Mark as completed'}
-                        >
-                          {call.completed ? '✅' : '⏰'}
-                        </button>
-                        <button
-                          className="wakeup-delete"
-                          onClick={() => deleteWakeUpCall(call.id)}
-                          title="Delete wake-up call"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                
-                {wakeUpCalls.filter(call => call.date >= new Date().toISOString().split('T')[0]).length === 0 && (
-                  <div className="wakeup-empty">
-                    No upcoming wake-up calls
-                  </div>
-                )}
-              </div>
-              
-              <div className="wakeup-buttons">
-                <button
-                  className="wakeup-add-btn"
-                  onClick={() => setShowWakeUpModal(true)}
-                >
-                  + Add Wake-Up Call
-                </button>
-                <button
-                  className="wakeup-fullscreen-btn"
-                  onClick={() => setShowWakeUpFullscreen(true)}
-                  title="View all wake-up calls"
-                >
-                  📋 View All
-                </button>
-                {wakeUpCalls.length > 0 && (
-                  <button
-                    className="wakeup-clear-btn"
-                    onClick={clearOldWakeUpCalls}
-                  >
-                    Clear Old
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-          )}
+          <p className="app-nav-subtitle">Management Portal</p>
         </div>
 
-        {/* Right content area */}
-        <div className="main-content">
-          {/* Top right header with title and shift selector */}
-          <div className="top-header">
-            <h2 className="night-title">{shift} Checklist</h2>
-          <div className={`shift-selector shift-selector-${shift.toLowerCase()}`}>
+        <nav className="app-nav-list" aria-label="Main navigation">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`app-nav-link ${activeView === item.id ? 'is-active' : ''}`}
+              onClick={() => handleNavSelect(item.id)}
+            >
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {isReceptionWidgetVisible('handover-daily') && (
+          <div className="app-nav-footer">
+            <button type="button" className="app-nav-new-handover" onClick={openHandoverModal}>
+              <span className="material-symbols-outlined">add</span>
+              <span>New Handover</span>
+            </button>
+          </div>
+        )}
+      </aside>
+
+      {mobileNavOpen && (
+        <button
+          type="button"
+          className="app-nav-overlay"
+          aria-label="Close navigation"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      <header className="app-top-bar">
+        <div className="app-top-bar-left">
+          <button
+            type="button"
+            className="app-nav-mobile-toggle"
+            aria-label="Open navigation"
+            onClick={() => setMobileNavOpen(true)}
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <h2 className="app-top-bar-title">{getViewTitle(activeView, shift)}</h2>
+          {activeView === 'checklist' && (
+            <div className="app-shift-selector">
               {Object.keys(checklists).map((shiftName) => (
                 <button
                   key={shiftName}
+                  type="button"
                   onClick={() => handleShiftChange(shiftName)}
-                  className={`shift-btn ${shift === shiftName ? 'active' : ''}`}
+                  className={`app-shift-btn ${shift === shiftName ? 'is-active' : ''}`}
                 >
                   {shiftName}
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Meta bar */}
-          <div className="meta-bar">
-        <div className="meta-bar-info">
-          <span className="meta-bar-user">
-            Logged in as <strong>{displayName}</strong>
-          </span>
-          <span>
-            <span role="img" aria-label="calendar">📅</span>
-            &nbsp;{new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
-          </span>
+          )}
         </div>
-          <div className="meta-bar-actions">
+
+        <div className="app-top-bar-right">
+          <div className="app-top-bar-utilities">
             <ThemeToggle />
             <WeatherWidget />
-            {isAdmin && (
-              <button className="add-note-btn admin-panel-btn" onClick={() => setShowAdmin(true)}>
-                🛠️ Admin Panel
-              </button>
-            )}
-            <button className="reset-btn" onClick={handleResetAll}>Reset All</button>
-            <span
-              className={`initials-chip initials-chip-action ${showInitialsModal ? "active" : ""}`}
-              title="Click to change initials"
+          </div>
+          <div className="app-top-bar-divider" aria-hidden="true" />
+          <div className="app-top-bar-profile">
+            <div className="app-top-bar-profile-text">
+              <p className="app-top-bar-profile-name">
+                {userProfile?.displayName || displayName.split('@')[0]}
+              </p>
+              <p className="app-top-bar-profile-role">Front Desk</p>
+            </div>
+            <button
+              type="button"
+              className="app-top-bar-avatar"
+              title="Change initials"
               onClick={() => {
                 setNewInitials(initials);
                 setShowInitialsModal(true);
               }}
             >
               {initials}
-            </span>
-            <button className="add-note-btn logout-btn" onClick={handleLogout}>
-              Log Out
             </button>
           </div>
-          </div>
+        </div>
+      </header>
 
-          {/* Progress bar */}
-          <div className="progress-bar">
-            <div className="progress-bar-inner" style={{ width: percent + "%" }}></div>
-          </div>
-          <div className="progress-summary">
-            {percent}% Complete ({tasks.filter(t => t.completed).length}/{tasks.length} tasks)
+      <main className="frotask-main">
+        {activeView === 'checklist' ? (
+        <div className="frotask-main-inner">
+          <section className="frotask-checklist-header">
+            <div className="frotask-checklist-heading">
+              <h3 className="frotask-checklist-title">{shift} Checklist</h3>
+              <div className="frotask-checklist-progress-row">
+                <div className="frotask-checklist-progress-track">
+                  <div className="frotask-checklist-progress-fill" style={{ width: `${percent}%` }} />
+                </div>
+                <span className="frotask-checklist-progress-label">
+                  {percent}% COMPLETE ({tasks.filter((t) => t.completed).length}/{tasks.length} TASKS)
+                </span>
+              </div>
+              <div className="app-shift-selector frotask-mobile-shift-selector">
+                {Object.keys(checklists).map((shiftName) => (
+                  <button
+                    key={shiftName}
+                    type="button"
+                    onClick={() => handleShiftChange(shiftName)}
+                    className={`app-shift-btn ${shift === shiftName ? 'is-active' : ''}`}
+                  >
+                    {shiftName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <div className="frotask-meta-strip">
+            <div className="frotask-meta-strip-info">
+              <span className="meta-bar-user">
+                Logged in as <strong>{displayName}</strong>
+              </span>
+              <span>
+                {new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })}
+              </span>
+            </div>
+            <div className="frotask-meta-strip-actions">
+              {isAdmin && (
+                <button type="button" className="add-note-btn admin-panel-btn" onClick={() => setShowAdmin(true)}>
+                  Admin Panel
+                </button>
+              )}
+              <button type="button" className="reset-btn" onClick={handleResetAll}>Reset All</button>
+              <button type="button" className="add-note-btn logout-btn" onClick={handleLogout}>
+                Log Out
+              </button>
+            </div>
           </div>
 
           {/* Loading and Error states */}
@@ -1088,9 +945,21 @@ function ChecklistApp({ userProfile, currentUser }) {
                     <span className="ios-checkbox" aria-hidden="true"></span>
                   </label>
 
-                  <div className="task-card-body">
-                    <div className="task-title-row">
-                      <h3 className="task-title">{task.text}</h3>
+                  <div className="frotask-task-main">
+                    <div className={`frotask-task-icon ${isInProgress || isCritical ? 'is-active' : ''}`}>
+                      <span className="material-symbols-outlined">
+                        {isCritical ? 'priority_high' : isInProgress ? 'pending' : 'task_alt'}
+                      </span>
+                    </div>
+                    <div className="frotask-task-content">
+                      <div className="frotask-task-title-row">
+                        {isCritical && <span className="frotask-task-badge is-critical">Critical</span>}
+                        {isInProgress && <span className="frotask-task-badge is-working">Working</span>}
+                        <h3 className="task-title">{task.text}</h3>
+                      </div>
+                      {task.note && (
+                        <p className="task-note-preview">{task.note}</p>
+                      )}
                       {isInProgress && (
                         <span className="in-progress-indicator">
                           <span className="in-progress-dot" aria-hidden="true"></span>
@@ -1098,9 +967,6 @@ function ChecklistApp({ userProfile, currentUser }) {
                         </span>
                       )}
                     </div>
-                    {task.note && (
-                      <p className="task-note-preview">{task.note}</p>
-                    )}
                   </div>
 
                   <div className="task-card-actions">
@@ -1111,22 +977,7 @@ function ChecklistApp({ userProfile, currentUser }) {
                       disabled={task.completed || (isInProgress && !isMine)}
                       title={isInProgress && !isMine ? `${task.inProgressBy} is working on this task` : isMine ? "Stop working on this task" : "Start working on this task"}
                     >
-                      {isMine ? (
-                        <>
-                          <span>●</span>
-                          <span>Stop</span>
-                        </>
-                      ) : isInProgress ? (
-                        <>
-                          <span>●</span>
-                          <span>{task.inProgressBy}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>○</span>
-                          <span>Work</span>
-                        </>
-                      )}
+                      {isMine ? 'Finish Task' : isInProgress ? task.inProgressBy : 'Start Task'}
                     </button>
                     <button
                       className="info-btn"
@@ -1196,6 +1047,263 @@ function ChecklistApp({ userProfile, currentUser }) {
             <br />
             <a href="mailto:ayush.gurung@scandichotels.com">ayush.gurung@scandichotels.com</a>
           </div>
+        </div>
+        ) : (
+        <div className="frotask-main-inner frotask-panel-view">
+          {shouldShowWidget('hotel-info') && isReceptionWidgetVisible('hotel-info') && (
+          <div className="header-card">
+            <strong>{hotelInfo.name || 'Scandic Falkoner'}</strong>
+            
+            <div className="hotel-info-section">
+              <div className="info-item">
+                <span className="info-icon">📍</span>
+                <div className="info-content">
+                  <span className="info-label">Address</span>
+                  <span className="info-value">{hotelInfo.address}</span>
+                </div>
+              </div>
+              
+              <div className="info-item">
+                <span className="info-icon">📞</span>
+                <div className="info-content">
+                  <span className="info-label">Phone</span>
+                  <span className="info-value">{hotelInfo.phone}</span>
+                </div>
+              </div>
+              
+              <div className="info-item">
+                <span className="info-icon">✉️</span>
+                <div className="info-content">
+                  <span className="info-label">Email</span>
+                  <span className="info-value">
+                    <a href={`mailto:${hotelInfo.email}`}>{hotelInfo.email}</a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          )}
+          
+          {shouldShowWidget('hotel-times') && isReceptionWidgetVisible('hotel-times') && (
+          <div className="header-card">
+            <strong>Hotel Times</strong>
+            
+            <div className="hotel-times-section">
+              <div className="time-item">
+                <span className="time-icon">🍳</span>
+                <div className="time-content">
+                  <span className="time-label">Breakfast</span>
+                  <div className="breakfast-display">
+                    <span 
+                      className="time-value time-value-clickable"
+                      onClick={() => setShowBreakfastModal(true)}
+                      title="Click to edit breakfast times"
+                    >
+                      {breakfastTimes.start} - {breakfastTimes.end}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="time-item">
+                <span className="time-icon">🚪</span>
+                <div className="time-content">
+                  <span className="time-label">Check-Out</span>
+                  <span className="time-value">{hotelInfo.checkOut}</span>
+                </div>
+              </div>
+              
+              <div className="time-item">
+                <span className="time-icon">🔑</span>
+                <div className="time-content">
+                  <span className="time-label">Check-In</span>
+                  <span className="time-value">{hotelInfo.checkIn}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          )}
+          
+          {shouldShowWidget('pricing') && isReceptionWidgetVisible('pricing') && (
+          <div className="header-card">
+            <strong>Pricing Information</strong>
+            
+            <div className="pricing-section">
+              <div className="pricing-category">
+                <strong>Bike Rental</strong>
+                <div className="price-list">
+                  <div className="price-item">
+                    <span className="price-label">Regular rate:</span>
+                    <span className="price-value">{pricingInfo.bikeRegular} DKK per person</span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">Lufthansa rate:</span>
+                    <span className="price-value">{pricingInfo.bikeLufthansa} DKK per person</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pricing-category">
+                <strong>Breakfast Pricing</strong>
+                <div className="price-list">
+                  {getVisibleBreakfastItems(pricingInfo).map((item) => (
+                    <div className="price-item" key={item.id}>
+                      <span className="price-label">{item.label}:</span>
+                      <span className="price-value">{formatBreakfastPrice(item)}</span>
+                      {item.note && <span className="price-note">{item.note}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          )}
+          
+          {shouldShowWidget('handover-daily') && isReceptionWidgetVisible('handover-daily') && (
+          <div className="header-card">
+            <strong>Daily Handover</strong>
+            
+            <div className="handover-section">
+              <div className="handover-date-selector">
+                <input
+                  type="date"
+                  value={handoverDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="handover-date-input"
+                />
+              </div>
+              
+              <div className="handover-preview">
+                {savedHandovers[handoverDate] ? (
+                  <div className="handover-preview-text">
+                    {savedHandovers[handoverDate].substring(0, 80)}
+                    {savedHandovers[handoverDate].length > 80 ? "..." : ""}
+                  </div>
+                ) : (
+                  <div className="handover-preview-empty">
+                    No notes for this date
+                  </div>
+                )}
+              </div>
+              
+              <button
+                className="handover-btn"
+                onClick={openHandoverModal}
+              >
+                {savedHandovers[handoverDate] ? "Edit Notes" : "Add Notes"}
+              </button>
+              
+              <button
+                className="handover-view-all-btn"
+                onClick={() => setShowHandoverFullscreen(true)}
+              >
+                View All Handovers
+              </button>
+              
+              <div className="handover-stats">
+                <span className="handover-stat">
+                  {Object.keys(savedHandovers).length} days recorded
+                </span>
+              </div>
+            </div>
+          </div>
+          )}
+
+          {shouldShowWidget('team-handovers') && isReceptionWidgetVisible('team-handovers') && (
+          <div className="header-card team-handover-sidebar-card">
+            <TeamHandoverPanel
+              user={currentUser}
+              role="reception"
+              isAdmin={isAdmin}
+              compact
+            />
+          </div>
+          )}
+          
+          {shouldShowWidget('wakeup') && isReceptionWidgetVisible('wakeup') && (
+          <div className="header-card">
+            <strong>Wake-Up Calls</strong>
+            
+            <div className="wakeup-section">
+              <div className="wakeup-summary">
+                <div className="wakeup-stats">
+                  <span className="wakeup-stat">
+                    {wakeUpCalls.filter(call => !call.completed && call.date >= new Date().toISOString().split('T')[0]).length} pending
+                  </span>
+                  <span className="wakeup-stat">
+                    {wakeUpCalls.filter(call => call.completed).length} completed
+                  </span>
+                </div>
+              </div>
+              
+              <div className="wakeup-list">
+                {wakeUpCalls
+                  .filter(call => call.date >= new Date().toISOString().split('T')[0])
+                  .slice(0, 4)
+                  .map(call => (
+                    <div key={call.id} className={`wakeup-item ${call.completed ? 'completed' : ''}`}>
+                      <div className="wakeup-info">
+                        <span className="wakeup-room">Room {call.roomNumber}</span>
+                        <span className="wakeup-time">{call.time}</span>
+                        {call.date !== new Date().toISOString().split('T')[0] && (
+                          <span className="wakeup-date">{new Date(call.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</span>
+                        )}
+                      </div>
+                      <div className="wakeup-actions">
+                        <button
+                          className={`wakeup-toggle ${call.completed ? 'completed' : ''}`}
+                          onClick={() => toggleWakeUpCallComplete(call.id)}
+                          title={call.completed ? 'Mark as pending' : 'Mark as completed'}
+                        >
+                          {call.completed ? '✅' : '⏰'}
+                        </button>
+                        <button
+                          className="wakeup-delete"
+                          onClick={() => deleteWakeUpCall(call.id)}
+                          title="Delete wake-up call"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                
+                {wakeUpCalls.filter(call => call.date >= new Date().toISOString().split('T')[0]).length === 0 && (
+                  <div className="wakeup-empty">
+                    No upcoming wake-up calls
+                  </div>
+                )}
+              </div>
+              
+              <div className="wakeup-buttons">
+                <button
+                  className="wakeup-add-btn"
+                  onClick={() => setShowWakeUpModal(true)}
+                >
+                  Add Wake-Up Call
+                </button>
+                <button
+                  className="wakeup-fullscreen-btn"
+                  onClick={() => setShowWakeUpFullscreen(true)}
+                  title="View all wake-up calls"
+                >
+                  View All
+                </button>
+                {wakeUpCalls.length > 0 && (
+                  <button
+                    className="wakeup-clear-btn"
+                    onClick={clearOldWakeUpCalls}
+                  >
+                    Clear Old
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          )}
+        </div>
+        )}
+      </main>
 
       {/* Info Modal */}
       {showInfo && (() => {
@@ -2191,11 +2299,10 @@ function ChecklistApp({ userProfile, currentUser }) {
           </div>
         </div>
       )}
-        </div>
+      <div className="frotask-fab-stack">
+        <FloatingMapButton />
+        <FloatingHskWidget currentUser={currentUser} userProfile={userProfile} />
       </div>
-
-      <FloatingHskWidget currentUser={currentUser} userProfile={userProfile} />
-      <FloatingMapButton />
 
       {/* Admin Panel (admin only) */}
       {showAdmin && isAdmin && <AdminPanel onClose={() => setShowAdmin(false)} />}
