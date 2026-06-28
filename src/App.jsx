@@ -324,10 +324,6 @@ function ChecklistApp({ userProfile, currentUser }) {
     setActiveView('checklist');
   }, []);
 
-  const handleMobileHub = useCallback(() => {
-    setActiveView('hub');
-  }, []);
-
   const handleMobileHsk = useCallback(() => {
     document.querySelector('.floating-hsk-button')?.click();
   }, []);
