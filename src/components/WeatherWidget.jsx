@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const WeatherWidget = () => {
+const WeatherWidget = ({ variant = 'minimal' }) => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -71,6 +71,14 @@ const WeatherWidget = () => {
   }, []);
 
   if (loading) {
+    if (variant === 'pill') {
+      return (
+        <div className="weather-widget weather-pill">
+          <span className="material-symbols-outlined">wb_sunny</span>
+          <span>--°</span>
+        </div>
+      );
+    }
     return (
       <div className="weather-widget weather-minimal">
         <span className="weather-spinner">🌡️</span>
@@ -80,10 +88,27 @@ const WeatherWidget = () => {
   }
 
   if (error) {
+    if (variant === 'pill') {
+      return (
+        <div className="weather-widget weather-pill">
+          <span className="material-symbols-outlined">cloud_off</span>
+          <span>--°</span>
+        </div>
+      );
+    }
     return (
       <div className="weather-widget weather-minimal weather-error">
         <span className="weather-icon">❌</span>
         <span className="weather-temp-minimal">--°</span>
+      </div>
+    );
+  }
+
+  if (variant === 'pill') {
+    return (
+      <div className="weather-widget weather-pill" title={`Copenhagen: ${weather.description}, ${weather.temperature}°C`}>
+        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>wb_sunny</span>
+        <span>{weather.temperature}°C · Frederiksberg</span>
       </div>
     );
   }
