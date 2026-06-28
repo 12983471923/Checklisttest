@@ -3,6 +3,19 @@
  * Desktop (min-width: 1025px) is intentionally untouched.
  */
 
+/* FROTASK shell: mobile shift selector in checklist header */
+.frotask-mobile-shift-selector {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .frotask-checklist-header .frotask-mobile-shift-selector {
+    display: flex;
+    margin-top: 16px;
+    width: fit-content;
+  }
+}
+
 /* Preserve desktop meta-bar layout (replaces removed inline styles) */
 .meta-bar-info {
   display: flex;

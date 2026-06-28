@@ -1,0 +1,1721 @@
+/* FROTASK hospitality operations design system */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.frotask-app {
+  --ft-background: #f9f9f9;
+  --ft-surface: #ffffff;
+  --ft-surface-container-low: #f3f3f4;
+  --ft-surface-container-lowest: #ffffff;
+  --ft-surface-container: #eeeeee;
+  --ft-surface-container-high: #e8e8e8;
+  --ft-surface-variant: #e2e2e2;
+  --ft-outline-variant: #cfc4c5;
+  --ft-outline: #7e7576;
+  --ft-primary: #000000;
+  --ft-on-primary: #ffffff;
+  --ft-on-surface: #1a1c1c;
+  --ft-on-surface-variant: #4c4546;
+  --ft-secondary: #5e5e63;
+  --ft-error: #ba1a1a;
+  --ft-error-container: #ffdad6;
+  --ft-primary-fixed-dim: #c6c6c6;
+  --ft-margin-desktop: 40px;
+  --ft-margin-mobile: 20px;
+  --ft-gutter: 24px;
+  --ft-stack-sm: 8px;
+  --ft-stack-md: 16px;
+  --ft-stack-lg: 32px;
+  --ft-stack-xl: 64px;
+  --ft-container-max: 1200px;
+  --ft-nav-width: 256px;
+  --ft-topbar-height: 64px;
+  --ft-card-radius: 24px;
+  --ft-shell-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+  min-height: 100vh;
+  background: var(--ft-background);
+  color: var(--ft-on-surface);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="dark"] .frotask-app {
+  --ft-background: #121212;
+  --ft-surface: #1e1e1e;
+  --ft-surface-container-low: #1a1a1a;
+  --ft-surface-container-lowest: #161616;
+  --ft-surface-container: #2a2a2a;
+  --ft-surface-container-high: #333333;
+  --ft-surface-variant: #2c2c2c;
+  --ft-outline-variant: #444444;
+  --ft-outline: #8e8e93;
+  --ft-primary: #ffffff;
+  --ft-on-primary: #000000;
+  --ft-on-surface: #f0f1f1;
+  --ft-on-surface-variant: #aeaeb2;
+  --ft-secondary: #aeaeb2;
+  --ft-primary-fixed-dim: #5e5e5e;
+  --ft-shell-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* Navigation sidebar */
+.app-nav-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: var(--ft-nav-width);
+  height: 100%;
+  padding: var(--ft-stack-lg) var(--ft-stack-md);
+  background: var(--ft-surface-container-lowest);
+  border-right: 1px solid var(--ft-outline-variant);
+}
+
+.app-nav-brand {
+  margin-bottom: var(--ft-stack-xl);
+  padding: 0 8px;
+}
+
+.app-nav-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.app-nav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.app-nav-logo .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 20px;
+}
+
+.app-nav-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ft-primary);
+}
+
+.app-nav-subtitle {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-secondary);
+}
+
+.app-nav-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ft-secondary);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app-nav-link:hover {
+  background: var(--ft-surface-container-high);
+  color: var(--ft-primary);
+}
+
+.app-nav-link.is-active {
+  border-right: 2px solid var(--ft-primary);
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+  font-weight: 700;
+}
+
+.app-nav-link.is-active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.app-nav-footer {
+  margin-top: auto;
+  padding: 0 8px;
+}
+
+.app-nav-new-handover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.app-nav-new-handover:hover {
+  opacity: 0.8;
+}
+
+.app-nav-new-handover .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* Top app bar */
+.app-top-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: calc(100% - var(--ft-nav-width));
+  height: var(--ft-topbar-height);
+  padding: 0 var(--ft-margin-desktop);
+  background: var(--ft-surface-container-lowest);
+  border-bottom: 1px solid var(--ft-outline-variant);
+  backdrop-filter: blur(12px);
+}
+
+.app-top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-width: 0;
+}
+
+.app-top-bar-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ft-primary);
+  white-space: nowrap;
+}
+
+.app-shift-selector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 999px;
+  background: var(--ft-surface-container-low);
+}
+
+.app-shift-btn {
+  padding: 4px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ft-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-shift-btn:hover {
+  color: var(--ft-primary);
+}
+
+.app-shift-btn.is-active {
+  border: 1px solid var(--ft-outline-variant);
+  background: var(--ft-surface);
+  color: var(--ft-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.app-top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.app-top-bar-utilities {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--ft-secondary);
+}
+
+.app-top-bar-divider {
+  width: 1px;
+  height: 32px;
+  margin: 0 8px;
+  background: var(--ft-outline-variant);
+}
+
+.app-top-bar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-top-bar-profile-text {
+  text-align: right;
+}
+
+.app-top-bar-profile-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ft-primary);
+}
+
+.app-top-bar-profile-role {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-secondary);
+}
+
+.app-top-bar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 50%;
+  background: var(--ft-surface-container);
+  color: var(--ft-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.app-top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-top-bar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ft-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.app-top-bar-icon-btn:hover {
+  color: var(--ft-primary);
+}
+
+.app-nav-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  padding: 0;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 12px;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+  cursor: pointer;
+}
+
+.app-nav-overlay {
+  display: none;
+}
+
+/* Main content */
+.frotask-main {
+  margin-left: var(--ft-nav-width);
+  padding-top: var(--ft-topbar-height);
+  min-height: 100vh;
+}
+
+.frotask-main-inner {
+  max-width: var(--ft-container-max);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--ft-margin-desktop);
+}
+
+/* Panel views (hotel info, pricing, etc.) */
+.frotask-panel-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-gutter);
+}
+
+.frotask-panel-view .header-card {
+  position: static;
+  margin-bottom: 0;
+  padding: 32px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: var(--ft-card-radius);
+  background: var(--ft-surface);
+  box-shadow: none;
+  transform: none;
+  backdrop-filter: none;
+}
+
+.frotask-panel-view .header-card:hover {
+  transform: none;
+  border-color: var(--ft-outline-variant);
+  background: var(--ft-surface);
+}
+
+.frotask-panel-view .header-card strong {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ft-primary);
+}
+
+/* Checklist header */
+.frotask-checklist-header {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+@media (min-width: 768px) {
+  .frotask-checklist-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.frotask-checklist-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.frotask-checklist-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ft-primary);
+}
+
+.frotask-checklist-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.frotask-checklist-progress-track {
+  flex: 1;
+  max-width: 28rem;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ft-surface-container);
+}
+
+.frotask-checklist-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ft-primary);
+  transition: width 0.3s ease;
+}
+
+.frotask-checklist-progress-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-primary);
+  white-space: nowrap;
+}
+
+/* Meta strip */
+.frotask-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: var(--ft-gutter);
+  padding: 12px 16px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 16px;
+  background: var(--ft-surface);
+}
+
+.frotask-meta-strip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--ft-secondary);
+}
+
+.frotask-meta-strip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Custom cards */
+.frotask-custom-card,
+.frotask-app .task-card,
+.frotask-app .downtime-checklist {
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: var(--ft-card-radius);
+  background: var(--ft-surface);
+  box-shadow: var(--ft-shell-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.frotask-app .task-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+}
+
+.frotask-app .task-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--ft-primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.frotask-task-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.frotask-task-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+}
+
+.frotask-task-icon.is-active {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.frotask-task-icon .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.frotask-task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.frotask-task-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.frotask-task-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.frotask-task-badge.is-critical {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.frotask-task-badge.is-working {
+  border: 1px solid var(--ft-outline-variant);
+  background: var(--ft-surface-container);
+  color: var(--ft-primary);
+}
+
+.frotask-app .task-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ft-on-surface);
+}
+
+.frotask-app .task-card.is-completed .task-title {
+  color: var(--ft-secondary);
+  text-decoration: line-through;
+}
+
+.frotask-app .task-note-preview {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ft-secondary);
+}
+
+.frotask-app .task-card.task-critical {
+  background: var(--ft-surface);
+  box-shadow: var(--ft-shell-shadow);
+}
+
+.frotask-app .task-card.is-in-progress {
+  box-shadow: var(--ft-shell-shadow);
+}
+
+.frotask-app .task-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.frotask-app .working-btn,
+.frotask-app .add-note-btn,
+.frotask-app .edit-note-btn {
+  min-width: auto;
+  height: auto;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.frotask-app .working-btn:hover:not(:disabled),
+.frotask-app .add-note-btn:hover,
+.frotask-app .edit-note-btn:hover {
+  opacity: 0.9;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.frotask-app .working-btn.working-active {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.frotask-app .working-btn.working-other {
+  opacity: 0.6;
+}
+
+.frotask-app .working-btn:disabled {
+  opacity: 0.5;
+}
+
+.frotask-app .info-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-secondary);
+  font-weight: 700;
+}
+
+.frotask-app .info-btn:hover {
+  background: var(--ft-surface-container-high);
+  color: var(--ft-primary);
+}
+
+.frotask-app .task-checkbox-control {
+  display: none;
+}
+
+.frotask-app .checklist-section-label {
+  margin: 0 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-secondary);
+}
+
+.frotask-app .downtime-section-label {
+  margin-top: 32px;
+}
+
+.frotask-app .task-list {
+  gap: 16px;
+}
+
+.frotask-app .downtime-checklist {
+  padding: 24px;
+}
+
+.frotask-app .shift-instructions-card {
+  margin-bottom: var(--ft-gutter);
+  padding: 24px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: var(--ft-card-radius);
+  background: var(--ft-surface);
+}
+
+.frotask-app .reset-btn,
+.frotask-app .logout-btn,
+.frotask-app .admin-panel-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--ft-primary);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ft-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.frotask-app .reset-btn:hover,
+.frotask-app .logout-btn:hover,
+.frotask-app .admin-panel-btn:hover {
+  background: var(--ft-surface-container);
+}
+
+.frotask-app .initials-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 999px;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.frotask-app .footer-text {
+  margin-top: var(--ft-stack-xl);
+  font-size: 14px;
+  color: var(--ft-secondary);
+}
+
+/* Floating action buttons */
+.frotask-fab-stack {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.frotask-app .floating-map-button,
+.frotask-app .floating-hsk-button {
+  position: static;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.frotask-app .floating-map-button {
+  border: 1px solid var(--ft-outline-variant);
+  background: var(--ft-surface);
+  color: var(--ft-primary);
+}
+
+.frotask-app .floating-map-button:hover {
+  transform: scale(1.1);
+  background: var(--ft-surface);
+}
+
+.frotask-app .floating-hsk-button {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.frotask-app .floating-map-label,
+.frotask-app .floating-hsk-label {
+  display: none;
+}
+
+.frotask-app .floating-map-button .material-symbols-outlined,
+.frotask-app .floating-hsk-button .material-symbols-outlined {
+  font-size: 24px;
+}
+
+/* ── FROTASK shell responsive ─────────────────────────────────── */
+@media (max-width: 1024px) {
+  .app-nav-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .app-nav-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .app-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    border: none;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+
+  .app-nav-mobile-toggle {
+    display: inline-flex;
+  }
+
+  .app-top-bar {
+    width: 100%;
+    padding: 0 var(--ft-margin-mobile);
+    gap: 12px;
+  }
+
+  .frotask-main {
+    margin-left: 0;
+  }
+
+  .frotask-main-inner {
+    padding: var(--ft-margin-mobile);
+  }
+
+  .app-top-bar-left {
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .app-top-bar-title {
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-shift-selector {
+    display: none;
+  }
+
+  .app-top-bar-profile-text {
+    display: none;
+  }
+
+  .app-top-bar-right {
+    gap: 8px;
+  }
+
+  .app-top-bar-divider {
+    display: none;
+  }
+
+  .frotask-checklist-title {
+    font-size: 24px;
+  }
+
+  .frotask-checklist-progress-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .frotask-checklist-progress-label {
+    white-space: normal;
+  }
+
+  .frotask-app .task-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .frotask-app .task-card-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .frotask-fab-stack {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .frotask-meta-strip {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .frotask-meta-strip-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .frotask-meta-strip-actions .admin-panel-btn {
+    grid-column: 1 / -1;
+  }
+
+  .frotask-task-main {
+    gap: 16px;
+  }
+
+  .frotask-app .working-btn,
+  .frotask-app .add-note-btn,
+  .frotask-app .edit-note-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Scrollbar */
+.frotask-app ::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.frotask-app ::-webkit-scrollbar-track {
+  background: #f5f5f7;
+}
+
+.frotask-app ::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #e5e5e7;
+}
+
+/* Top bar enhancements */
+.app-top-bar {
+  justify-content: space-between;
+}
+
+.app-shift-selector-top {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.app-top-bar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ft-top-link {
+  border: none;
+  background: transparent;
+  color: var(--ft-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ft-top-link:hover {
+  color: var(--ft-primary);
+}
+
+.ft-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 999px;
+  background: var(--ft-surface);
+  color: var(--ft-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ft-user-pill-role {
+  color: var(--ft-secondary);
+  font-weight: 600;
+}
+
+.weather-widget.weather-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 999px;
+  background: var(--ft-surface);
+  color: var(--ft-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.frotask-meta-strip-compact {
+  margin-bottom: 24px;
+}
+
+/* Completed tasks */
+.frotask-app .task-card.is-completed {
+  background: var(--ft-surface-container);
+  border-color: var(--ft-outline-variant);
+}
+
+.frotask-app .task-card.is-completed:hover {
+  transform: none;
+  border-color: var(--ft-outline-variant);
+}
+
+.frotask-app .task-card.is-completed .frotask-task-icon {
+  background: var(--ft-surface-container-high);
+  color: var(--ft-secondary);
+}
+
+.ft-task-completed-by {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ft-secondary);
+}
+
+.ft-btn-ghost-sm {
+  background: transparent !important;
+  color: var(--ft-primary) !important;
+  border: 2px solid var(--ft-primary) !important;
+  box-shadow: none !important;
+}
+
+.ft-undo-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ft-outline-variant);
+  background: var(--ft-surface);
+  color: var(--ft-secondary);
+}
+
+/* Panel pages */
+.ft-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-gutter);
+}
+
+.ft-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.ft-page-eyebrow,
+.ft-label-caps {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-secondary);
+}
+
+.ft-display-title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ft-primary);
+}
+
+.ft-page-subtitle {
+  margin: 8px 0 0;
+  font-size: 18px;
+  color: var(--ft-secondary);
+}
+
+.ft-card {
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: var(--ft-card-radius);
+  background: var(--ft-surface);
+  padding: 32px;
+  box-shadow: var(--ft-shell-shadow);
+}
+
+.ft-card-dark {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+  border-color: transparent;
+}
+
+.ft-card-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ft-primary);
+}
+
+.ft-card-dark .ft-card-title,
+.ft-card-dark .ft-label-caps {
+  color: var(--ft-on-primary);
+}
+
+.ft-on-dark-muted {
+  color: var(--ft-primary-fixed-dim) !important;
+}
+
+.ft-bento-grid,
+.ft-pricing-grid,
+.ft-times-grid {
+  display: grid;
+  gap: var(--ft-gutter);
+}
+
+.ft-bento-grid {
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.ft-card-span-8 {
+  grid-column: span 12;
+}
+
+@media (min-width: 1024px) {
+  .ft-card-span-8 {
+    grid-column: span 8;
+  }
+}
+
+.ft-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.ft-icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.ft-icon-circle .material-symbols-outlined {
+  font-size: 32px;
+}
+
+.ft-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .ft-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ft-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.ft-info-icon {
+  color: var(--ft-primary);
+}
+
+.ft-info-value {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ft-primary);
+}
+
+.ft-info-value a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ft-times-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .ft-times-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ft-time-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+.ft-time-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.ft-icon-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ft-time-card:hover .ft-icon-tile {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.ft-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ft-secondary);
+  cursor: pointer;
+}
+
+.ft-icon-btn:hover {
+  color: var(--ft-primary);
+  background: var(--ft-surface-container-low);
+}
+
+.ft-time-card-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.ft-time-card-desc {
+  margin: 0 0 auto;
+  color: var(--ft-secondary);
+}
+
+.ft-time-card-value {
+  margin-top: 32px;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ft-primary);
+}
+
+.ft-pricing-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .ft-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ft-pricing-card-head {
+  margin-bottom: 24px;
+}
+
+.ft-pricing-card-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ft-price-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.ft-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ft-surface-container);
+}
+
+.ft-price-row:last-child {
+  border-bottom: none;
+}
+
+.ft-price-label {
+  color: var(--ft-secondary);
+}
+
+.ft-price-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ft-primary);
+}
+
+.ft-wakeup-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ft-gutter);
+}
+
+@media (min-width: 1024px) {
+  .ft-wakeup-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.ft-wakeup-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .ft-wakeup-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ft-wakeup-call-card.is-overdue {
+  border-left: 4px solid var(--ft-error);
+}
+
+.ft-wakeup-call-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.ft-label-caps.is-error {
+  color: var(--ft-error);
+}
+
+.ft-wakeup-time {
+  margin: 8px 0 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ft-wakeup-call-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ft-wakeup-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ft-wakeup-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ft-wakeup-summary-value {
+  margin: 8px 0 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ft-on-primary);
+}
+
+.ft-stat-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ft-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ft-surface-container);
+  color: var(--ft-secondary);
+}
+
+.ft-stat-row strong {
+  color: var(--ft-primary);
+}
+
+.ft-handover-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ft-gutter);
+}
+
+@media (min-width: 1024px) {
+  .ft-handover-layout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+.ft-handover-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ft-handover-daily {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ft-date-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 12px;
+  background: var(--ft-surface-container-low);
+  font-family: inherit;
+}
+
+.ft-handover-preview p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ft-on-surface-variant);
+}
+
+.ft-muted {
+  color: var(--ft-secondary);
+  font-size: 14px;
+}
+
+.ft-btn-primary,
+.ft-btn-outline,
+.ft-btn-ghost,
+.ft-btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.ft-btn-full {
+  width: 100%;
+}
+
+.ft-btn-primary {
+  border: none;
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+.ft-btn-outline {
+  border: 2px solid var(--ft-primary);
+  background: transparent;
+  color: var(--ft-primary);
+}
+
+.ft-btn-ghost {
+  border: none;
+  background: var(--ft-surface-container-low);
+  color: var(--ft-primary);
+}
+
+.ft-btn-ghost-dark {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: var(--ft-on-primary);
+}
+
+.ft-btn-pill {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ft-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--ft-surface-container);
+  color: var(--ft-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ft-pill-dark {
+  background: var(--ft-primary);
+  color: var(--ft-on-primary);
+}
+
+/* Hub (mobile operations) */
+.ft-hub-page .ft-hub-header {
+  margin-bottom: 8px;
+}
+
+.ft-hub-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ft-hub-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ft-hub-lines,
+.ft-hub-wakeup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.ft-hub-line,
+.ft-hub-wakeup-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.ft-hub-wakeup-item strong {
+  margin-left: auto;
+}
+
+.ft-hub-schedule-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.ft-hub-schedule-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ft-hub-schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ft-hub-schedule-row span {
+  opacity: 0.7;
+}
+
+.ft-hub-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: 16px 0;
+}
+
+.ft-hub-pricing-label,
+.ft-hub-price-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.ft-hub-pricing-label {
+  justify-content: flex-start;
+  color: var(--ft-secondary);
+  margin-bottom: 12px;
+}
+
+.ft-hub-handover-preview {
+  margin: 12px 0;
+  font-size: 14px;
+  color: var(--ft-secondary);
+  font-style: italic;
+}
+
+/* Team handover inside frotask panels */
+.frotask-app .team-handover-sidebar-card {
+  padding: 24px;
+}
+
+.frotask-app .team-handover-form-row button {
+  background: var(--ft-primary);
+  border-radius: 999px;
+}
+
+.frotask-app .team-handover-card {
+  border: 1px solid var(--ft-outline-variant);
+  border-radius: 16px;
+  background: var(--ft-surface);
+}
+
+/* Mobile bottom nav */
+.ft-mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .ft-mobile-bottom-nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ft-outline-variant);
+    background: var(--ft-surface-container-lowest);
+  }
+
+  .ft-mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    color: var(--ft-secondary);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .ft-mobile-nav-item.is-active {
+    color: var(--ft-primary);
+    font-weight: 700;
+  }
+
+  .ft-mobile-nav-item.is-active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .frotask-main {
+    padding-bottom: 72px;
+  }
+
+  .frotask-fab-stack {
+    display: none;
+  }
+
+  .app-shift-selector-top {
+    display: none;
+  }
+
+  .app-top-bar-header-actions .ft-top-link,
+  .app-top-bar-header-actions .ft-user-pill {
+    display: none;
+  }
+
+  .app-top-bar-title {
+    font-size: 16px;
+  }
+}
